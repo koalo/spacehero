@@ -1,13 +1,13 @@
 CC=gcc 
 CFLAGS+=-Wall -Wextra
-CFLAGS+=`sdl-config --cflags` --save-temps
+CFLAGS+=`sdl-config --cflags`
 LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs`
 
 #CFLAGS+=-ftree-vectorize
 #CFLAGS+=-funroll-all-loops
 
 # Vollbild
-CFLAGS+=-DFULLSCREEN
+#CFLAGS+=-DFULLSCREEN
 
 # langsam aber ansi
 #CFLAGS+=-ansi -pedantic
