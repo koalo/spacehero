@@ -1,0 +1,26 @@
+Jemand hat einen komischen Bildschirm (Loesung - man sieht trotzdem was!) 
+Wie gross muss das Array maximal sein? (Berechnung aus galaxy.c Konstanten!!!) alternativ dynamische speicherallozierzung
+  *INstars = (skymass *) realloc(*INstars, sizeof(skymass) * (starsAmount + *starsSize));
+  stars = &(*INstars)[*starsSize];
+
+Galaxie zu schwer (Orbits, Arbeitsspeciehr)
+zu leicht!!
+
+Werden alle Sterne angezeigt?
+StarsAmount manuell
+
+Konstanten mit Sternenanzahl - stuerzt ab!!
+
+valgrind --leak-check=full ./spacehero
+
+mauszeiger unsichtbar beim intro und evtl. schwarzes loch beim setzen
+
+Gewinn auch moeglich wenn weg -> exists wurde beim Sieg nicht abgefragt
+
+Galaxienmittelpunkte wirken nicht -> wirken eingeschaltet und schwerer
+
+Mehr als zwei bewegen sich nicht -> bewegung hieng von konstante ab
+
+Zu viele Objekte in Level geht nicht 
+
+Mausmasse wird zurueckgesetzt, das nervt -> ausbauen
