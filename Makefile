@@ -14,20 +14,23 @@ LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs`
 
 # schnell aber nicht ansi
 CFLAGS+=-DFAST -DBETTER --std=gnu99
-#CFLAGS+=-march=pentium4 -mfpmath=sse,387 -ffast-math
-# laesst Galaxien stocken
-#CFLAGS+=-Os
+CFLAGS+=-O3
 
-# ca. Geschwindigkeiten:
-# ohne alles: 5.95
-# mit FAST: 5.00
-# mit BETTER: 3.87
-# mit FAST und BETTER: 3.16
+#CFLAGS+=-march=pentium4 -mfpmath=sse,387 -ffast-math
 
 #CFLAGS+=-pg
 #LDFLAGS+=-pg
 
-spacehero: displaySpacehero.o displayAbstract.o galaxy.o game.o spacehero.o buttons.o glprint.o levelladen.o
+SRC=displaySpacehero.c displayAbstract.c galaxy.c game.c spacehero.c buttons.c glprint.c levelladen.c
+OBJS=$(SRC:.c=.o)
+
+spacehero: $(OBJS)
 
 clean:
-	rm -f spacehero displaySpacehero.o displayAbstract.o galaxy.o game.o spacehero.o buttons.o glprint.o levelladen.o
+	rm -f spacehero $(OBJS)
+	rm -f .depend
+
+.depend:
+	$(CC) $(CFLAGS) -E -MM $(SRC) > .depend
+
+include .depend
