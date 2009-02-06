@@ -1,5 +1,6 @@
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=`sdl-config --cflags`
+CXXFLAGS+=-g
 LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lboost_filesystem-mt
 
 #CFLAGS+=-ftree-vectorize
@@ -30,6 +31,9 @@ spacehero: $(OBJS)
 clean:
 	rm -f spacehero $(OBJS)
 	rm -f .depend
+
+dist:
+	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > spacehero.tgz
 
 .depend: $(SRC)
 	$(CXX) $(CXXFLAGS) -E -MM $(SRC) > .depend
