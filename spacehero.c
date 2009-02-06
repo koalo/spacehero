@@ -1,25 +1,12 @@
 #include "spacehero.h"
 
-#include "displayAbstract.h"
-#include "displaySpacehero.h"
-#include <unistd.h>
-#include <time.h>
-#include "galaxy.h"
-#include "game.h"
-
-#define VORN 300
-#define SPEED 0
-
-#define LEVEL 3
-
 void intro(GLdisplay *display)
 {
   Universe uni;
   Kamera cam;
-  int simulationTime, i, j;
+  int simulationTime, j;
   int clocktime;
   float diff, herotime;
-  skymass newstar;
 
   double scale;
 
@@ -78,11 +65,16 @@ void intro(GLdisplay *display)
     /* Fenster und Tiefenbuffer loeschen */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-/*   if(simulationTime > 500)
+    if(simulationTime > 500)
     {
       for(j = 0; j < 8; j++) uni.stars[(int)((rand() / (RAND_MAX + 1.0))*uni.starsSize)].vz = (10e8*(rand() / (RAND_MAX + 1.0)))+2e8;
     }
-  */  
+    
+    if(simulationTime == 570)
+    {
+      uni.galaxies[0].exists = 0;
+    }
+    
     /* Universum zeichnen */ 
     if(simulationTime > 4)
     {
@@ -148,16 +140,6 @@ int main(int argc, char *argv[])
   
   exitApp(&display);
   return 0;
-}
-
-void displayMenu()
-{
-
-}
-
-void gameOver(int level, int score)
-{
-
 }
 
 

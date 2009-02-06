@@ -1,3 +1,7 @@
+/** @file local.h
+ * @brief Globale Konstanten und Strukturen.
+ */
+
 #ifndef LOCAL_H
 #define LOCAL_H
 

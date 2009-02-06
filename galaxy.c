@@ -1,15 +1,4 @@
 #include "galaxy.h"
-#include "local.h"
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-
-#define R_MIN_CENTER 0.02
-#define R_MIN 0.0005
-#define A 200
-#define M 5
-
-#define ORBITS_MAX 130
 
 #ifdef BETTER
 #ifdef FAST
@@ -162,7 +151,7 @@ void eventHorizon(skymass stars[], int starsSize, skymass holes[], int holesSize
 
 void move(skymass galaxies[], int galaxiesSize, skymass holes[], int holesSize, skymass stars[], int starsSize, int time)
 {
-  int sum, i, j, k, teiler;/* half, full, max;
+  int i, j, k, teiler;/* half, full, max;
   
   full = ((starsSize+1)*starsSize)/2;
   half = full/2;
@@ -177,6 +166,8 @@ void move(skymass galaxies[], int galaxiesSize, skymass holes[], int holesSize, 
   }
 
   for(i = 0; sum < max; sum+=i++)*/
+
+time = 5; /* nur Unsinn */
 
 teiler = 1;
 /*
@@ -256,17 +247,12 @@ if(time%teiler == 0)
 
 void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize)
 {
-  skymass center, star;
+  skymass star;
   double Stars_Angle;
   double R_Array[ORBITS_MAX],
-         Orbit_Velocity[ORBITS_MAX], Orbit_Accelerate[ORBITS_MAX], 
-         mass1, mass2, first_angle, 
-         a_newtonOUT_x, a_newtonOUT_y, 
-         a_newtonIN_x, a_newtonIN_y, 
-         abstandOUT_x, abstandOUT_y, abstandOUT,
-         abstandIN_x, abstandIN_y, abstandIN;
-
-  int orbits1, i , j, k, a, s, Stars_Amount[ORBITS_MAX], starsAmount, starsAmountOrbit, realstarsAmount;
+         Orbit_Velocity[ORBITS_MAX], first_angle;
+         
+  int orbits1, i , j, s, Stars_Amount[ORBITS_MAX], starsAmount, starsAmountOrbit, realstarsAmount;
   skymass *stars;
 
 /* Zufaellige Mittelpunkt fuer Galaxy festlegen */

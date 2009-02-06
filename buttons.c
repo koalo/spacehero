@@ -1,5 +1,4 @@
 #include "buttons.h"
-#include "local.h"
 
 void clearStatus(BStatus *state)
 {

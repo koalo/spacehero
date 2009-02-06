@@ -1,13 +1,7 @@
 #include "game.h"
-#include "displayAbstract.h"
-#include "displaySpacehero.h"
-#include <unistd.h>
-#include <time.h>
-#include "galaxy.h"
-#include "levelladen.h"
 
 /* laed ein Level */
-void loadLevel(int level, skymass galaxies[], int *galaxiesSize, skymass holes[], int *holesSize, skygoal *goal)
+/*void loadLevel(int level, skymass galaxies[], int *galaxiesSize, skymass holes[], int *holesSize, skygoal *goal)
 {
   holes[0].x = 0.2;
   holes[0].y = 0.8;
@@ -70,13 +64,13 @@ void loadLevel(int level, skymass galaxies[], int *galaxiesSize, skymass holes[]
   goal->y = 0.6;
   goal->z = 0;
   goal->r = 0.1;
-}
+}*/
 
 void startRound(GLdisplay *display, char *level)
 {
   Universe uni, paruni;
   Kamera cam;
-  int win, simulationTime, i;
+  int win, simulationTime, i, first;
   int clocktime;
   float diff;
 
@@ -89,8 +83,9 @@ void startRound(GLdisplay *display, char *level)
   levelladen(level, uni.galaxies, &uni.galaxiesSize, uni.holes, &uni.holesSize, &uni.goal);
   BUT_mediumHole(&display->state);
 
-  /* Solange nicht beendet wurde, oder das Level geschafft */
+  /* Solange nicht beendet wurde, oder das Level geschafft */  
   win = 0;
+  first = 1;
   while(win == 0)
   {
     /* Galaxie erzeugen */
@@ -107,6 +102,12 @@ void startRound(GLdisplay *display, char *level)
     drawPut( display, &uni );
 
     /* so lange bis jemand die Simulation startet */
+    if(first)
+    {
+      first = 0;
+      continue;
+    }
+    
     while( !(display->state.startSimulation || display->state.exit) )
     { 
       handleEvents( display, PUT, &uni );
@@ -224,4 +225,3 @@ void startRound(GLdisplay *display, char *level)
     if(display->state.exit) break;
   }
 }
-

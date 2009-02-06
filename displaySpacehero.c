@@ -1,9 +1,4 @@
 #include "displaySpacehero.h"
-
-#define TEXTSPACE 15
-#define TEXTR 0.0f
-#define TEXTG 1.0f
-#define TEXTB 0.0f
   
 #ifdef FAST
 static inline 
@@ -229,8 +224,8 @@ void alignSimulButtons(GLdisplay *display)
 void drawBridge(GLdisplay *display, Universe *uni, int projection, int time)
 {
   double center;
-  int mrx, mry, y, curse, i;
-  double mrangle;
+  int mrx, mry, y, i;
+  double mrangle, curse;
   double width, height;
 
   /* Bildschirm loeschen */
@@ -272,7 +267,13 @@ void drawBridge(GLdisplay *display, Universe *uni, int projection, int time)
   glPrint( display, TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
   for(i = 0; i < uni->galaxiesSize; i++)
   {
-    glPrint( display, TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni->galaxies[0].mass,(int)round((-atan2(uni->galaxies[i].vy,uni->galaxies[i].vx)-0.5*M_PI)*(360/(2*M_PI))));
+    if(uni->galaxies[i].exists)
+    {
+      curse = atan2(uni->galaxies[i].vx,-uni->galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
+      curse = (curse < 0)?curse+2*M_PI:curse;
+      curse = curse*(180/M_PI);
+      glPrint( display, TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni->galaxies[0].mass,(int)round(curse));
+    }
   }
  /* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
 /*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
@@ -334,11 +335,12 @@ void drawPut(GLdisplay *display, Universe *uni)
 void drawSimulation( GLdisplay *display, Universe *uni, Kamera *cam, int time )
 {
   drawBridge(display, uni, PERSPECTIVE, time);
+  cam->rx = 0; /* nur Unsinn */
 }
 
 void handleEvents(GLdisplay *display, int part, Universe *uni)
 {
-  int i, j, run, delete;
+  int i, j, delete;
 
   GLdouble modelMatrix[16];
   GLdouble projMatrix[16];

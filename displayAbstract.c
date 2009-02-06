@@ -10,21 +10,20 @@ int LoadGLTextures(GLuint texture[])
   /* Textur einladen */
   if( (TextureImage[0] = SDL_LoadBMP( "data/star.bmp" )) &&
       (TextureImage[1] = SDL_LoadBMP( "data/hole.bmp" )) &&
-      (TextureImage[2] = SDL_LoadBMP( "data/background.bmp" )) &&
-      (TextureImage[3] = SDL_LoadBMP( "data/black.bmp" )) &&
-      (TextureImage[4] = SDL_LoadBMP( "data/goal.bmp" ))  &&
-      (TextureImage[5] = SDL_LoadBMP( "data/panel_MASS.bmp" ))  &&
-      (TextureImage[6] = SDL_LoadBMP( "data/panel_TIME.bmp" ))  &&
-      (TextureImage[7] = SDL_LoadBMP( "data/green.bmp" ))  &&
-      (TextureImage[8] = SDL_LoadBMP( "data/button_start.bmp" )) &&
-      (TextureImage[9] = SDL_LoadBMP( "data/button_stop.bmp" )) &&
-      (TextureImage[10] = SDL_LoadBMP( "data/button_replay.bmp" )) &&
-      (TextureImage[11] = SDL_LoadBMP( "data/x.bmp" )) &&
-      (TextureImage[12] = SDL_LoadBMP( "data/spacehero.bmp" )) &&
-      (TextureImage[13] = SDL_LoadBMP( "data/bulge.bmp" )) &&
-      (TextureImage[14] = SDL_LoadBMP( "data/accomplished.bmp" )) &&
-      (TextureImage[15] = SDL_LoadBMP( "data/timesup.bmp" )) &&
-      (TextureImage[16] = SDL_LoadBMP( "data/red.bmp" )) )
+      (TextureImage[2] = SDL_LoadBMP( "data/black.bmp" )) &&
+      (TextureImage[3] = SDL_LoadBMP( "data/goal.bmp" ))  &&
+      (TextureImage[4] = SDL_LoadBMP( "data/panel_MASS.bmp" ))  &&
+      (TextureImage[5] = SDL_LoadBMP( "data/panel_TIME.bmp" ))  &&
+      (TextureImage[6] = SDL_LoadBMP( "data/green.bmp" ))  &&
+      (TextureImage[7] = SDL_LoadBMP( "data/button_start.bmp" )) &&
+      (TextureImage[8] = SDL_LoadBMP( "data/button_stop.bmp" )) &&
+      (TextureImage[9] = SDL_LoadBMP( "data/button_replay.bmp" )) &&
+      (TextureImage[10] = SDL_LoadBMP( "data/x.bmp" )) &&
+      (TextureImage[11] = SDL_LoadBMP( "data/spacehero.bmp" )) &&
+      (TextureImage[12] = SDL_LoadBMP( "data/bulge.bmp" )) &&
+      (TextureImage[13] = SDL_LoadBMP( "data/accomplished.bmp" )) &&
+      (TextureImage[14] = SDL_LoadBMP( "data/timesup.bmp" )) &&
+      (TextureImage[15] = SDL_LoadBMP( "data/red.bmp" )) )
   {
     success = 1;
 
@@ -130,7 +129,7 @@ void initDisplay(GLdisplay *display)
   /* Textur laden */
   if (!LoadGLTextures(display->texture))
   {
-    fprintf( stderr, "Textur konnte nicht geladen werden\n" );   
+    fprintf( stderr, "Textur konnte nicht geladen werden\n" );
   }
 
   /* Font einladen */

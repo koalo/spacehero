@@ -1,11 +1,5 @@
 #include "levelladen.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "local.h"
-
-
 int levelladen(char *indateiname, skymass galaxies[], int *galaxiesSize, skymass holes[], int *holesSize, skygoal *goal)
 {
   FILE *stream;
