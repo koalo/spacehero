@@ -449,6 +449,8 @@ void Universe::alignPutButtons(GLdisplay &display)
 #undef TEXTURE
 }
 
+#include <locale>
+
 int Universe::levelladen(std::ifstream &level)
 {
 	int i=0, k=0;
@@ -461,20 +463,26 @@ int Universe::levelladen(std::ifstream &level)
 	    printf("\nWelches Level möchten sie laden?\n");
 	    printf("(Bsp.: level1.txt)\n");
 	    scanf("%s", &dateiname[6]);*/
-
+	//level.exceptions(std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit);
+	
 	level >> goal.x;
 	level >> goal.y;
 	level >> goal.z;
 	level >> goal.r;
 
-	while(!level.eof())
+	std::cerr << "goal: geladen" << std::endl;
+	while(level.good())
 	{
 		char typ;
 		skymass body;
 		body.inLevel = 1;
 		body.exists = 1;
 
-		level >> typ >> body.x>> body.y>> body.z>> body.vx>> body.vy>> body.vz>> body.mass;
+		level >> typ ;
+	std::cerr << typ << ": laden:" << std::endl;
+		level >> body.x>> body.y>> body.z>> body.vx>> body.vy>> body.vz>> body.mass;
+
+
 
 		if(typ == 'G')
 		{

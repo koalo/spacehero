@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
 
 			for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) 
 			{
-				std::cerr << itr->path().filename() << std::endl;
-				std::ifstream level(itr->path().filename().c_str());
-				display.startRound(level);
+				std::cerr << "trying to load level: " << itr->path() << std::endl;
+				std::ifstream level(itr->path().string().c_str());
+				if(level) display.startRound(level);
 			}
 		}
 	}
