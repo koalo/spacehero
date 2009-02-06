@@ -28,6 +28,9 @@
 #define MAX_LEVEL_HOLES 50
 #define MAX_STARS 2000
 
+#define ORTHOGONAL 56345
+#define PERSPECTIVE 34523
+
 #define HOLESMALLMASS 8e11
 #define HOLEMEDIUMMASS HOLESMALLMASS*3
 #define HOLELARGEMASS HOLESMALLMASS*5
@@ -39,34 +42,7 @@
 #define STARSIZE 0.0028f
 #define HOLESIZE 0.018f
 
-typedef struct
-{
-  double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-  double vx, vy, vz; /* in m/s */
-  double fx, fy, fz; /* Kraft in Newton auf den Koerper */
-  double mass; /* in Sonnenmassen */
-  int inLevel; /* ob das Objekt durch das Level vorgegeben ist */
-  int exists;
-  int nograv;
-} skymass;
-
-typedef struct
-{
-  double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-  double r; /* Radius */  
-} skygoal;
-
-typedef struct
-{
-  skygoal goal;
-  skymass holes[MAX_LEVEL_HOLES+MAX_PUT_HOLES];
-  skymass galaxies[MAX_GALAXIES];
-  skymass *stars;
-  int holesSize;
-  int galaxiesSize;
-  int starsSize;
-  double massreserve;
-} Universe;
-
+#define VORN 300
+#define SPEED 0
 #endif
 

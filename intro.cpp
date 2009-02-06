@@ -1,6 +1,11 @@
-#include "spacehero.h"
+#include "Universe.h"
+#include "intro.h"
+#include "handleEvents.h"
+#include "displayUniverse.h"
 
-void intro(GLdisplay *display)
+#include "local.h"
+
+void intro(GLdisplay &display)
 {
   Universe uni;
   Kamera cam;
@@ -54,13 +59,13 @@ void intro(GLdisplay *display)
   cam.rx = cam.ry = cam.rz = 0;
 
   /* bis die Zeit abgelaufen ist, oder Ziel erreicht */
-  display->state.breakIntro = 0;
+  display.state.m_breakIntro = 0;
   for(simulationTime = 1; simulationTime < 1200; simulationTime++)
   {
     clocktime = clock();
     cam.rx = 30;
 
-    move(uni.galaxies, uni.galaxiesSize, uni.holes, uni.holesSize, uni.stars, uni.starsSize, simulationTime);
+    uni.move(simulationTime);
  
     /* Fenster und Tiefenbuffer loeschen */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -78,21 +83,21 @@ void intro(GLdisplay *display)
     /* Universum zeichnen */ 
     if(simulationTime > 4)
     {
-      displayUniverse(display, &uni, PERSPECTIVE, display->width, display->height);
+      displayUniverse(display, uni, PERSPECTIVE,display.width,display.height);
       scale = 0.9;
       herotime = 1.0-exp(-(simulationTime-600)*0.005);
       herotime = (herotime > 0)?herotime:0;
       herotime = (herotime < scale)?herotime:scale;
       
-      putImage( IMG_SPACEHERO, 0.5-scale*herotime/2, 0.5-(scale*(186.0/634.0)*herotime)/2.0, scale*herotime, scale*(186.0/634.0)*herotime, display );
+      display.putImage( GLdisplay::IMG_SPACEHERO, 0.5-scale*herotime/2, 0.5-(scale*(186.0/634.0)*herotime)/2.0, scale*herotime, scale*(186.0/634.0)*herotime );
     }
 
     /* Versteckten Buffer aktivieren */
     SDL_GL_SwapBuffers();
  
-    handleEvents( display, 457645, &uni );
+    handleEvents( display, 457645, uni );
      
-    if(display->state.breakIntro) break;
+    if(display.state.m_breakIntro) break;
 
     /* etwas warten... */
     diff = TIMESTEP-((float)(clock()-clocktime)/CLOCKS_PER_SEC);
@@ -101,45 +106,6 @@ void intro(GLdisplay *display)
   }
 
   free(uni.stars);
-}
-
-
-int main(int argc, char *argv[])
-{ 
-  GLdisplay display;
-  char levelString[50];
-  int rlevel = -1, altrlevel;
-
-  /* Fenster initialisieren */
-  initDisplay(&display);
-
-  /* Zufall starten */
-  srand((unsigned int) time(NULL));
-
-  SDL_ShowCursor(SDL_DISABLE);
-  intro(&display);
-  SDL_ShowCursor(SDL_ENABLE);
-
-  do
-  {
-    if(argc == 1)
-    {
-      altrlevel = rlevel;
-      do
-      {
-        rlevel = (int)((rand() / (RAND_MAX + 1.0))*LEVEL)+1;
-      } while(rlevel == altrlevel);
-      
-      sprintf(levelString,"level%i",rlevel);
-    } else {
-      strcpy(levelString,argv[1]);
-    }
-  
-    startRound(&display,levelString);
-  } while(rlevel != -1 && !display.state.exit);
-  
-  exitApp(&display);
-  return 0;
 }
 
 

@@ -12,8 +12,6 @@
 #include "galaxy.h"
 #include "game.h"
 
-#define VORN 300
-#define SPEED 0
 
 #define LEVEL 4
 
