@@ -7,6 +7,7 @@ using namespace boost::filesystem;
 #include <stdlib.h>
 
 #include "GLdisplay.h"
+#include "Universe.h"
 #include "intro.h"
 
 int main(int argc, char *argv[])
@@ -21,20 +22,29 @@ int main(int argc, char *argv[])
 		if (is_directory(levels) ) {
 			std::cerr << "level dir found" << std::endl;
 
-			intro(display);
+			//intro(display);
 			std::cerr << "intro done" << std::endl;
 
 			for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) {
 				std::cerr << "trying to load level: " << itr->path() << std::endl;
 				std::ifstream level(itr->path().string().c_str());
-				if(level) display.startRound(level);
+				if(level) {
+					Level l(level);
+					Universe u(l);
+					if(!u.play(display)) break;
+				}
 			}
 		}
 	} else {
 		std::ifstream level(argv[1]);
-		display.startRound(level);
+		Level l(level);
+		std::cerr << l << std::endl;
+		Universe u(l);
+		u.play(display);
 
 	}
+
+
 
 	return 0;
 }

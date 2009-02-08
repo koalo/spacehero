@@ -5,6 +5,7 @@
 #ifndef SPACEHERO_H
 #define SPACEHERO_H
 
+#if 0
 #include "displayAbstract.h"
 #include "displaySpacehero.h"
 #include <unistd.h>
@@ -26,4 +27,5 @@ void intro(GLdisplay *display);
   */
 int main(int argc, char *argv[]);
 
+#endif
 #endif

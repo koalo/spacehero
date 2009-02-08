@@ -1,3 +1,4 @@
+#if 0
 #include "Universe.h"
 #include "intro.h"
 #include "handleEvents.h"
@@ -109,3 +110,4 @@ void intro(GLdisplay &display)
 }
 
 
+#endif

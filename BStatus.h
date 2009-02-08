@@ -2,6 +2,7 @@
 #ifndef _BUTTONS_H_
 #define _BUTTONS_H_
 
+#if 0
 class BStatus
 {
 	public:
@@ -26,4 +27,5 @@ class BStatus
 	static void exit(BStatus &);
 };
 
+#endif
 #endif

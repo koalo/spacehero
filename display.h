@@ -2,6 +2,7 @@
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
 
+#if 0
 #define PUT 3463
 #define SIMULATION 46584
 
@@ -29,4 +30,5 @@
 #define TEXTG 1.0f
 #define TEXTB 0.0f
 
+#endif
 #endif

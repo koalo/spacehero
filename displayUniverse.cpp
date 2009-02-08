@@ -1,3 +1,4 @@
+#if 0
 #include "displayUniverse.h"
 #include "display.h"
 
@@ -153,3 +154,4 @@ glPopMatrix();
 
   glDisable(GL_LIGHT1);
 }
+#endif

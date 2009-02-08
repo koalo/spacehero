@@ -1,3 +1,4 @@
+#if 0
 #include "GLdisplay.h"
 #include "handleEvents.h"
 #include "Universe.h"
@@ -18,7 +19,7 @@ void GLdisplay::startRound(std::ifstream &level)
   uni.massreserve = MAXSTARTRESERVE;
   
   /* Level laden */
-  uni.levelladen(level);
+  // TODO uni.levelladen(level);
   state.mediumHole(this->state);
 
   /* Solange nicht beendet wurde, oder das Level geschafft */  
@@ -496,3 +497,4 @@ GLvoid GLdisplay::glPrint(float red, float green, float blue, float x, float y, 
   glColor3f(1,1,1);
 }
 
+#endif

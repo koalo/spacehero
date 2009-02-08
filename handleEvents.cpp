@@ -1,4 +1,4 @@
-
+#if 0
 #include "handleEvents.h"
 #include "display.h"
 
@@ -134,3 +134,4 @@ void handleEvents(GLdisplay &display, int part, Universe &uni)
     }
   }
 }
+#endif

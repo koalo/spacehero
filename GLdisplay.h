@@ -1,6 +1,13 @@
 #ifndef _GLDISPLAY_H_
 #define _GLDISPLAY_H_
 
+class GLdisplay
+{
+
+};
+
+#if 0
+
 class GLdisplay;
 class Kamera;
 class Button;
@@ -113,4 +120,5 @@ class GLdisplay
 
 
 
+#endif
 #endif

@@ -1,6 +1,7 @@
 #include "BStatus.h"
 #include "local.h"
 
+#if 0
 void BStatus::clearStatus()
 {
   m_startSimulation = 0;
@@ -49,3 +50,4 @@ void BStatus::exit(BStatus &state)
   state.m_exit = 1;
 }
 
+#endif

@@ -1,19 +1,151 @@
 #ifndef _UNIVERSE_H_
 #define _UNIVERSE_H_
 
-class Universe;
 #include <fstream>
+#include <iostream>
+#include <iterator>
 
 #include "GLdisplay.h"
 
-#include "local.h"
+#include <vector>
 
-#define R_MIN_CENTER 0.02
-#define R_MIN 0.0005
-#define A 200
-#define M 5
+class SkyObject {
+	protected:
+	double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
+public:
+	friend std::ostream& operator<< (std::ostream &o, const SkyObject &g) {
+		o << "SkyObject: " << std::endl;
+		o << "(x,y,z): " << g.x << " " << g.y << " " << g.z << std::endl;
+		return o;
+	}
+};
 
-#define ORBITS_MAX 130
+class SkyMass : public virtual SkyObject {
+	protected:
+	double fx, fy, fz; /* Kraft in Newton auf den Koerper */
+	double mass; /* in Sonnenmassen */
+public:
+	friend std::ostream& operator<< (std::ostream &o, const SkyMass &g) {
+		o << "SkyMass: " << std::endl;
+		o << "mass: " << g.mass << std::endl;
+		o << "(fx,fy,fz): " << g.fx << " " << g.fy << " " << g.fz << std::endl;
+		o << static_cast<SkyObject>(g) << std::endl;
+		return o;
+	}
+};
+
+class SkyMovableObject :public virtual  SkyObject {
+	protected:
+	double vx, vy, vz; /* in m/s */
+public:
+	friend std::ostream& operator<< (std::ostream &o, const SkyMovableObject &g) {
+		o << "SkyMovableObject: " << std::endl;
+		o << "(vx,vy,vz)" << g.vx << " " << g.vy << " " << g.vz << std::endl;
+		o << static_cast<SkyObject>(g) << std::endl;
+		return o;
+	}
+};
+
+class Goal : public virtual SkyObject {
+	protected:
+	double radius;
+public:
+	Goal() {};
+	Goal(std::ifstream &in) {
+		in >> x >> y >> z;
+	       	in >> radius;
+       	};
+	friend std::ostream& operator<< (std::ostream &o, const Goal &g) {
+		o << "Goal: " << std::endl;
+		o << "radius: " << g.radius << std::endl;
+		o << static_cast<SkyObject>(g) << std::endl;
+		return o;
+	}
+};
+
+class Blackhole : public virtual SkyMass {
+public:
+	Blackhole(std::ifstream &in) {
+		double t;
+	in >> x >> y >> z; 
+	in >> t >> t >> t; 
+	in >> mass; 
+	};
+	friend std::ostream& operator<< (std::ostream &o, const Blackhole &g) {
+		o << "Blackhole: " << std::endl;
+		o << static_cast<SkyMass>(g) << std::endl;
+		return o;
+	}
+};
+
+class Star : public virtual SkyMovableObject, public virtual SkyMass {
+public:
+	Star(double R, double phi, double theta, double v);
+	friend std::ostream& operator<< (std::ostream &o, const Star &g) {
+		o << "Star: " << std::endl;
+		o << static_cast<SkyMovableObject>(g) << std::endl;
+		o << static_cast<SkyMass>(g) << std::endl;
+		return o;
+	}
+};
+
+class Galaxy : public virtual SkyMovableObject, public virtual SkyMass {
+private:
+	static const int ORBITS_MAX = 130;
+	static const int R_MIN_CENTER = 0.02;
+	static const int R_MIN = 0.0005;
+	static const int A = 200;
+	static const int M = 5;
+
+public:
+	Galaxy(std::ifstream &in) {
+	in >> x >> y >> z; 
+	in >> vx >> vy >> vz; 
+	in >> mass; 
+	};
+
+	std::vector<Star> getStars(int seed);
+
+public:
+	friend std::ostream& operator<< (std::ostream &o, const Galaxy &g) {
+		o << "Galaxy: " << std::endl;
+		o << static_cast<SkyMovableObject>(g) << std::endl;
+		o << static_cast<SkyMass>(g) << std::endl;
+		return o;
+	}
+};
+
+class Level {
+protected:
+	std::vector<Blackhole> holes;
+	std::vector<Galaxy> galaxies;
+	Goal goal;
+	int seed;
+public:
+	Level(std::ifstream &in);
+
+
+
+public:
+	friend std::ostream& operator<< (std::ostream &o, const Level &l) {
+		o << l.goal << std::endl;
+		copy(l.holes.begin(),l.holes.end(),std::ostream_iterator<Blackhole>(o));
+		copy(l.galaxies.begin(),l.galaxies.end(),std::ostream_iterator<Galaxy>(o));
+		return o;
+	};
+};
+
+
+class Universe: public Level
+{
+	std::vector<Star> stars;
+public:
+	Universe(Level &l);
+	bool play(GLdisplay &d);
+
+};
+
+#if 0
 
 class skymass
 {
@@ -38,10 +170,10 @@ class skygoal
 		double r; /* Radius */  
 };
 
-void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
 
-class Universe
-{
+	public:
+		Universe() {};
+		//int levelladen(std::ifstream &level);
 	public:
 		skygoal goal;
 		skymass holes[MAX_LEVEL_HOLES+MAX_PUT_HOLES];
@@ -90,7 +222,6 @@ class Universe
 		void alignPutButtons(GLdisplay &display);
 
 	public:
-		int levelladen(std::ifstream &level);
 		void eventHorizon();
 	private:
 		inline void applyNewton(skymass* skymass1, skymass* skymass2, int teiler)
@@ -123,10 +254,15 @@ class Universe
 			/*  ((SUNGRAVTIMEWIDTH/r2)*skmass)*(AX/r)
 			    = (SUNGRAVTIMEWIDTH*skymass*AX)/r3*/
 		}
-
 };
 
+#include "local.h"
 
+
+
+
+void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
+#endif
 
 
 

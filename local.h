@@ -5,6 +5,7 @@
 #ifndef LOCAL_H
 #define LOCAL_H
 
+#if 0
 #define YEARINSECONDS 365*24*60*60
 #define TIMESCALE 1400000*YEARINSECONDS /* -> so viele Sekunden werden pro Schritt berechnet */
 #define TIMESTEP 0.02 /* Sekunden zwischen zwei Berechnungen */
@@ -45,4 +46,4 @@
 #define VORN 300
 #define SPEED 0
 #endif
-
+#endif

@@ -6,142 +6,51 @@
 
 #include "displayUniverse.h"
 
-skymass::skymass(const skymass& p):
-	x(p.x),y(p.y),z(p.z),
-	vx(p.vx),
-	vy(p.vy),
-	vz(p.vz),
-	fx(p.fx),
-	fy(p.fy),
-	fz(p.fz),
-	mass(p.mass),
-	inLevel(p.inLevel),
-	exists(p.exists),
-	nograv(p.nograv)
-{}
 
-void Universe::move(int time)
+Level::Level(std::ifstream &in)
 {
-	int i, j, k, teiler;/* half, full, max;
-
-			       full = ((starsSize+1)*starsSize)/2;
-			       half = full/2;
-
-			       if(time % 2)
-			       {
-			       sum = 0;
-			       max = half;
-			       } else {
-			       sum = half;
-			       max = full;
-			       }
-
-			       for(i = 0; sum < max; sum+=i++)*/
-
-	time = 5; /* nur Unsinn */
-
-	teiler = 1;
-	/*
-	   if(time%teiler == 0)
-	   {*/
-	for(i = 0; i < starsSize; i++)
-	{
-		if(stars[i].exists && stars[i].nograv != 1) 
-		{
-			/*      for(j = i+1; j < starsSize; j++)
-				{
-				if(stars[j].exists)
-				{
-				applyNewton(&stars[i], &stars[j], teiler);
-				}
-				}*/
-
-			for(k = 0; k < holesSize; k++)
-			{
-				applyNewton(&stars[i], &holes[k], teiler);
-			}
-
-			for(j = 0; j < galaxiesSize; j++)
-			{
-				applyNewton(&galaxies[j], &stars[i], teiler);
-			} 
+	goal = Goal(in);
+	while(in.good()) {
+		char c;
+		in >> c;
+		std::cerr << "Type: " << c << std::endl;
+		switch(c) {
+			case 'G': 
+				galaxies.push_back( Galaxy(in) );
+				break;
+			case 'H':
+				holes.push_back( Blackhole(in) );
+				break;
+			case 'S':
+				in >> seed;
+				break;
 		}
 	}
-
-	for(i = 0; i < galaxiesSize; i++)
-	{
-		for(k = 0; k < holesSize; k++)
-		{
-			applyNewton(&galaxies[i], &holes[k], teiler);
-		}    
-
-		for(k = i+1; k < galaxiesSize; k++)
-		{
-			if(galaxies[i].exists && galaxies[k].exists && galaxies[i].nograv != 1 && galaxies[k].nograv != 1)
-			{
-				applyNewton(&galaxies[i], &galaxies[k], teiler);
-			}
-		}
-	}
-
-
-
-
-	/*}*/
-
-	/* Bewegung fuer Sternen */
-	for(i = 0; i < starsSize; i++)
-	{
-		if(stars[i].exists)
-		{
-			stars[i].x += (stars[i].vx/WIDTHINMETERS)*TIMESCALE;
-			stars[i].y += (stars[i].vy/WIDTHINMETERS)*TIMESCALE;
-			stars[i].z += (stars[i].vz/WIDTHINMETERS)*TIMESCALE;
-		}
-	}
-
-	/* Bewegung fuer Koerper in MittelPunkte von Galaxien */
-	for(i = 0; i < galaxiesSize; i++)
-	{
-		galaxies[i].x += (galaxies[i].vx/WIDTHINMETERS)*TIMESCALE;
-		galaxies[i].y += (galaxies[i].vy/WIDTHINMETERS)*TIMESCALE;
-		galaxies[i].z += (galaxies[i].vz/WIDTHINMETERS)*TIMESCALE;
-	}
-
-	/* Bewegung von Black Holes */
-	/*for(i = 0; i < holesSize; i++)
-	  {
-	  holes[i].x += (holes[i].vx/WIDTHINMETERS)*TIMESCALE;
-	  holes[i].y += (holes[i].vy/WIDTHINMETERS)*TIMESCALE;
-	  }*/
 }
 
-void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize)
-{
+std::vector<Star> Galaxy::getStars(int seed) {
+#if 0
+	/*
 	skymass star;
 	double Stars_Angle;
 	double R_Array[ORBITS_MAX],
 	       Orbit_Velocity[ORBITS_MAX], first_angle;
+	       
 
 	int orbits1, i , j, s, Stars_Amount[ORBITS_MAX], starsAmount, starsAmountOrbit, realstarsAmount;
 	skymass *stars;
-
-	/* Zufaellige Mittelpunkt fuer Galaxy festlegen */
-	/*center.x = (double)((1.0/12) + ((3.0/12) * (rand() / (RAND_MAX + 1.0))));
-	  center.y = (double)((1.0/12) + ((10.0/12) * (rand() / (RAND_MAX + 1.0))));
-	 *galaxies = center;*/
-
-	/* Masse für jede Stern verteilen*/
+	*/
 
 	/* Anzahl von Orbits, von Masse abhaengig (Orbits MIN = 5, MAX = 15) */
-	orbits1 = (galaxy->mass * 2) / 4e10;
+	int orbits1 = (mass * 2) / 4e10;
 	if(orbits1 > ORBITS_MAX)
 	{
 		printf("Galaxie ist zu schwer!\n");
 		exit(1);
 	}
-	starsAmount = (galaxy->mass) / 4e8;
+	int starsAmount = (mass) / 4e8;
 
+	std::vector<double> R_Array(ORBITS_MAX);
 	/* R_Array[20] <- Array von Radius der Orbit fuer 2 Galaxien */
 	/* 1 Radius zufaellige Radius berechnen (incl. R_MIN_CENTER) */
 	R_Array[0] = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
@@ -156,26 +65,29 @@ void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize)
 
 	/*  starsAmountOrbit = starsAmount / orbits1;*/
 	/* das kann weg, brauch ich Stars_amount[i] nicht mehr*/
-	realstarsAmount = 0;
+	int realstarsAmount = 0;
+	std::vector<double> Stars_Amount(ORBITS_MAX);
 	for(i = 0; i < orbits1; i++)
 	{  
 		Stars_Amount[i] = starsAmount / (orbits1);
 		realstarsAmount += Stars_Amount[i];
 	}
 
-	starsAmountOrbit = starsAmount / orbits1;
+	int starsAmountOrbit = starsAmount / orbits1;
 
 	/* starsArrayGroesse festlegen */
 	/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+	/*
 	*INstars = (skymass*)realloc(*INstars, sizeof(skymass) * (realstarsAmount + *starsSize));
 	if(*INstars == NULL)
 	{
 		printf("Kein Arbeitsspeicher fuer die Sterne!\n");
 		exit(1);
 	}
-
 	stars = &(*INstars)[*starsSize];
+	*/
+
 
 	/* X, Y Koordiante fuer jede Stern ausrechnen */
 
@@ -189,6 +101,8 @@ void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize)
 	 */
 
 	/* fuer Galaxy1 */
+
+	std::vector<Star> stars(realstarsAmount);
 
 	s = -1;
 	for(i = 0; i < orbits1; i++)
@@ -303,6 +217,144 @@ void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize)
 
 	}
 }
+#endif
+}
+
+Universe::Universe(Level &l) :
+	Level(l)
+{
+	for(std::vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
+		std::vector<Star> gstars = i->getStars(seed);
+		copy(gstars.begin(),gstars.end(),back_inserter(stars));
+	}
+}
+
+/**
+ * @return false on close
+ */
+bool Universe::play(GLdisplay &disp) 
+{
+
+	return true;
+}
+
+
+#if 0
+
+
+
+
+skymass::skymass(const skymass& p):
+	x(p.x),y(p.y),z(p.z),
+	vx(p.vx),
+	vy(p.vy),
+	vz(p.vz),
+	fx(p.fx),
+	fy(p.fy),
+	fz(p.fz),
+	mass(p.mass),
+	inLevel(p.inLevel),
+	exists(p.exists),
+	nograv(p.nograv)
+{}
+
+
+void Universe::move(int time)
+{
+	int i, j, k, teiler;/* half, full, max;
+
+			       full = ((starsSize+1)*starsSize)/2;
+			       half = full/2;
+
+			       if(time % 2)
+			       {
+			       sum = 0;
+			       max = half;
+			       } else {
+			       sum = half;
+			       max = full;
+			       }
+
+			       for(i = 0; sum < max; sum+=i++)*/
+
+	time = 5; /* nur Unsinn */
+
+	teiler = 1;
+	/*
+	   if(time%teiler == 0)
+	   {*/
+	for(i = 0; i < starsSize; i++)
+	{
+		if(stars[i].exists && stars[i].nograv != 1) 
+		{
+			/*      for(j = i+1; j < starsSize; j++)
+				{
+				if(stars[j].exists)
+				{
+				applyNewton(&stars[i], &stars[j], teiler);
+				}
+				}*/
+
+			for(k = 0; k < holesSize; k++)
+			{
+				applyNewton(&stars[i], &holes[k], teiler);
+			}
+
+			for(j = 0; j < galaxiesSize; j++)
+			{
+				applyNewton(&galaxies[j], &stars[i], teiler);
+			} 
+		}
+	}
+
+	for(i = 0; i < galaxiesSize; i++)
+	{
+		for(k = 0; k < holesSize; k++)
+		{
+			applyNewton(&galaxies[i], &holes[k], teiler);
+		}    
+
+		for(k = i+1; k < galaxiesSize; k++)
+		{
+			if(galaxies[i].exists && galaxies[k].exists && galaxies[i].nograv != 1 && galaxies[k].nograv != 1)
+			{
+				applyNewton(&galaxies[i], &galaxies[k], teiler);
+			}
+		}
+	}
+
+
+
+
+	/*}*/
+
+	/* Bewegung fuer Sternen */
+	for(i = 0; i < starsSize; i++)
+	{
+		if(stars[i].exists)
+		{
+			stars[i].x += (stars[i].vx/WIDTHINMETERS)*TIMESCALE;
+			stars[i].y += (stars[i].vy/WIDTHINMETERS)*TIMESCALE;
+			stars[i].z += (stars[i].vz/WIDTHINMETERS)*TIMESCALE;
+		}
+	}
+
+	/* Bewegung fuer Koerper in MittelPunkte von Galaxien */
+	for(i = 0; i < galaxiesSize; i++)
+	{
+		galaxies[i].x += (galaxies[i].vx/WIDTHINMETERS)*TIMESCALE;
+		galaxies[i].y += (galaxies[i].vy/WIDTHINMETERS)*TIMESCALE;
+		galaxies[i].z += (galaxies[i].vz/WIDTHINMETERS)*TIMESCALE;
+	}
+
+	/* Bewegung von Black Holes */
+	/*for(i = 0; i < holesSize; i++)
+	  {
+	  holes[i].x += (holes[i].vx/WIDTHINMETERS)*TIMESCALE;
+	  holes[i].y += (holes[i].vy/WIDTHINMETERS)*TIMESCALE;
+	  }*/
+}
+
 
 void Universe::drawBridge(GLdisplay &display, int projection, int time)
 {
@@ -449,61 +501,6 @@ void Universe::alignPutButtons(GLdisplay &display)
 #undef TEXTURE
 }
 
-#include <locale>
-
-int Universe::levelladen(std::ifstream &level)
-{
-	int i=0, k=0;
-
-
-	/*  printf("\n\t  L E V E L - P O O L");
-	    printf("\n\t (1)Level 1\n\n");
-	    printf("__________________________________\n");
-
-	    printf("\nWelches Level möchten sie laden?\n");
-	    printf("(Bsp.: level1.txt)\n");
-	    scanf("%s", &dateiname[6]);*/
-	//level.exceptions(std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit);
-	
-	level >> goal.x;
-	level >> goal.y;
-	level >> goal.z;
-	level >> goal.r;
-
-	std::cerr << "goal: geladen" << std::endl;
-	while(level.good())
-	{
-		char typ;
-		skymass body;
-		body.inLevel = 1;
-		body.exists = 1;
-
-		level >> typ ;
-	std::cerr << typ << ": laden:" << std::endl;
-		level >> body.x>> body.y>> body.z>> body.vx>> body.vy>> body.vz>> body.mass;
-
-
-
-		if(typ == 'G')
-		{
-			galaxies[i++] = body;
-		}
-		else if(typ == 'H')
-		{
-			holes[k++] = body;
-		}
-		/* else if(typ == 'Z')
-		   {
-		   goal[i] = body;
-		   }*/ 
-
-	}
-
-	galaxiesSize = i;
-	holesSize = k;
-
-	return 1;
-}
 
 void Universe::eventHorizon()
 {
@@ -550,3 +547,4 @@ void Universe::drawSimulation( GLdisplay &display, Kamera *cam, int time )
 	drawBridge(display, PERSPECTIVE, time);
 	cam->rx = 0; /* nur Unsinn */
 };
+#endif
