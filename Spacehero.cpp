@@ -43,7 +43,7 @@ Spacehero::SpaceheroState Spacehero::simulate() {
   Universe paruni(universe);
 
   paruni.move();
-  display.drawSimulation(universe);
+  display.drawBridge(universe,SpaceDisplay::SimulationView);
 
   if (paruni.timeout()) return spacehero_edit;
   if ((won = paruni.won())) return spacehero_next;

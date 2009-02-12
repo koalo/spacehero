@@ -1,7 +1,7 @@
 #include "SpaceDisplay.h"
 #include "local.h"
 
-void SpaceDisplay::drawBridge(Universe &uni, int projection, int time)
+void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 {
 	double center;
 	int mrx, mry, y;
@@ -58,25 +58,25 @@ void SpaceDisplay::drawBridge(Universe &uni, int projection, int time)
 	}
 	/* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
 	/*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
-	putImage( (projection==ORTHOGONAL)?GLdisplay::IMG_PANEL_MASS:GLdisplay::IMG_PANEL_TIME, this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
+	putImage( (view==PutView)?GLdisplay::IMG_PANEL_MASS:GLdisplay::IMG_PANEL_TIME, this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
 
 	center = this->width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
-	if(projection == ORTHOGONAL)
+	if(view == PutView)
 	{
 		alignPutButtons();
 /*		mrangle = (double)(uni.massreserve)/(double)(MAXSTARTRESERVE);*/
 	}
 
-	if(projection == PERSPECTIVE)
+	if(view == SimulationView)
 	{
 		alignSimulButtons();
-		mrangle = (double)(MAXTIME-time)/(double)(MAXTIME);
+	/*	mrangle = (double)(MAXTIME-time)/(double)(MAXTIME);*/
 	}
 
 	glEnable(GL_POLYGON_SMOOTH);
 
-	if(projection == PERSPECTIVE || projection == ORTHOGONAL)
+	if(view == PutView || view == SimulationView)
 	{
 		/* Zeigerposition berechnen */
 		mrangle = (mrangle < 0)?0:mrangle;
@@ -100,7 +100,7 @@ void SpaceDisplay::drawBridge(Universe &uni, int projection, int time)
 
 	drawButtons();
 
-	displayUniverse(uni, projection, width, height);
+	displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
 
 	/* Versteckten Buffer aktivieren */
 	SDL_GL_SwapBuffers();
@@ -146,7 +146,6 @@ void SpaceDisplay::alignPutButtons()
 	addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, BStatus::largeHole);
 #undef TEXTURE
 }
-
 
 void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height )
 {
@@ -304,7 +303,7 @@ glPopMatrix();
 
 void SpaceDisplay::handleEvents(int part, Universe &uni)
 {
-  unsigned int i, j, remove;
+  unsigned int i, remove;
 
   GLdouble modelMatrix[16];
   GLdouble projMatrix[16];
@@ -389,7 +388,7 @@ void SpaceDisplay::handleEvents(int part, Universe &uni)
             }
             
           }
-          drawPut(uni);
+          drawBridge(uni,SpaceDisplay::PutView);
         }
         break;
       case SDL_VIDEORESIZE:
@@ -398,7 +397,7 @@ void SpaceDisplay::handleEvents(int part, Universe &uni)
         
         if(part == PUT)
         {
-          drawPut(uni);
+          drawBridge(uni,SpaceDisplay::PutView);
         }
         /* Simulation wird sowieso gleich wieder gezeichnet */
         break;
@@ -426,15 +425,4 @@ void SpaceDisplay::handleEvents(int part, Universe &uni)
         break;
     }
   }
-}
-
-void SpaceDisplay::drawPut(Universe &uni)
-{ 
-	drawBridge(uni, ORTHOGONAL, 0);
-}
-
-void SpaceDisplay::drawSimulation( Universe &uni )
-{
-	drawBridge(uni, PERSPECTIVE, 0);
-	/*cam->rx = 0;*/ /* nur Unsinn */
 }

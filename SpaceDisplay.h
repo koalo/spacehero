@@ -32,39 +32,43 @@
 class SpaceDisplay : public GLdisplay
 {
   public:
+    enum BridgeView { 
+      SimulationView,
+      PutView,
+      EditorView
+    };
+
     void displayUniverse( Universe &uni, int projection, int width, int height );
-    void drawBridge(Universe &uni, int projection, int time);
+    void drawBridge(Universe &uni, BridgeView view);
     void handleEvents(int part, Universe &uni);
-    void drawPut(Universe &uni);
-    void drawSimulation( Universe &uni );
   private:
     void alignSimulButtons();
     void alignPutButtons();
 
-		inline void drawSkymass(SkyMass body, float size)
-		{
-			glBegin(GL_QUADS);
-			glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, -size+body.y, body.z );
-			glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  size+body.x, -size+body.y, body.z );
-			glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  size+body.x,  size+body.y, body.z );
-			glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -size+body.x,  size+body.y, body.z );
-			glEnd();
-			/* Objekt zeichnen */
-			/*
-			   glBegin(GL_QUADS);
-			   glTexCoord2f( 0.0f, 0.0f ); glVertex3f( body.x, -size+body.y, -size+body.z );
-			   glTexCoord2f( 1.0f, 0.0f ); glVertex3f( body.x, -size+body.y, size+body.z );
-			   glTexCoord2f( 1.0f, 1.0f ); glVertex3f( body.x,  size+body.y, size+body.z );
-			   glTexCoord2f( 0.0f, 1.0f ); glVertex3f( body.x,  size+body.y, -size+body.z );
-			   glEnd();
+    inline void drawSkymass(SkyMass body, float size)
+    {
+      glBegin(GL_QUADS);
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, -size+body.y, body.z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  size+body.x, -size+body.y, body.z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  size+body.x,  size+body.y, body.z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -size+body.x,  size+body.y, body.z );
+      glEnd();
+      /* Objekt zeichnen */
+      /*
+      glBegin(GL_QUADS);
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( body.x, -size+body.y, -size+body.z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f( body.x, -size+body.y, size+body.z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f( body.x,  size+body.y, size+body.z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( body.x,  size+body.y, -size+body.z );
+      glEnd();
 
-			   glBegin(GL_QUADS);
-			   glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, body.y, -size+body.z );
-			   glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -size+body.x, body.y, size+body.z );
-			   glTexCoord2f( 1.0f, 1.0f ); glVertex3f( size+body.x,  body.y, size+body.z );
-			   glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
-			   glEnd();*/
-		} ;
+      glBegin(GL_QUADS);
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, body.y, -size+body.z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -size+body.x, body.y, size+body.z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f( size+body.x,  body.y, size+body.z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
+      glEnd();*/
+    };
 };
 
 
