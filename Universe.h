@@ -36,33 +36,28 @@ class SkyMass : public SkyObject {
     inline void operator^ (SkyMass m) {
       register double AX, AY, a1, a2, r3;
 
-      /* Verbindungsvektor */    
       AX = x - m.x;
       AY = y - m.y;
 
       r3 = hypot(AX,AY);
       r3 = r3*r3*r3;
 
-      /* Einheitsvektor in Verbindungsrichtung */
       AX = AX/r3;
       AY = AY/r3;
-      /*  AZ = AZ/r3;*/
 
-      /* Beschleunigung */
       a1 = SUNGRAVTIMEWIDTH*mass;
-      a2 = SUNGRAVTIMEWIDTH*m.mass;
-
-      /* Geschwindigkeitsaenderung */
       vx += a1*AX;
       vy += a1*AY;  
-      /*  skymass1->vz += a1*AZ;  */
+
+      a2 = SUNGRAVTIMEWIDTH*m.mass;
       m.vx -= a2*AX;
       m.vy -= a2*AY;
     };
     inline void move() {
-      x += (vx/WIDTHINMETERS)*TIMESCALE;
-      y += (vy/WIDTHINMETERS)*TIMESCALE;
-      z += (vz/WIDTHINMETERS)*TIMESCALE;
+      x += (vx/WIDTHINMETERS)*TIMESCALE/1e0;
+      y += (vy/WIDTHINMETERS)*TIMESCALE/1e0;
+      z += (vz/WIDTHINMETERS)*TIMESCALE/1e0;
+      //if(hypot(vx,vy)>1) std::cerr << ".";
     }
 };
 

@@ -104,7 +104,7 @@ void Universe::move()
   }
 
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
-    i->move();
+    //i->move();
   }
 }
 
