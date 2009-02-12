@@ -43,14 +43,14 @@ class SkyMass : public SkyObject {
       r3 = hypot(AX,AY);
       r3 = r3*r3*r3;
 
-      AX = AX/r3;
-      AY = AY/r3;
+      AX = -AX/r3;
+      AY = -AY/r3;
 
-      a1 = SUNGRAVTIMEWIDTH*mass;
+      a1 = SUNGRAVTIMEWIDTH*mass*5e8;
       vx += a1*AX;
       vy += a1*AY;  
 
-      a2 = SUNGRAVTIMEWIDTH*m.mass;
+      a2 = SUNGRAVTIMEWIDTH*m.mass*5e8;
       m.vx -= a2*AX;
       m.vy -= a2*AY;
     };
@@ -66,7 +66,7 @@ class SkyMass : public SkyObject {
 class Goal : public SkyObject {
   public:
     double radius;
-Goal(): radius(0) {};
+    Goal(): radius(0) {};
     Goal(std::ifstream &in) {
       in >> x >> y >> z;
       in >> radius;
@@ -148,75 +148,4 @@ class Universe: public Level
 
 };
 
-#if 0
-
-class skymass
-{
-  public:
-    double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-    double vx, vy, vz; /* in m/s */
-    double fx, fy, fz; /* Kraft in Newton auf den Koerper */
-    double mass; /* in Sonnenmassen */
-    int inLevel; /* ob das Objekt durch das Level vorgegeben ist */
-    int exists;
-    int nograv;
-  public:
-    static void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
-    skymass(const skymass& p);
-    skymass() {};
-};
-
-class skygoal
-{
-  public:
-    double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-    double r; /* Radius */  
-};
-
-
-public:
-Universe() {};
-//int levelladen(std::ifstream &level);
-public:
-skygoal goal;
-skymass holes[MAX_LEVEL_HOLES+MAX_PUT_HOLES];
-skymass galaxies[MAX_GALAXIES];
-skymass *stars;
-int holesSize;
-int galaxiesSize;
-int starsSize;
-double massreserve;
-
-public:
-/* Zeichnet die Oberflaeche zum Setzen der Galaxien */
-void drawPut(GLdisplay &display);
-/* Zeichnet die Simulation */
-void drawSimulation( GLdisplay &display, Kamera *cam, int time ); 
-void move(int time);
-
-public:
-void eventHorizon();
-private:
-inline void applyNewton(skymass* skymass1, skymass* skymass2, int teiler)
-{
-};
-
-#include "local.h"
-
-
-
-
-void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
 #endif
-
-
-
-
-
-
-
-
-
-#endif
-
-

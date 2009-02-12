@@ -56,7 +56,7 @@ std::vector<Star> Galaxy::getStars(int seed) {
   int n=NOrbits;
   double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
   while (n--) {
-    orb += R_MIN +  ((double)((rand() / (RAND_MAX + 1.0))) / 150.0);
+    orb += R_MIN +  ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
     double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
     int m=NStarsPerOrbit;
     while (m--) {
