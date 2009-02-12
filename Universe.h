@@ -10,7 +10,11 @@
 class SkyObject {
   protected:
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
+    bool exists;
+    bool level;
   public:
+    SkyObject():x(0),y(0),z(0),exists(true),level(false) {};
+    void setlevel() { level = true; };
     friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
 };
 
@@ -19,6 +23,7 @@ class SkyMass : public virtual SkyObject {
     double fx, fy, fz; /* Kraft in Newton auf den Koerper */
     double mass; /* in Sonnenmassen */
   public:
+SkyMass():fx(0),fy(0),fz(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 };
 
@@ -26,6 +31,7 @@ class SkyMovableObject :public virtual  SkyObject {
   protected:
     double vx, vy, vz; /* in m/s */
   public:
+SkyMovableObject():vx(0),vy(0),vz(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMovableObject &g);
 };
 
@@ -33,10 +39,11 @@ class Goal : public virtual SkyObject {
   protected:
     double radius;
   public:
-    Goal() {};
+Goal(): radius(0) {};
     Goal(std::ifstream &in) {
       in >> x >> y >> z;
       in >> radius;
+		setlevel();
     };
     friend std::ostream& operator<< (std::ostream &o, const Goal &g);
 };
@@ -48,13 +55,14 @@ class Blackhole : public virtual SkyMass {
       in >> x >> y >> z; 
       in >> t >> t >> t; 
       in >> mass; 
+		setlevel();
     };
     friend std::ostream& operator<< (std::ostream &o, const Blackhole &g);
 };
 
 class Star : public virtual SkyMovableObject, public virtual SkyMass {
   public:
-    Star(double R, double phi, double theta, double v);
+	Star(double R, double phi, double z, double v, double mass=1e3);
     friend std::ostream& operator<< (std::ostream &o, const Star &g);
 };
 
