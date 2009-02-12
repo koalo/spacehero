@@ -6,7 +6,7 @@ void SpaceDisplay::drawBridge(Universe &uni, int projection, int time)
 	double center;
 	int mrx, mry, y;
   unsigned int i;
-	double mrangle, curse;
+	double mrangle =0, curse;
 	double width, height;
 
 	/* Bildschirm loeschen */
@@ -304,7 +304,7 @@ glPopMatrix();
 
 void SpaceDisplay::handleEvents(int part, Universe &uni)
 {
-  unsigned int i, j, remove;
+  unsigned int i, remove;
 
   GLdouble modelMatrix[16];
   GLdouble projMatrix[16];

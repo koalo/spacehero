@@ -6,6 +6,9 @@
 #include <iterator>
 
 #include <vector>
+#include <math.h>
+
+#include "local.h"
 
 class SkyObject {
   public:
@@ -18,25 +21,48 @@ class SkyObject {
     friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
 };
 
-class SkyMass : public virtual SkyObject {
-  protected:
-    double fx, fy, fz; /* Kraft in Newton auf den Koerper */
+class SkyMass : public SkyObject {
+  public:
+    //double fx, fy, fz; /* Kraft in Newton auf den Koerper */
+    double vx, vy, vz; /* in m/s */
   public:
     double mass; /* in Sonnenmassen */
   public:
-SkyMass():fx(0),fy(0),fz(0) {};
+    SkyMass():
+      //fx(0),fy(0),fz(0),
+      vx(0),vy(0),vz(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
+
+    inline void operator^ (SkyMass m) {
+      register double AX, AY, a1, a2, r3;
+
+      /* Verbindungsvektor */    
+      AX = x - m.x;
+      AY = y - m.y;
+
+      r3 = hypot(AX,AY);
+      r3 = r3*r3*r3;
+
+      /* Einheitsvektor in Verbindungsrichtung */
+      AX = AX/r3;
+      AY = AY/r3;
+      /*  AZ = AZ/r3;*/
+
+      /* Beschleunigung */
+      a1 = SUNGRAVTIMEWIDTH*mass;
+      a2 = SUNGRAVTIMEWIDTH*m.mass;
+
+      /* Geschwindigkeitsaenderung */
+      vx += a1*AX;
+      vy += a1*AY;  
+      /*  skymass1->vz += a1*AZ;  */
+      m.vx -= a2*AX;
+      m.vy -= a2*AY;
+    };
 };
 
-class SkyMovableObject :public virtual SkyObject {
-  public:
-    double vx, vy, vz; /* in m/s */
-  public:
-SkyMovableObject():vx(0),vy(0),vz(0) {};
-    friend std::ostream& operator<< (std::ostream &o, const SkyMovableObject &g);
-};
 
-class Goal : public virtual SkyObject {
+class Goal : public SkyObject {
   public:
     double radius;
 Goal(): radius(0) {};
@@ -48,7 +74,7 @@ Goal(): radius(0) {};
     friend std::ostream& operator<< (std::ostream &o, const Goal &g);
 };
 
-class Blackhole : public virtual SkyMass {
+class Blackhole : public SkyMass {
   public:
     Blackhole(std::ifstream &in) {
       double t;
@@ -60,13 +86,9 @@ class Blackhole : public virtual SkyMass {
     friend std::ostream& operator<< (std::ostream &o, const Blackhole &g);
 };
 
-class Star : public virtual SkyMovableObject, public virtual SkyMass {
-  public:
-	Star(double R, double phi, double z, double v, double mass=1e3);
-    friend std::ostream& operator<< (std::ostream &o, const Star &g);
-};
+class Star;
 
-class Galaxy : public virtual SkyMovableObject, public virtual SkyMass {
+class Galaxy : public SkyMass {
   private:
     static const int ORBITS_MAX = 130;
     static const int R_MIN_CENTER = 0.02;
@@ -85,6 +107,12 @@ class Galaxy : public virtual SkyMovableObject, public virtual SkyMass {
 
   public:
     friend std::ostream& operator<< (std::ostream &o, const Galaxy &g);
+};
+
+class Star : public SkyMass {
+  public:
+	Star(Galaxy &g,double R, double phi, double z, double v, double mass=1e3);
+    friend std::ostream& operator<< (std::ostream &o, const Star &g);
 };
 
 class Level {
@@ -163,69 +191,11 @@ void drawPut(GLdisplay &display);
 void drawSimulation( GLdisplay &display, Kamera *cam, int time ); 
 void move(int time);
 
-inline void drawSkymass(skymass body, float size)
-{
-  glBegin(GL_QUADS);
-  glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, -size+body.y, body.z );
-  glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  size+body.x, -size+body.y, body.z );
-  glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  size+body.x,  size+body.y, body.z );
-  glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -size+body.x,  size+body.y, body.z );
-  glEnd();
-  /* Objekt zeichnen */
-  /*
-     glBegin(GL_QUADS);
-     glTexCoord2f( 0.0f, 0.0f ); glVertex3f( body.x, -size+body.y, -size+body.z );
-     glTexCoord2f( 1.0f, 0.0f ); glVertex3f( body.x, -size+body.y, size+body.z );
-     glTexCoord2f( 1.0f, 1.0f ); glVertex3f( body.x,  size+body.y, size+body.z );
-     glTexCoord2f( 0.0f, 1.0f ); glVertex3f( body.x,  size+body.y, -size+body.z );
-     glEnd();
-
-     glBegin(GL_QUADS);
-     glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, body.y, -size+body.z );
-     glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -size+body.x, body.y, size+body.z );
-     glTexCoord2f( 1.0f, 1.0f ); glVertex3f( size+body.x,  body.y, size+body.z );
-     glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
-     glEnd();*/
-} ;
-
-private:
-void drawBridge(GLdisplay &display, int projection, int time);
-void alignSimulButtons(GLdisplay &display);
-void alignPutButtons(GLdisplay &display);
-
 public:
 void eventHorizon();
 private:
 inline void applyNewton(skymass* skymass1, skymass* skymass2, int teiler)
 {
-  register double AX, AY, a1, a2, r3;
-
-  /* Verbindungsvektor */    
-  AX = skymass2->x - skymass1->x;
-  AY = skymass2->y - skymass1->y;
-
-  r3 = hypot(AX,AY);
-  r3 = r3*r3*r3;
-
-  /* Einheitsvektor in Verbindungsrichtung */
-  AX = AX/r3;
-  AY = AY/r3;
-  /*  AZ = AZ/r3;*/
-
-  /* Beschleunigung */
-  a1 = SUNGRAVTIMEWIDTH*teiler*skymass2->mass;
-  a2 = SUNGRAVTIMEWIDTH*teiler*skymass1->mass;
-
-  /* Geschwindigkeitsaenderung */
-  skymass1->vx += a1*AX;
-  skymass1->vy += a1*AY;  
-  /*  skymass1->vz += a1*AZ;  */
-  skymass2->vx -= a2*AX;
-  skymass2->vy -= a2*AY;
-  /*  skymass2->vz -= a2*AZ;*/
-  /*  ((SUNGRAVTIMEWIDTH/r2)*skmass)*(AX/r)
-      = (SUNGRAVTIMEWIDTH*skymass*AX)/r3*/
-}
 };
 
 #include "local.h"
