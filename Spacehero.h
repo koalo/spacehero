@@ -11,7 +11,9 @@ class Spacehero
   // Endzustaende: next und exit
 	enum SpaceheroState { 
 		spacehero_edit, 
+    spacehero_startsimu,
 		spacehero_simulate, 
+		spacehero_stopsimu, 
 		spacehero_next, 
 		spacehero_exit 
 	} state;
@@ -20,6 +22,7 @@ class Spacehero
 
 	SpaceDisplay &display;
 	Universe &universe;
+  Universe *paruni;
 
 public:
 

@@ -6,7 +6,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 	double center;
 	int mrx, mry, y;
   unsigned int i;
-	double mrangle, curse;
+	double mrangle =0, curse;
 	double width, height;
 
 	/* Bildschirm loeschen */
