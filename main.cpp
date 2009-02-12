@@ -6,14 +6,15 @@ using namespace boost::filesystem;
 
 #include <stdlib.h>
 
-#include "GLdisplay.h"
+#include "SpaceDisplay.h"
+#include "Spacehero.h"
 #include "Universe.h"
 #include "intro.h"
 
 int main(int argc, char *argv[])
 { 
   std::string levels("./level/");
-  GLdisplay display;
+  SpaceDisplay display;
 
   std::cerr << "argc: " << argc << std::endl;
 
@@ -31,6 +32,8 @@ int main(int argc, char *argv[])
         if(level) {
           Level l(level);
           Universe u(l);
+          Spacehero s(display,u);
+
 
         }
       }
@@ -40,6 +43,7 @@ int main(int argc, char *argv[])
     Level l(level);
     std::cerr << l << std::endl;
     Universe u(l);
+    Spacehero s(display,u);
 
   }
 

@@ -1,7 +1,7 @@
 
 #include "Spacehero.h"
 
-Spacehero::Spacehero(GLdisplay &d, Universe &u)
+Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   :display(d), universe(u)
 {
 }
@@ -46,6 +46,10 @@ Spacehero::SpaceheroState Spacehero::simulate() {
   if ((won = paruni.won())) return spacehero_next;
 
   return handleEvents();
+}
+
+Spacehero::SpaceheroState Spacehero::handleEvents() {
+  return state;
 }
 
 

@@ -1,11 +1,14 @@
 #ifndef SPACEHERO_H
 #define SPACEHERO_H
 
-#include "GLdisplay.h"
+#include "SpaceDisplay.h"
 #include "Universe.h"
 
 class Spacehero
 {
+  // Zustaende des Spielautomaten
+  //
+  // Endzustaende: next und exit
 	enum SpaceheroState { 
 		spacehero_edit, 
 		spacehero_simulate, 
@@ -15,12 +18,12 @@ class Spacehero
 
 	bool won;
 
-	GLdisplay &display;
+	SpaceDisplay &display;
 	Universe &universe;
 
 public:
 
-	Spacehero(GLdisplay &d, Universe &u);
+	Spacehero(SpaceDisplay &d, Universe &u);
 
 	bool play();
 

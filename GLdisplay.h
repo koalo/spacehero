@@ -7,9 +7,15 @@ class GLdisplay;
 class GLdisplay
 {
   public:
-  void drawEditor(Universe &u);
-  void drawSimulation(Universe &u);
 
+};
+
+class Kamera
+{
+  public:
+    float rx;
+    float ry;
+    float rz;
 };
 
 #if 0
