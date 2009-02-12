@@ -1,14 +1,17 @@
-
 #include "Spacehero.h"
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   :display(d), universe(u)
 {
+  state = spacehero_simulate;
 }
 
 bool Spacehero::play()
 {
+  unsigned int i = 0;
   while (true) {
+    usleep(100000);
+    if(i++ > 10) state = spacehero_next;
     switch (state) {
       case spacehero_edit:
         state = edit();
@@ -31,7 +34,7 @@ bool Spacehero::play()
 
 Spacehero::SpaceheroState Spacehero::edit() {
 
-  display.drawEditor(universe);
+/*  display.drawEditor(universe);*/
   return handleEvents(); // das ding muesste mir irgendwie mitteilen, was als naechstes passieren soll
 
 }

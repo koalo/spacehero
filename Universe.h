@@ -8,7 +8,7 @@
 #include <vector>
 
 class SkyObject {
-  protected:
+  public:
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
     bool exists;
     bool level;
@@ -21,14 +21,15 @@ class SkyObject {
 class SkyMass : public virtual SkyObject {
   protected:
     double fx, fy, fz; /* Kraft in Newton auf den Koerper */
+  public:
     double mass; /* in Sonnenmassen */
   public:
 SkyMass():fx(0),fy(0),fz(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 };
 
-class SkyMovableObject :public virtual  SkyObject {
-  protected:
+class SkyMovableObject :public virtual SkyObject {
+  public:
     double vx, vy, vz; /* in m/s */
   public:
 SkyMovableObject():vx(0),vy(0),vz(0) {};
@@ -36,9 +37,8 @@ SkyMovableObject():vx(0),vy(0),vz(0) {};
 };
 
 class Goal : public virtual SkyObject {
-  protected:
-    double radius;
   public:
+    double radius;
 Goal(): radius(0) {};
     Goal(std::ifstream &in) {
       in >> x >> y >> z;
@@ -88,10 +88,11 @@ class Galaxy : public virtual SkyMovableObject, public virtual SkyMass {
 };
 
 class Level {
-  protected:
+  public:
     std::vector<Blackhole> holes;
     std::vector<Galaxy> galaxies;
     Goal goal;
+  protected:
     int seed;
   public:
     Level(std::ifstream &in);
@@ -105,6 +106,7 @@ class Level {
 
 class Universe: public Level
 {
+  public:
   std::vector<Star> stars;
   public:
   Universe(Level &l);

@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
           Level l(level);
           Universe u(l);
           Spacehero s(display,u);
-
+          s.play();
 
         }
       }

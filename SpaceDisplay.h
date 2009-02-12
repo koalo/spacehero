@@ -1,10 +1,8 @@
 #ifndef _SPACEDISPLAY_H_
 #define _SPACEDISPLAY_H_
 
-enum {
-PUT = 3463,
-SIMULATION = 46584,
-};
+#define PUT 3463
+#define SIMULATION 46584
 
 #define UNIVERSE_LEFT 0
 #define UNIVERSE_TOP 0
@@ -38,13 +36,35 @@ class SpaceDisplay : public GLdisplay
     void drawBridge(Universe &uni, int projection, int time);
     void handleEvents(int part, Universe &uni);
     void drawPut(Universe &uni);
-    void drawSimulation( Universe &uni, Kamera *cam, int time );
+    void drawSimulation( Universe &uni );
   private:
     void alignSimulButtons();
     void alignPutButtons();
-  public:
-    void drawEditor(Universe &/*u*/) {};
-    void drawSimulation(Universe &/*u*/) {};
+
+		inline void drawSkymass(SkyMass body, float size)
+		{
+			glBegin(GL_QUADS);
+			glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, -size+body.y, body.z );
+			glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  size+body.x, -size+body.y, body.z );
+			glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  size+body.x,  size+body.y, body.z );
+			glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -size+body.x,  size+body.y, body.z );
+			glEnd();
+			/* Objekt zeichnen */
+			/*
+			   glBegin(GL_QUADS);
+			   glTexCoord2f( 0.0f, 0.0f ); glVertex3f( body.x, -size+body.y, -size+body.z );
+			   glTexCoord2f( 1.0f, 0.0f ); glVertex3f( body.x, -size+body.y, size+body.z );
+			   glTexCoord2f( 1.0f, 1.0f ); glVertex3f( body.x,  size+body.y, size+body.z );
+			   glTexCoord2f( 0.0f, 1.0f ); glVertex3f( body.x,  size+body.y, -size+body.z );
+			   glEnd();
+
+			   glBegin(GL_QUADS);
+			   glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, body.y, -size+body.z );
+			   glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -size+body.x, body.y, size+body.z );
+			   glTexCoord2f( 1.0f, 1.0f ); glVertex3f( size+body.x,  body.y, size+body.z );
+			   glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
+			   glEnd();*/
+		} ;
 };
 
 
