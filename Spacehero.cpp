@@ -3,7 +3,7 @@
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   :display(d), universe(u)
 {
-  state = spacehero_simulate;
+  state = spacehero_edit;
 }
 
 bool Spacehero::play()
@@ -11,13 +11,22 @@ bool Spacehero::play()
   unsigned int i = 0;
   while (true) {
     usleep(100000);
-    if(i++ > 10) state = spacehero_next;
+    if(i++ > 30) state = spacehero_next;
     switch (state) {
       case spacehero_edit:
         state = edit();
         break;
+      case spacehero_startsimu:
+        paruni = new Universe(universe);
+        state = spacehero_simulate;
+        break;
       case spacehero_simulate:
+        std::cerr << i << std::endl;
         state = simulate();
+        break;
+      case spacehero_stopsimu:
+        delete(paruni);
+        state = spacehero_edit;
         break;
       case spacehero_next:
         return true;
@@ -34,19 +43,18 @@ bool Spacehero::play()
 
 Spacehero::SpaceheroState Spacehero::edit() {
 
+  return spacehero_startsimu;
 /*  display.drawEditor(universe);*/
-  return handleEvents(); // das ding muesste mir irgendwie mitteilen, was als naechstes passieren soll
+  //return handleEvents(); // das ding muesste mir irgendwie mitteilen, was als naechstes passieren soll
 
 }
 
 Spacehero::SpaceheroState Spacehero::simulate() {
-  Universe paruni(universe);
+  paruni->move();
+  display.drawSimulation(*paruni);
 
-  paruni.move();
-  display.drawSimulation(universe);
-
-  if (paruni.timeout()) return spacehero_edit;
-  if ((won = paruni.won())) return spacehero_next;
+  if (paruni->timeout()) return spacehero_edit;
+  if ((won = paruni->won())) return spacehero_next;
 
   return handleEvents();
 }

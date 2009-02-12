@@ -59,6 +59,11 @@ class SkyMass : public SkyObject {
       m.vx -= a2*AX;
       m.vy -= a2*AY;
     };
+    inline void move() {
+      x += (vx/WIDTHINMETERS)*TIMESCALE;
+      y += (vy/WIDTHINMETERS)*TIMESCALE;
+      z += (vz/WIDTHINMETERS)*TIMESCALE;
+    }
 };
 
 
@@ -139,7 +144,7 @@ class Universe: public Level
   public:
   Universe(Level &l);
   //bool play(GLdisplay &d);
-  bool move() {return false;};
+  void move();
   bool timeout() {return false;};
   bool won() {return false;};
 

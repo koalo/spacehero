@@ -44,9 +44,9 @@ Level::Level(std::ifstream &in)
 }
 
 std::vector<Star> Galaxy::getStars(int seed) {
-  const double NStars = mass / 4e8;
-  const double NOrbits = mass / 4e10;
-  const double NStarsPerOrbit = NStars/NOrbits;
+  double NStars = mass / 4e8;
+  double NOrbits = mass / 4e10;
+  double NStarsPerOrbit = NStars/NOrbits;
   std::vector<Star> accu;
 
   srand(seed);
@@ -78,6 +78,36 @@ Universe::Universe(Level &l) :
 }
 
 
+void Universe::move()
+{
+// star: hole, galaxy
+  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
+    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+      *i ^ *j;
+    }
+    for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
+      *i ^ *k;
+    }
+  }
+// galaxy: hole, galaxy
+  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
+    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+      *i ^ *j;
+    }
+    for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
+      *i ^ *k;
+    }
+  }
+
+  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
+    i->move();
+  }
+
+  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
+    i->move();
+  }
+}
+
 #if 0
 
 
@@ -97,102 +127,6 @@ skymass::skymass(const skymass& p):
   nograv(p.nograv)
 {}
 
-
-void Universe::move(int time)
-{
-  int i, j, k, teiler;/* half, full, max;
-
-                         full = ((starsSize+1)*starsSize)/2;
-                         half = full/2;
-
-                         if(time % 2)
-                         {
-                         sum = 0;
-                         max = half;
-                         } else {
-                         sum = half;
-                         max = full;
-                         }
-
-                         for(i = 0; sum < max; sum+=i++)*/
-
-  time = 5; /* nur Unsinn */
-
-  teiler = 1;
-  /*
-     if(time%teiler == 0)
-     {*/
-  for(i = 0; i < starsSize; i++)
-  {
-    if(stars[i].exists && stars[i].nograv != 1) 
-    {
-      /*      for(j = i+1; j < starsSize; j++)
-              {
-              if(stars[j].exists)
-              {
-              applyNewton(&stars[i], &stars[j], teiler);
-              }
-              }*/
-
-      for(k = 0; k < holesSize; k++)
-      {
-        applyNewton(&stars[i], &holes[k], teiler);
-      }
-
-      for(j = 0; j < galaxiesSize; j++)
-      {
-        applyNewton(&galaxies[j], &stars[i], teiler);
-      } 
-    }
-  }
-
-  for(i = 0; i < galaxiesSize; i++)
-  {
-    for(k = 0; k < holesSize; k++)
-    {
-      applyNewton(&galaxies[i], &holes[k], teiler);
-    }    
-
-    for(k = i+1; k < galaxiesSize; k++)
-    {
-      if(galaxies[i].exists && galaxies[k].exists && galaxies[i].nograv != 1 && galaxies[k].nograv != 1)
-      {
-        applyNewton(&galaxies[i], &galaxies[k], teiler);
-      }
-    }
-  }
-
-
-
-
-  /*}*/
-
-  /* Bewegung fuer Sternen */
-  for(i = 0; i < starsSize; i++)
-  {
-    if(stars[i].exists)
-    {
-      stars[i].x += (stars[i].vx/WIDTHINMETERS)*TIMESCALE;
-      stars[i].y += (stars[i].vy/WIDTHINMETERS)*TIMESCALE;
-      stars[i].z += (stars[i].vz/WIDTHINMETERS)*TIMESCALE;
-    }
-  }
-
-  /* Bewegung fuer Koerper in MittelPunkte von Galaxien */
-  for(i = 0; i < galaxiesSize; i++)
-  {
-    galaxies[i].x += (galaxies[i].vx/WIDTHINMETERS)*TIMESCALE;
-    galaxies[i].y += (galaxies[i].vy/WIDTHINMETERS)*TIMESCALE;
-    galaxies[i].z += (galaxies[i].vz/WIDTHINMETERS)*TIMESCALE;
-  }
-
-  /* Bewegung von Black Holes */
-  /*for(i = 0; i < holesSize; i++)
-    {
-    holes[i].x += (holes[i].vx/WIDTHINMETERS)*TIMESCALE;
-    holes[i].y += (holes[i].vy/WIDTHINMETERS)*TIMESCALE;
-    }*/
-}
 
 void Universe::eventHorizon()
 {
