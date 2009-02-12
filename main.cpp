@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         std::ifstream level(itr->path().string().c_str());
         if(level) {
           Level l(level);
-          //std::cerr << l << std::endl;
+          std::cerr << l << std::endl;
           Universe u(l);
           Spacehero s(display,u);
           s.play();

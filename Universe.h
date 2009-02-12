@@ -33,8 +33,9 @@ class SkyMass : public SkyObject {
       vx(0),vy(0),vz(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 
-    inline void operator^ (SkyMass m) {
-      register double AX, AY, a1, a2, r3;
+    inline void operator^ (SkyMass &m) {
+      double AX, AY, a1, a2, r3;
+      //std::cerr << *this << m << std::endl;
 
       AX = x - m.x;
       AY = y - m.y;
@@ -54,9 +55,9 @@ class SkyMass : public SkyObject {
       m.vy -= a2*AY;
     };
     inline void move() {
-      x += (vx/WIDTHINMETERS)*TIMESCALE/1e0;
-      y += (vy/WIDTHINMETERS)*TIMESCALE/1e0;
-      z += (vz/WIDTHINMETERS)*TIMESCALE/1e0;
+      x += (vx/WIDTHINMETERS)*TIMESCALE;
+      y += (vy/WIDTHINMETERS)*TIMESCALE;
+      z += (vz/WIDTHINMETERS)*TIMESCALE;
       //if(hypot(vx,vy)>1) std::cerr << ".";
     }
 };
@@ -101,7 +102,9 @@ class Galaxy : public SkyMass {
       in >> x >> y >> z; 
       in >> vx >> vy >> vz; 
       in >> mass; 
+      lr=true;
     };
+    bool lr; // links true /rechts
 
     std::vector<Star> getStars(int seed);
 

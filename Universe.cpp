@@ -12,10 +12,12 @@ Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
 {
   x = R * cos(phi * M_PI/180) + g.x;
   y = R * sin(phi * M_PI/180) + g.y;
-  z = z + g.z;
+  //z = z + g.z;
+  z=0;
 
-  vx = v * sin(phi * M_PI/180);
-  vy = v * cos(phi * M_PI/180);
+  vx = v * cos((phi-90-(g.lr?0:180)) * M_PI/180);
+  vy = v * sin((phi-90-(g.lr?0:180)) * M_PI/180);
+  //vx=vy=0;
   vz = 0;
 
   this->mass = mass;
@@ -88,6 +90,7 @@ void Universe::move()
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       *i ^ *k;
     }
+    i->move();
   }
 // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
@@ -99,9 +102,8 @@ void Universe::move()
     }
   }
 
-  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
-    i->move();
-  }
+  //for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
+  //}
 
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     //i->move();
