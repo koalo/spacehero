@@ -8,8 +8,8 @@ void displayUniverse( GLdisplay &display, Universe &uni, int projection, int wid
   GLfloat ratio;
   float zoomX, zoomY, viewrad;
   GLUquadricObj *pObj = gluNewQuadric();
-GLfloat LightPosition[]= { 0.0f, 0.0f, 2.0f, 1.0f };
-GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };	
+  GLfloat LightPosition[]= { 0.0f, 0.0f, 2.0f, 1.0f };
+  GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };	
 
   /* Universum zeichnen */
   /* blending */
@@ -34,7 +34,7 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
     {
       height = 1;
     }
-   
+
     ratio = ( GLfloat )width / ( GLfloat )height;
 
     /* Perspektive einstellen */
@@ -76,19 +76,19 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
   {
     glTranslatef(-0.5f,-0.5f,0.0f);
     glTranslatef(0.0f, 0.0f, -display.zoom);
-    
-/*    glRotatef(60, 1.0f, 0.0f, 0.0f);*/
+
+    /*    glRotatef(60, 1.0f, 0.0f, 0.0f);*/
     /* fuer Drehung */
-/*    glRotatef(cam->rx, 1.0f, 0.0f, 0.0f);
-    glRotatef(cam->ry, 0.0f, 1.0f, 0.0f);
-    glRotatef(cam->rz, 0.0f, 0.0f, 1.0f);
-    */
+    /*    glRotatef(cam->rx, 1.0f, 0.0f, 0.0f);
+          glRotatef(cam->ry, 0.0f, 1.0f, 0.0f);
+          glRotatef(cam->rz, 0.0f, 0.0f, 1.0f);
+          */
     /* evtl. fuer Verfolgungsmodus */
-  /*  drehung = (asin(stars[0].vy/stars[0].vx)/(2*M_PI))*360;
-    glRotatef(90, -1.0f, 0.0f, 0.0f);
-    glRotatef(90+drehung, 0.0f, 0.0f, 1.0f);
-    glTranslatef( -(stars[0].x - 0.5), -(0.5 - stars[0].y), 0.0f );
-    glTranslatef( stars[0].vx/500000, stars[0].vy/500000, 0.0f);*/
+    /*  drehung = (asin(stars[0].vy/stars[0].vx)/(2*M_PI))*360;
+        glRotatef(90, -1.0f, 0.0f, 0.0f);
+        glRotatef(90+drehung, 0.0f, 0.0f, 1.0f);
+        glTranslatef( -(stars[0].x - 0.5), -(0.5 - stars[0].y), 0.0f );
+        glTranslatef( stars[0].vx/500000, stars[0].vy/500000, 0.0f);*/
   }
 
 
@@ -109,7 +109,7 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
       uni.drawSkymass(uni.galaxies[i], BULGESIZE);
     }
   }
-  
+
   /* Sterne */
   glBindTexture( GL_TEXTURE_2D, display.texture[0] );
 
@@ -134,9 +134,9 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
   glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);	
   glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-  
+
   glLineWidth(1);
-glPushMatrix();
+  glPushMatrix();
 
   glColor3f(0.0,0.1,0.0);
   glTranslatef( uni.goal.x, uni.goal.y, 0.0f );
@@ -147,7 +147,7 @@ glPushMatrix();
   glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );
   glColor3f(1,1,1);
 
-glPopMatrix();
+  glPopMatrix();
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   gluDeleteQuadric(pObj);

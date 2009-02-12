@@ -22,7 +22,17 @@ CXXFLAGS+=-O3
 #LDFLAGS+=-pg
 
 #SRC=displaySpacehero.c displayAbstract.c galaxy.c game.c spacehero.c buttons.c glprint.c levelladen.c
-SRC=spacehero.cpp intro.cpp GLdisplay.cpp Universe.cpp BStatus.cpp handleEvents.cpp displayUniverse.cpp
+
+SRC+=BStatus.cpp 
+SRC+=GLdisplay.cpp 
+SRC+=Universe.cpp 
+SRC+=Spacehero.cpp
+SRC+=displayUniverse.cpp
+SRC+=handleEvents.cpp 
+SRC+=intro.cpp
+SRC+=output.cpp
+SRC+=main.cpp
+
 OBJS=$(SRC:.cpp=.o)
 
 spacehero: $(OBJS)

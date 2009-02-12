@@ -17,7 +17,7 @@ void GLdisplay::startRound(std::ifstream &level)
   uni.galaxiesSize = 0;
   uni.starsSize = 0;
   uni.massreserve = MAXSTARTRESERVE;
-  
+
   /* Level laden */
   // TODO uni.levelladen(level);
   state.mediumHole(this->state);
@@ -46,7 +46,7 @@ void GLdisplay::startRound(std::ifstream &level)
       first = 0;
       continue;
     }
-    
+
     while( !(state.m_startSimulation || state.m_exit) )
     { 
       handleEvents( *this, PUT, uni );
@@ -58,14 +58,14 @@ void GLdisplay::startRound(std::ifstream &level)
     do
     {
       state.m_replaySimulation = 0;
-      
+
       /* Paralleluniversum erzeugen */
       paruni.goal = uni.goal;
       paruni.holesSize = uni.holesSize;
       paruni.galaxiesSize = uni.galaxiesSize;
       paruni.starsSize = uni.starsSize;
       paruni.stars = (skymass*)malloc(sizeof(skymass)*paruni.starsSize);
-      
+
       /* Inputarrays kopieren */
       for(i = 0; i < uni.galaxiesSize; i++)
       {
@@ -76,14 +76,14 @@ void GLdisplay::startRound(std::ifstream &level)
       {
         paruni.holes[i] = uni.holes[i];
       }
-      
+
       for(i = 0; i < uni.starsSize; i++)
       {
         paruni.stars[i] = uni.stars[i];
       }
-      
+
       cam.rx = cam.ry = cam.rz = 0;
-      
+
       /* bis die Zeit abgelaufen ist, oder Ziel erreicht */
       for(simulationTime = 1; simulationTime < MAXTIME; simulationTime++)
       {
@@ -94,16 +94,16 @@ void GLdisplay::startRound(std::ifstream &level)
         paruni.eventHorizon();
 
         paruni.drawSimulation(*this, &cam, simulationTime);
-        
+
         handleEvents( *this, SIMULATION, uni );
-        
+
         /* Abbrechen */
         if(state.m_breakSimulation || state.m_replaySimulation || state.m_exit)
         {
           simulationTime = MAXTIME;
           break;
         }
-        
+
         /* gewonnen? */
         if(sqrt(pow(paruni.galaxies[0].x - paruni.goal.x,2)+pow(paruni.galaxies[0].y - paruni.goal.y,2)) < paruni.goal.r && paruni.galaxies[0].exists)
         {
@@ -115,7 +115,7 @@ void GLdisplay::startRound(std::ifstream &level)
         diff = (diff > 0)?diff:0;
         usleep(1000000*diff);
       }
-      
+
       glEnable(GL_BLEND);
 
       if(simulationTime == MAXTIME)
@@ -160,13 +160,13 @@ void GLdisplay::startRound(std::ifstream &level)
 
     paruni.stars = NULL;
     free(uni.stars);
-    
+
     if(state.m_exit) break;
   }
 }
 
 GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
-	width(width), height(height),bpp(bpp)
+  width(width), height(height),bpp(bpp)
 {
   /* Grafik initialisieren */
   if(SDL_Init( SDL_INIT_VIDEO ) < 0)
@@ -193,9 +193,9 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   videoFlags |= SDL_GL_DOUBLEBUFFER; /* double buffering */
 
   if(fullscreen) {
-	  videoFlags |= SDL_FULLSCREEN;
-	  width = videoInfo->current_w;
-	  height = videoInfo->current_h;
+    videoFlags |= SDL_FULLSCREEN;
+    width = videoInfo->current_w;
+    height = videoInfo->current_h;
   } else {
   }
 
@@ -236,7 +236,7 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );              /* Hintergrundfarbe */
   glClearDepth( 1.0f );                                /* Tiefenbuffer */
   glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST ); /* Perspektivenberechnung */
-  
+
   /* Textur laden */
   if (!LoadGLTextures(texture))
   {
@@ -270,10 +270,10 @@ void GLdisplay::putImage(Images t, float x, float y, float width, float height)
 
   /* Objekt zeichnen */
   glBegin(GL_QUADS);
-    glTexCoord2f( 0.0f, 0.0f ); glVertex3f( x, y, 0.0f );
-    glTexCoord2f( 1.0f, 0.0f ); glVertex3f( x+width, y, 0.0f );
-    glTexCoord2f( 1.0f, 1.0f ); glVertex3f( x+width, y+height, 0.0f );
-    glTexCoord2f( 0.0f, 1.0f ); glVertex3f( x, y+height, 0.0f );
+  glTexCoord2f( 0.0f, 0.0f ); glVertex3f( x, y, 0.0f );
+  glTexCoord2f( 1.0f, 0.0f ); glVertex3f( x+width, y, 0.0f );
+  glTexCoord2f( 1.0f, 1.0f ); glVertex3f( x+width, y+height, 0.0f );
+  glTexCoord2f( 0.0f, 1.0f ); glVertex3f( x, y+height, 0.0f );
   glEnd();
 }
 
@@ -284,10 +284,10 @@ void GLdisplay::drawRect(float red, float green, float blue, float x, float y, f
 
   /* Objekt zeichnen */
   glBegin(GL_QUADS);
-    glVertex3f( x, y, 0.0f );
-    glVertex3f( x+width, y, 0.0f );
-    glVertex3f( x+width, y+height, 0.0f );
-    glVertex3f( x, y+height, 0.0f );
+  glVertex3f( x, y, 0.0f );
+  glVertex3f( x+width, y, 0.0f );
+  glVertex3f( x+width, y+height, 0.0f );
+  glVertex3f( x, y+height, 0.0f );
   glEnd();
 
   glColor3f(1,1,1);
@@ -298,7 +298,7 @@ void GLdisplay::drawSphere(Images t, float x, float y, float r)
   GLUquadricObj *pObj = gluNewQuadric();
 
   glEnable(GL_LIGHT3);
-  
+
   glTranslatef( x, y, 0.0f );
   gluQuadricTexture(pObj, 1);
   glBindTexture(GL_TEXTURE_2D, texture[t]);
@@ -337,7 +337,7 @@ void GLdisplay::clearButtons()
 void GLdisplay::addButton(Images t, float x, float y, float r, void (*action)(BStatus &state))
 {
   Button newButton;
-  
+
   newButton.x = x;
   newButton.y = y;
   newButton.r = r;
@@ -350,13 +350,13 @@ void GLdisplay::addButton(Images t, float x, float y, float r, void (*action)(BS
 void GLdisplay::drawButtons()
 {
   int i;
-  
+
   for(i = 0; i < buttonSize; i++)
   {
-/*    glEnable( GL_BLEND );
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-    drawDisk(IMG_BULGE,display->buttons[i].x,display->buttons[i].y,display->buttons[i].r*3,display);
-    glDisable( GL_BLEND );*/
+    /*    glEnable( GL_BLEND );
+          glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+          drawDisk(IMG_BULGE,display->buttons[i].x,display->buttons[i].y,display->buttons[i].r*3,display);
+          glDisable( GL_BLEND );*/
     drawDisk(buttons[i].texture,buttons[i].x,buttons[i].y,buttons[i].r);
   }
 }
@@ -364,7 +364,7 @@ void GLdisplay::drawButtons()
 void GLdisplay::checkButtons()
 {
   int i;
-  
+
   for(i = 0; i < buttonSize; i++)
   {
     if( hypot(buttons[i].x-event.motion.x,buttons[i].y-event.motion.y) < buttons[i].r)
@@ -401,7 +401,7 @@ int GLdisplay::LoadGLTextures(GLuint texture[])
   {
     success = 1;
 
-   
+
     for (i=0; i < TEXTURES; i++)
     {
       glBindTexture( GL_TEXTURE_2D, texture[i] ); /* Textur einstellen */
@@ -450,10 +450,10 @@ void GLdisplay::buildFont()
   if ( fontInfo == NULL )
   {
     printf("Schrift nicht verfuegbar.\n");
-	}
+  }
 
   glXUseXFont( fontInfo->fid, 32, 96, fontbase );
-  
+
   /* Aufraeumen */
   XFreeFont( tmpdisplay, fontInfo );
   XCloseDisplay( tmpdisplay );
@@ -477,11 +477,11 @@ GLvoid GLdisplay::glPrint(float red, float green, float blue, float x, float y, 
   glDisable(GL_BLEND);
   glPushAttrib( GL_LIST_BIT );
   glListBase( fontbase - 32 );
-  
+
   /* Position anpassen */
   y += 12.0f;
   x += 3.0f;
-  
+
   /* Schatten */
   glColor3f(0.3,0.3,0.3);
   glRasterPos2f(x+0.001,y+0.002);

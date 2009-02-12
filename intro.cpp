@@ -33,7 +33,7 @@ void intro(GLdisplay &display)
   uni.galaxies[0].inLevel = 0;
   uni.galaxies[0].exists = 1;
   uni.galaxies[0].nograv = 1;
-  
+
   uni.galaxies[1].x = 1.42;
   uni.galaxies[1].y = 1.42;
   uni.galaxies[1].z = VORN;
@@ -44,7 +44,7 @@ void intro(GLdisplay &display)
   uni.galaxies[1].inLevel = 1;
   uni.galaxies[1].exists = 1;
   uni.galaxies[1].nograv = 1;
-  
+
   /* Galaxie erzeugen */
   uni.starsSize = 0;
   uni.stars = NULL;
@@ -67,20 +67,20 @@ void intro(GLdisplay &display)
     cam.rx = 30;
 
     uni.move(simulationTime);
- 
+
     /* Fenster und Tiefenbuffer loeschen */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
+
     if(simulationTime > 500)
     {
       for(j = 0; j < 8; j++) uni.stars[(int)((rand() / (RAND_MAX + 1.0))*uni.starsSize)].vz = (10e8*(rand() / (RAND_MAX + 1.0)))+2e8;
     }
-    
+
     if(simulationTime == 570)
     {
       uni.galaxies[0].exists = 0;
     }
-    
+
     /* Universum zeichnen */ 
     if(simulationTime > 4)
     {
@@ -89,15 +89,15 @@ void intro(GLdisplay &display)
       herotime = 1.0-exp(-(simulationTime-600)*0.005);
       herotime = (herotime > 0)?herotime:0;
       herotime = (herotime < scale)?herotime:scale;
-      
+
       display.putImage( GLdisplay::IMG_SPACEHERO, 0.5-scale*herotime/2, 0.5-(scale*(186.0/634.0)*herotime)/2.0, scale*herotime, scale*(186.0/634.0)*herotime );
     }
 
     /* Versteckten Buffer aktivieren */
     SDL_GL_SwapBuffers();
- 
+
     handleEvents( display, 457645, uni );
-     
+
     if(display.state.m_breakIntro) break;
 
     /* etwas warten... */
