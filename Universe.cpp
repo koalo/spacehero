@@ -6,6 +6,21 @@
 
 #include "displayUniverse.h"
 
+#include "local.h"
+
+Star::Star(double R, double phi, double z, double v, double mass)
+{
+  x = R * cos(phi * M_PI/180);
+  y = R * sin(phi * M_PI/180);
+  z = z;
+
+  vx = v * sin(phi * M_PI/180);
+  vy = v * cos(phi * M_PI/180);
+  vz = 0;
+
+  this->mass = mass;
+}
+
 
 Level::Level(std::ifstream &in)
 {
@@ -29,197 +44,26 @@ Level::Level(std::ifstream &in)
 }
 
 std::vector<Star> Galaxy::getStars(int seed) {
-  seed=5;
-  return std::vector<Star>();
-#if 0
-  /*
-     skymass star;
-     double Stars_Angle;
-     double R_Array[ORBITS_MAX],
-     Orbit_Velocity[ORBITS_MAX], first_angle;
+  const double NStars = mass / 4e8;
+  const double NOrbits = mass / 4e10;
+  const double NStarsPerOrbit = NStars/NOrbits;
+  std::vector<Star> accu;
 
+  srand(seed);
 
-     int orbits1, i , j, s, Stars_Amount[ORBITS_MAX], starsAmount, starsAmountOrbit, realstarsAmount;
-     skymass *stars;
-     */
-
-  /* Anzahl von Orbits, von Masse abhaengig (Orbits MIN = 5, MAX = 15) */
-  int orbits1 = (mass * 2) / 4e10;
-  if(orbits1 > ORBITS_MAX)
-  {
-    printf("Galaxie ist zu schwer!\n");
-    exit(1);
-  }
-  int starsAmount = (mass) / 4e8;
-
-  std::vector<double> R_Array(ORBITS_MAX);
-  /* R_Array[20] <- Array von Radius der Orbit fuer 2 Galaxien */
-  /* 1 Radius zufaellige Radius berechnen (incl. R_MIN_CENTER) */
-  R_Array[0] = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
-
-  /* Naechste Radius Berechnen (incl. R_MIN) */
-
-  for (i = 1; i < orbits1; i++)
-  {
-    R_Array[i] = R_Array[i-1] + R_MIN +  ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
-  }
-
-
-  /*  starsAmountOrbit = starsAmount / orbits1;*/
-  /* das kann weg, brauch ich Stars_amount[i] nicht mehr*/
-  int realstarsAmount = 0;
-  std::vector<double> Stars_Amount(ORBITS_MAX);
-  for(i = 0; i < orbits1; i++)
-  {  
-    Stars_Amount[i] = starsAmount / (orbits1);
-    realstarsAmount += Stars_Amount[i];
-  }
-
-  int starsAmountOrbit = starsAmount / orbits1;
-
-  /* starsArrayGroesse festlegen */
-  /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
-  /*
-   *INstars = (skymass*)realloc(*INstars, sizeof(skymass) * (realstarsAmount + *starsSize));
-   if(*INstars == NULL)
-   {
-   printf("Kein Arbeitsspeicher fuer die Sterne!\n");
-   exit(1);
-   }
-   stars = &(*INstars)[*starsSize];
-   */
-
-
-  /* X, Y Koordiante fuer jede Stern ausrechnen */
-
-  /* Erste Winkel (first_angle) zwischen y=0,+x und Erste Stern auf der Bahn zufaellig,
-   * dann jede naechste Wikel durch Drewinkel Stars_Angle erzeugt
-   * Erzeugung durch Drehmatrix:
-   * [x2] = (cos&  -sin&) [x1]
-   * [y2]   (sin&   cos&) [y1]
-   *
-   * dazu star.vx, star.vy <- normierte GeschwindigkeitsVektoren von Stern senkrecht zu R, entgegengesetzt zu Zeit
-   */
-
-  /* fuer Galaxy1 */
-
-  std::vector<Star> stars(realstarsAmount);
-
-  s = -1;
-  for(i = 0; i < orbits1; i++)
-  {
-    s++;
-
-    first_angle = (double)(360 * (rand() / (RAND_MAX + 1.0)));
-
-    star.x = (R_Array[i] * cos(first_angle * M_PI/180)) - (0.0 * sin(first_angle * M_PI/180)) + galaxy->x;
-    star.y = (R_Array[i] * sin(first_angle * M_PI/180)) + (0.0 * cos(first_angle * M_PI/180)) + galaxy->y;
-
-
-    star.vx = (0 * cos(first_angle * M_PI/180)) - (1.0 * sin(first_angle * M_PI/180));
-    star.vy = (0 * sin(first_angle * M_PI/180)) + (1.0 * cos(first_angle * M_PI/180));
-
-    stars[s] = star;
-
-    for(j = 1; j < (starsAmountOrbit); j++)
-    {
-      s++;
-
-      Stars_Angle = (double)(360 * (rand() / (RAND_MAX + 1.0)));
-
-      star.x = (stars[s-1].x - galaxy->x) * cos(Stars_Angle * M_PI/180) - (stars[s-1].y - galaxy->y) * sin(Stars_Angle * M_PI/180) + galaxy->x;
-
-      star.y = (stars[s-1].x - galaxy->x) * sin(Stars_Angle * M_PI/180) + (stars[s-1].y - galaxy->y) * cos(Stars_Angle * M_PI/180) + galaxy->y;
-
-      star.vx = (stars[s-1].vx * cos(Stars_Angle * M_PI/180)) - (stars[s-1].vy * sin(Stars_Angle * M_PI/180));
-      star.vy = (stars[s-1].vx * sin(Stars_Angle * M_PI/180)) + (stars[s-1].vy * cos(Stars_Angle * M_PI/180));
-
-      stars[s] = star;
+  int n=NOrbits;
+  double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
+  while (n--) {
+    orb += R_MIN +  ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
+    double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
+    int m=NStarsPerOrbit;
+    while (m--) {
+      double phi = (double)(360 * (rand() / (RAND_MAX + 1.0)));
+      double z = (double)((1.0/10.0) * (rand() / (RAND_MAX + 1.0)))-(1.0/20.0);
+      accu.push_back(Star(orb,phi,z,v));
     }
-
   }
-
-  starsAmount = s + 1;
-  *starsSize += starsAmount;
-
-  /* Z Koordinate fuer jede Stern ausgeben */
-  /* fuer 4 Gruppen Teilen */
-  /* In der Mitte soll dichter sein ale am Randen */
-
-  /* 1 Gruppe kriegt Z Koordinate von 0 bis 1/40 */
-  for(i = 0; i < starsAmount; i=i+4)
-  {
-    stars[i].z = (double)((rand() / (RAND_MAX + 1.0)) / 100);
-  }
-
-  /* von 0 bis -1/40 */
-  for(i = 1; i < starsAmount; i=i+4)
-  {
-    stars[i].z = - (double)((rand() / (RAND_MAX + 1.0)) / 100);
-  }
-
-  /* von 0 bis 1/30 */
-  for(i = 2; i < starsAmount; i=i+4)
-  {
-    stars[i].z = (double)((rand() / (RAND_MAX + 1.0)) / 80);
-  }
-
-  /* von 0 bis -1/30 */
-  for(i = 3; i < starsAmount; i=i+4)
-  {
-    stars[i].z = - (double)((rand() / (RAND_MAX + 1.0)) / 80);
-  }
-
-  /* Masse für jede Stern verteilen*/
-
-  /* Massen fur Sternen die herum fliegen */
-  for(i = 0; i < starsAmount; i++)
-  {
-    stars[i].mass = 1e3;
-    stars[i].exists = 1;
-  }
-
-  /* Nuetige AnfangsGeschwindigkeit 
-   * Orbit_Velocity = sqrt((G*M)/R)
-   *
-   * und NewtonBeschleunigung von Sternen auf verschidenen Bahnen
-   * Orbit_Accelerate = G*(M/R²)
-   *
-   * M - Masse von Stern in Mittelpunkt
-   *GRAVKONST- Gravitationskonstante
-   */
-
-  for(i=0; i < orbits1; i++)
-  {
-    Orbit_Velocity[i] = sqrt((GRAVKONST * galaxy->mass * SUNMASS) / (R_Array[i] * WIDTHINMETERS));
-  }
-
-
-
-  /* VX und VY -Geschwindigkeiten, für jede Stern berechnen */
-
-  s = -1;
-  for(i = 0; i < orbits1; i++)
-  { 
-
-    for(j = 0; j < (starsAmountOrbit); j++)
-    {
-      s++;
-
-      /* Normirte GeschwindigkeitsVektor * Orbit_Geschwindigkeit */
-      stars[s].vx *= Orbit_Velocity[i];
-      stars[s].vy *= Orbit_Velocity[i];
-
-      /* Dazu noch AnfangsGeschwindigkeit von Galaxy */
-      stars[s].vx += galaxy->vx;
-      stars[s].vy += galaxy->vy;
-
-    }
-
-  }
-}
-#endif
+  return accu;
 }
 
 Universe::Universe(Level &l) :
@@ -227,6 +71,7 @@ Universe::Universe(Level &l) :
 {
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
     std::vector<Star> gstars = i->getStars(seed);
+    std::cerr << "got " << gstars.size() << " stars" << std::endl;
     copy(gstars.begin(),gstars.end(),back_inserter(stars));
   }
 }
