@@ -9,9 +9,11 @@ Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
 
 bool Spacehero::play()
 {
+  ButtonFlags bflags;
+  
   while (true) {
-    //usleep(100000);
-    //if(i++ > 30) state = spacehero_next;
+    display.handleEvents(SpaceDisplay::SimulationView, universe, bflags);
+    if(bflags.checkFlag(ButtonFlags::breakSimulation)) state = spacehero_next;   
     switch (state) {
       case spacehero_edit:
         state = edit();
@@ -62,7 +64,6 @@ Spacehero::SpaceheroState Spacehero::simulate() {
   if (paruni->timeout()) return spacehero_next; // XXX
   if ((won = paruni->won())) return spacehero_next;
 
-  display.handleEvents(0,*paruni);
   return state;
 }
 

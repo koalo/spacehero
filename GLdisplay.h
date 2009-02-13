@@ -16,16 +16,35 @@ class Button;
 
 #include "Universe.h"
 
+class AbstractButtonFlags
+{
+  public:
+  enum Actions {
+  };
+
+  private:
+  int flags;
+  
+  public:
+  void activateFlag(Actions action);
+  bool checkFlag(int action); /* statt int waer enum besser, aber geht nicht da kein Enum-Prototyping - loescht auch das Flag */
+  AbstractButtonFlags()
+  {
+    flags = 0;
+  }
+};
+
+#include "ButtonFlags.h"
 
 class Button
 {
-	public:
-	int texture;
-	float x;
-	float y;
-	float r;
-	int active;
-	void (*action)(BStatus &state);
+  public:
+ 	  int texture;
+ 	  float x;
+	  float y;
+	  float r;
+	  int active;
+	  ButtonFlags::Actions action;
 };
 
 
@@ -92,10 +111,10 @@ class GLdisplay
 	void drawSphere(Images t, float x, float y, float r);
 	void drawDisk(int t, float x, float y, float r);
 
-	void addButton(Images t, float x, float y, float r, void (*action)(BStatus &state));
+	void addButton(Images t, float x, float y, float r, ButtonFlags::Actions action);
 	void clearButtons();
 	void drawButtons();
-	void checkButtons();
+	void checkButtons(ButtonFlags &flags);
 
 	void KillFont();
 	void buildFont();
