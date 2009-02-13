@@ -1,3 +1,4 @@
+#if 0
 #include "BStatus.h"
 #include "local.h"
 
@@ -48,4 +49,4 @@ void BStatus::exit(BStatus &state)
 {
   state.m_exit = 1;
 }
-
+#endif

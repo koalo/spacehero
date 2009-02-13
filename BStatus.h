@@ -1,3 +1,4 @@
+#if 0
 #ifndef _BUTTONS_H_
 #define _BUTTONS_H_
 
@@ -25,4 +26,5 @@ class BStatus
     static void exit(BStatus &);
 };
 
+#endif
 #endif

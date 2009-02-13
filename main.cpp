@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
     std::cerr << l << std::endl;
     Universe u(l);
     Spacehero s(display,u);
+    s.play();
 
   }
 

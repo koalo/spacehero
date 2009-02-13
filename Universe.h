@@ -10,6 +10,17 @@
 
 #include "local.h"
 
+#include <boost/progress.hpp>
+#include <iostream>
+#include <climits>
+
+using boost::timer;
+using boost::progress_timer;
+using boost::progress_display;
+
+
+
+
 class SkyObject {
   public:
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
@@ -30,7 +41,7 @@ class SkyMass : public SkyObject {
   public:
     SkyMass():
       //fx(0),fy(0),fz(0),
-      vx(0),vy(0),vz(0) {};
+      vx(0),vy(0),vz(0),mass(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 
     inline void operator^ (SkyMass &m) {
@@ -47,17 +58,18 @@ class SkyMass : public SkyObject {
       AY = AY/r3;
 
       a1 = SUNGRAVTIMEWIDTH*mass;
-      vx += a1*AX;
-      vy += a1*AY;  
+      m.vx += a1*AX;
+      m.vy += a1*AY;  
 
       a2 = SUNGRAVTIMEWIDTH*m.mass;
-      m.vx -= a2*AX;
-      m.vy -= a2*AY;
+      vx -= a2*AX;
+      vy -= a2*AY;
     };
-    inline void move() {
-      x += (vx/WIDTHINMETERS)*TIMESCALE;
-      y += (vy/WIDTHINMETERS)*TIMESCALE;
-      z += (vz/WIDTHINMETERS)*TIMESCALE;
+
+    inline void move(double delta) {
+      x += (vx/WIDTHINMETERS)*TIMESCALE*delta;
+      y += (vy/WIDTHINMETERS)*TIMESCALE*delta;
+      z += (vz/WIDTHINMETERS)*TIMESCALE*delta;
       //if(hypot(vx,vy)>1) std::cerr << ".";
     }
 };
@@ -66,7 +78,7 @@ class SkyMass : public SkyObject {
 class Goal : public SkyObject {
   public:
     double radius;
-Goal(): radius(0) {};
+    Goal(): radius(0) {};
     Goal(std::ifstream &in) {
       in >> x >> y >> z;
       in >> radius;
@@ -91,11 +103,8 @@ class Star;
 
 class Galaxy : public SkyMass {
   private:
-    static const int ORBITS_MAX = 130;
-    static const int R_MIN_CENTER = 0.02;
-    static const int R_MIN = 0.0005;
-    static const int A = 200;
-    static const int M = 5;
+    static const double R_MIN_CENTER = 0.02;
+    static const double R_MIN = 0.0005;
 
   public:
     Galaxy(std::ifstream &in) {
@@ -119,6 +128,10 @@ class Star : public SkyMass {
 };
 
 class Level {
+    timer t0;
+    double maxtime;
+    double lastt;
+    double fps;
   public:
     std::vector<Blackhole> holes;
     std::vector<Galaxy> galaxies;
@@ -127,6 +140,17 @@ class Level {
     int seed;
   public:
     Level(std::ifstream &in);
+
+    void tick() { t0 = timer(); }; // start time measure
+    double tack(double weight=0.99) {
+      fps = weight*fps + (1-weight)*(elapsed()-lastt);
+      return lastt=elapsed(); 
+    }; // get elapsed time
+    double elapsed() { return t0.elapsed(); }; // get elapsed time
+    double delta() {
+      return fps;
+    };
+    bool timeout() {return t0.elapsed() > maxtime; };
 
 
 
@@ -142,81 +166,9 @@ class Universe: public Level
   public:
   Universe(Level &l);
   //bool play(GLdisplay &d);
-  void move();
-  bool timeout() {return false;};
+  void move(double delta);
   bool won() {return false;};
 
 };
 
-#if 0
-
-class skymass
-{
-  public:
-    double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-    double vx, vy, vz; /* in m/s */
-    double fx, fy, fz; /* Kraft in Newton auf den Koerper */
-    double mass; /* in Sonnenmassen */
-    int inLevel; /* ob das Objekt durch das Level vorgegeben ist */
-    int exists;
-    int nograv;
-  public:
-    static void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
-    skymass(const skymass& p);
-    skymass() {};
-};
-
-class skygoal
-{
-  public:
-    double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
-    double r; /* Radius */  
-};
-
-
-public:
-Universe() {};
-//int levelladen(std::ifstream &level);
-public:
-skygoal goal;
-skymass holes[MAX_LEVEL_HOLES+MAX_PUT_HOLES];
-skymass galaxies[MAX_GALAXIES];
-skymass *stars;
-int holesSize;
-int galaxiesSize;
-int starsSize;
-double massreserve;
-
-public:
-/* Zeichnet die Oberflaeche zum Setzen der Galaxien */
-void drawPut(GLdisplay &display);
-/* Zeichnet die Simulation */
-void drawSimulation( GLdisplay &display, Kamera *cam, int time ); 
-void move(int time);
-
-public:
-void eventHorizon();
-private:
-inline void applyNewton(skymass* skymass1, skymass* skymass2, int teiler)
-{
-};
-
-#include "local.h"
-
-
-
-
-void constructGalaxy(skymass *galaxy, skymass **INstars, int *starsSize);
 #endif
-
-
-
-
-
-
-
-
-
-#endif
-
-

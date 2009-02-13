@@ -40,7 +40,8 @@ class SpaceDisplay : public GLdisplay
 
     void displayUniverse( Universe &uni, int projection, int width, int height );
     void drawBridge(Universe &uni, BridgeView view);
-    void handleEvents(int part, Universe &uni);
+    void handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags);
+
   private:
     void alignSimulButtons();
     void alignPutButtons();

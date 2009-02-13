@@ -57,6 +57,8 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 			glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
 		}
 	}
+	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
+	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
 	/* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
 	/*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
 	putImage( (view==PutView)?GLdisplay::IMG_PANEL_MASS:GLdisplay::IMG_PANEL_TIME, this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
@@ -116,13 +118,13 @@ void SpaceDisplay::alignSimulButtons()
 	center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
 	/* Simulation stoppen */
-	addButton(GLdisplay::IMG_STOP, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, BStatus::breakSimulation);
+	addButton(GLdisplay::IMG_STOP, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
 
 	/* Replay */
-	addButton(GLdisplay::IMG_REPLAY, center+REPLAY_BUTTON, height-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, BStatus::replaySimulation);
+	addButton(GLdisplay::IMG_REPLAY, center+REPLAY_BUTTON, height-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
 
 	/* Exit */
-	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, BStatus::exit);
+	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 }
 
 void SpaceDisplay::alignPutButtons()
@@ -133,18 +135,18 @@ void SpaceDisplay::alignPutButtons()
 	center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
 	/* Simulation starten */
-	addButton(GLdisplay::IMG_START, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, BStatus::startSimulation);
+	addButton(GLdisplay::IMG_START, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
 
 	/* Exit */
-	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, BStatus::exit);
+	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 
 	ypos = height*0.35;
 	margin = UNIVERSE_RIGHT*0.3;
 
 #define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) 
-	addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, BStatus::smallHole);
-	addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, BStatus::mediumHole);
-	addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, BStatus::largeHole);
+/*	addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
+	addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
+	addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);*/
 #undef TEXTURE
 }
 
@@ -302,7 +304,7 @@ glPopMatrix();
 }
 
 
-void SpaceDisplay::handleEvents(int part, Universe &uni, ButtonHandler buttonhandler)
+void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags)
 {
   unsigned int i, remove;
 
@@ -325,15 +327,16 @@ void SpaceDisplay::handleEvents(int part, Universe &uni, ButtonHandler buttonhan
         {
           isActive = 1;
         }  
+        break;
       case SDL_MOUSEBUTTONDOWN:
         /* Buttons */
-        if(part == PUT || part == SIMULATION)
+        if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView)
         {
-          checkButtons(buttonhandler);
+          checkButtons(flags);
         }
-      
+              
         /* Nur fuer Setzfenster */
-        if(part == PUT)
+        if(view == SpaceDisplay::PutView)
         {        
           /* schwarzes Loch setzen */
           if(event.motion.x > UNIVERSE_LEFT && 
@@ -396,7 +399,7 @@ void SpaceDisplay::handleEvents(int part, Universe &uni, ButtonHandler buttonhan
         /* Groesse vom Fenster geaendert */
         resizeWindow( event.resize.w, event.resize.h );
         
-        if(part == PUT)
+        if(view == SpaceDisplay::PutView)
         {
           drawBridge(uni,SpaceDisplay::PutView);
         }
@@ -416,7 +419,7 @@ void SpaceDisplay::handleEvents(int part, Universe &uni, ButtonHandler buttonhan
 	exit(0);
             break;
           case SDLK_SPACE:
-            state.m_breakIntro = 1;
+            flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
             break;
           default:
             break;
