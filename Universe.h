@@ -43,8 +43,8 @@ class SkyMass : public SkyObject {
       r3 = hypot(AX,AY);
       r3 = r3*r3*r3;
 
-      AX = -AX/r3;
-      AY = -AY/r3;
+      AX = AX/r3;
+      AY = AY/r3;
 
       a1 = SUNGRAVTIMEWIDTH*mass;
       vx += a1*AX;
@@ -91,11 +91,8 @@ class Star;
 
 class Galaxy : public SkyMass {
   private:
-    static const int ORBITS_MAX = 130;
     static const int R_MIN_CENTER = 0.02;
     static const int R_MIN = 0.0005;
-    static const int A = 200;
-    static const int M = 5;
 
   public:
     Galaxy(std::ifstream &in) {

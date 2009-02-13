@@ -10,14 +10,13 @@
 
 Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
 {
+  x=y=z=vx=vy=vz=0;
   x = R * cos(phi * M_PI/180) + g.x;
   y = R * sin(phi * M_PI/180) + g.y;
   z = z + g.z;
-  //z=0;
 
-  vx = v * cos((phi-90-(g.lr?0:180)) * M_PI/180)+g.vx;
-  vy = v * sin((phi-90-(g.lr?0:180)) * M_PI/180)+g.vy;
-  //vx=vy=0;
+  vx = v * cos((phi-90-(g.lr?0:180)) * M_PI/180) + g.vx;
+  vy = v * sin((phi-90-(g.lr?0:180)) * M_PI/180) + g.vy;
   vz = 0+g.vz;
 
   this->mass = mass;
@@ -55,14 +54,15 @@ std::vector<Star> Galaxy::getStars(int seed) {
 
   int n=NOrbits;
   double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
+  orb *= 10;
   while (n--) {
-    orb += R_MIN +  ((double)((rand() / (RAND_MAX + 1.0))) / 150.0);
+    orb += R_MIN + 10.0* ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
     double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
     int m=NStarsPerOrbit;
     while (m--) {
       double phi = (double)(360 * (rand() / (RAND_MAX + 1.0)));
       double z = (double)((1.0/10.0) * (rand() / (RAND_MAX + 1.0)))-(1.0/20.0);
-      accu.push_back(Star(*this,orb,phi,z,v));
+      accu.push_back(Star(*this,orb,phi,z,v,1e3));
     }
   }
   return accu;
@@ -90,21 +90,20 @@ void Universe::move()
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       *i ^ *k;
     }
-    i->move();
   }
 // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
-      if(i!=j)
-      *i ^ *j;
+      if(i!=j) *i ^ *j;
     }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       *i ^ *k;
     }
   }
 
-  //for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
-  //}
+  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
+    i->move();
+  }
 
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     i->move();
