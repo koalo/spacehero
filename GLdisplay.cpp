@@ -169,7 +169,7 @@ void GLdisplay::clearButtons()
   buttonSize = 0;
 }
 
-void GLdisplay::addButton(Images t, float x, float y, float r, ButtonAction action)
+void GLdisplay::addButton(Images t, float x, float y, float r, ButtonFlags::Actions action)
 {
   Button newButton;
   
@@ -196,7 +196,7 @@ void GLdisplay::drawButtons()
   }
 }
 
-void GLdisplay::checkButtons(ButtonHandler buttonhandler)
+void GLdisplay::checkButtons(ButtonFlags &flags)
 {
   int i;
   
@@ -204,10 +204,23 @@ void GLdisplay::checkButtons(ButtonHandler buttonhandler)
   {
     if( hypot(buttons[i].x-event.motion.x,buttons[i].y-event.motion.y) < buttons[i].r)
     {
-      buttons[i].action(state);
+      flags.activateFlag((AbstractButtonFlags::Actions)buttons[i].action);
     }
   }
 }
+
+void AbstractButtonFlags::activateFlag(Actions action)
+{
+  flags = flags | action;
+}
+
+bool AbstractButtonFlags::checkFlag(int action)
+{
+  bool ret = ((flags & action) == action);
+  flags = flags & ~action;
+  return ret;
+}
+
 
 int GLdisplay::LoadGLTextures(GLuint texture[])
 {
