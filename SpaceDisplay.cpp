@@ -1,5 +1,6 @@
 #include "SpaceDisplay.h"
 #include "local.h"
+#include "Spacehero.h"
 
 void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 {
@@ -301,7 +302,7 @@ glPopMatrix();
 }
 
 
-void SpaceDisplay::handleEvents(int part, Universe &uni)
+void SpaceDisplay::handleEvents(int part, Universe &uni, ButtonHandler buttonhandler)
 {
   unsigned int i, remove;
 
@@ -328,7 +329,7 @@ void SpaceDisplay::handleEvents(int part, Universe &uni)
         /* Buttons */
         if(part == PUT || part == SIMULATION)
         {
-          checkButtons();
+          checkButtons(buttonhandler);
         }
       
         /* Nur fuer Setzfenster */

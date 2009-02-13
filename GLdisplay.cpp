@@ -169,7 +169,7 @@ void GLdisplay::clearButtons()
   buttonSize = 0;
 }
 
-void GLdisplay::addButton(Images t, float x, float y, float r, void (*action)(BStatus &state))
+void GLdisplay::addButton(Images t, float x, float y, float r, ButtonAction action)
 {
   Button newButton;
   
@@ -196,7 +196,7 @@ void GLdisplay::drawButtons()
   }
 }
 
-void GLdisplay::checkButtons()
+void GLdisplay::checkButtons(ButtonHandler buttonhandler)
 {
   int i;
   

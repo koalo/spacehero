@@ -16,6 +16,16 @@ class Button;
 
 #include "Universe.h"
 
+#include "ButtonAction.h"
+
+class AbstractButtonAction
+{
+  int flags;
+  
+  void activateFlag(ButtonAction action),
+  void clearFlag(ButtonAction action),
+  bool checkFlag(ButtonAction action) /* ruft auch clearFlag auf */
+}
 
 class Button
 {
@@ -25,7 +35,7 @@ class Button
 	float y;
 	float r;
 	int active;
-	void (*action)(BStatus &state);
+	ButtonAction action;
 };
 
 
@@ -92,7 +102,7 @@ class GLdisplay
 	void drawSphere(Images t, float x, float y, float r);
 	void drawDisk(int t, float x, float y, float r);
 
-	void addButton(Images t, float x, float y, float r, void (*action)(BStatus &state));
+	void addButton(Images t, float x, float y, float r, ButtonAction action);
 	void clearButtons();
 	void drawButtons();
 	void checkButtons();
