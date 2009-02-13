@@ -44,7 +44,7 @@ class SkyMass : public SkyObject {
       vx(0),vy(0),vz(0),mass(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 
-    inline void operator^ (SkyMass &m) {
+    inline void newton(SkyMass &m, double delta) {
       double AX, AY, a1, a2, r3;
       //std::cerr << *this << m << std::endl;
 
@@ -57,11 +57,11 @@ class SkyMass : public SkyObject {
       AX = AX/r3;
       AY = AY/r3;
 
-      a1 = SUNGRAVTIMEWIDTH*mass;
+      a1 = SUNGRAVTIMEWIDTH*mass*delta;
       m.vx += a1*AX;
       m.vy += a1*AY;  
 
-      a2 = SUNGRAVTIMEWIDTH*m.mass;
+      a2 = SUNGRAVTIMEWIDTH*m.mass*delta;
       vx -= a2*AX;
       vy -= a2*AY;
     };
@@ -131,7 +131,7 @@ class Level {
     timer t0;
     double maxtime;
     double lastt;
-    double fps;
+    double m_delta;
   public:
     std::vector<Blackhole> holes;
     std::vector<Galaxy> galaxies;
@@ -143,12 +143,12 @@ class Level {
 
     void tick() { t0 = timer(); }; // start time measure
     double tack(double weight=0.99) {
-      fps = weight*fps + (1-weight)*(elapsed()-lastt);
+      m_delta = weight*m_delta + (1-weight)*(elapsed()-lastt);
       return lastt=elapsed(); 
     }; // get elapsed time
     double elapsed() { return t0.elapsed(); }; // get elapsed time
     double delta() {
-      return fps;
+      return m_delta;
     };
     bool timeout() {return t0.elapsed() > maxtime; };
 
