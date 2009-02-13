@@ -30,7 +30,7 @@ class SkyMass : public SkyObject {
   public:
     SkyMass():
       //fx(0),fy(0),fz(0),
-      vx(0),vy(0),vz(0) {};
+      vx(0),vy(0),vz(0),mass(0) {};
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 
     inline void operator^ (SkyMass &m) {
