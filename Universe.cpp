@@ -16,8 +16,8 @@ Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
   z = z + g.z;
 
   phi += -90-(g.lr?0:180);
-  vx = 1e1 * v * cos(phi * M_PI/180) + g.vx;
-  vy = 1e1 * v * sin(phi * M_PI/180) + g.vy;
+  vx = 1e0 * v * cos(phi * M_PI/180) + g.vx;
+  vy = 1e0 * v * sin(phi * M_PI/180) + g.vy;
   vz = 0+g.vz;
 
   this->mass = mass;
@@ -87,10 +87,10 @@ void Universe::move(double delta)
 // star: hole, galaxy
   for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
-      *i ^ *j;
+      i->newton(*j,delta);
     }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
-      *i ^ *k;
+      i->newton(*k,delta);
     }
     //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
         //*i ^ *l;
@@ -99,10 +99,11 @@ void Universe::move(double delta)
 // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     for(std::vector<Galaxy>::iterator j = i+1; j!= galaxies.end(); j++) {
-      if(i!=j) *i ^ *j;
+      if(i!=j) 
+      i->newton(*j,delta);
     }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
-      *i ^ *k;
+      i->newton(*k,delta);
     }
   }
 
