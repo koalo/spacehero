@@ -10,6 +10,17 @@
 
 #include "local.h"
 
+#include <boost/progress.hpp>
+#include <iostream>
+#include <climits>
+
+using boost::timer;
+using boost::progress_timer;
+using boost::progress_display;
+
+
+
+
 class SkyObject {
   public:
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
@@ -43,21 +54,22 @@ class SkyMass : public SkyObject {
       r3 = hypot(AX,AY);
       r3 = r3*r3*r3;
 
-      AX = AX/r3;
-      AY = AY/r3;
+      AX = -AX/r3;
+      AY = -AY/r3;
 
-      a1 = SUNGRAVTIMEWIDTH*mass;
+      a1 = SUNGRAVTIMEWIDTH*m.mass;
       vx += a1*AX;
       vy += a1*AY;  
 
-      a2 = SUNGRAVTIMEWIDTH*m.mass;
+      a2 = SUNGRAVTIMEWIDTH*mass;
       m.vx -= a2*AX;
       m.vy -= a2*AY;
     };
-    inline void move() {
-      x += (vx/WIDTHINMETERS)*TIMESCALE;
-      y += (vy/WIDTHINMETERS)*TIMESCALE;
-      z += (vz/WIDTHINMETERS)*TIMESCALE;
+
+    inline void move(double delta) {
+      x += (vx/WIDTHINMETERS)*TIMESCALE*delta;
+      y += (vy/WIDTHINMETERS)*TIMESCALE*delta;
+      z += (vz/WIDTHINMETERS)*TIMESCALE*delta;
       //if(hypot(vx,vy)>1) std::cerr << ".";
     }
 };
@@ -116,6 +128,10 @@ class Star : public SkyMass {
 };
 
 class Level {
+    timer t0;
+    double maxtime;
+    double lastt;
+    double fps;
   public:
     std::vector<Blackhole> holes;
     std::vector<Galaxy> galaxies;
@@ -124,6 +140,17 @@ class Level {
     int seed;
   public:
     Level(std::ifstream &in);
+
+    void tick() { t0 = timer(); }; // start time measure
+    double tack(double weight=0.99) {
+      fps = weight*fps + (1-weight)*(elapsed()-lastt);
+      return lastt=elapsed(); 
+    }; // get elapsed time
+    double elapsed() { return t0.elapsed(); }; // get elapsed time
+    double delta() {
+      return fps;
+    };
+    bool timeout() {return t0.elapsed() > maxtime; };
 
 
 
@@ -139,8 +166,7 @@ class Universe: public Level
   public:
   Universe(Level &l);
   //bool play(GLdisplay &d);
-  void move();
-  bool timeout() {return false;};
+  void move(double delta);
   bool won() {return false;};
 
 };

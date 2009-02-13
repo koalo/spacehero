@@ -1,4 +1,5 @@
 #include "Spacehero.h"
+#include <sys/time.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   :display(d), universe(u)
@@ -10,18 +11,19 @@ bool Spacehero::play()
 {
   unsigned int i = 0;
   while (true) {
-    usleep(100000);
-    if(i++ > 30) state = spacehero_next;
+    //usleep(100000);
+    //if(i++ > 30) state = spacehero_next;
     switch (state) {
       case spacehero_edit:
         state = edit();
         break;
       case spacehero_startsimu:
         paruni = new Universe(universe);
+        paruni->tick();
         state = spacehero_simulate;
         break;
       case spacehero_simulate:
-        std::cerr << i << std::endl;
+        //std::cerr << i << std::endl;
         state = simulate();
         break;
       case spacehero_stopsimu:
@@ -49,11 +51,19 @@ Spacehero::SpaceheroState Spacehero::edit() {
 
 }
 
+#define min(a,b) (a)<(b)?(a):(b)
+#define max(a,b) (a)<(b)?(b):(a)
 Spacehero::SpaceheroState Spacehero::simulate() {
-  paruni->move();
+  double delta=paruni->delta();
+  paruni->move(delta);
+
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
-  if (paruni->timeout()) return spacehero_edit;
+  double t = paruni->tack();
+  //while(( paruni->tack() - t) < delta) {
+    //std::cerr << t << paruni->tack() << std::endl;
+  //};
+  if (paruni->timeout()) return spacehero_next; // XXX
   if ((won = paruni->won())) return spacehero_next;
 
   return handleEvents();

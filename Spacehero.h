@@ -24,6 +24,9 @@ class Spacehero
 	Universe &universe;
   Universe *paruni;
 
+  static const double minframerate = 1.0/20.0;
+  static const double maxframerate = 1.0/100.0;
+
 public:
 
 	Spacehero(SpaceDisplay &d, Universe &u);

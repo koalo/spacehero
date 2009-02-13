@@ -42,6 +42,7 @@ Level::Level(std::ifstream &in)
         break;
     }
   }
+  maxtime = 30.0;
 }
 
 std::vector<Star> Galaxy::getStars(int seed) {
@@ -54,7 +55,7 @@ std::vector<Star> Galaxy::getStars(int seed) {
 
   int n=NOrbits;
   double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
-  orb *= 10;
+  orb *= 10.0;
   while (n--) {
     orb += R_MIN + 10.0* ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
     double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
@@ -80,8 +81,9 @@ Universe::Universe(Level &l) :
 }
 
 
-void Universe::move()
+void Universe::move(double delta)
 {
+  //std::cerr << "moving Universe with delta: " << delta << std::endl;
 // star: hole, galaxy
   for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
@@ -102,11 +104,11 @@ void Universe::move()
   }
 
   for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
-    i->move();
+    i->move(delta);
   }
 
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
-    i->move();
+    i->move(delta);
   }
 }
 
