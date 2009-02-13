@@ -46,11 +46,11 @@ class SkyMass : public SkyObject {
       AX = -AX/r3;
       AY = -AY/r3;
 
-      a1 = SUNGRAVTIMEWIDTH*mass*5e8;
+      a1 = SUNGRAVTIMEWIDTH*mass;
       vx += a1*AX;
       vy += a1*AY;  
 
-      a2 = SUNGRAVTIMEWIDTH*m.mass*5e8;
+      a2 = SUNGRAVTIMEWIDTH*m.mass;
       m.vx -= a2*AX;
       m.vy -= a2*AY;
     };
