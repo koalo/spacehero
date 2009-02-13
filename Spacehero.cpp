@@ -9,7 +9,6 @@ Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
 
 bool Spacehero::play()
 {
-  unsigned int i = 0;
   while (true) {
     //usleep(100000);
     //if(i++ > 30) state = spacehero_next;
@@ -59,14 +58,12 @@ Spacehero::SpaceheroState Spacehero::simulate() {
 
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
-  double t = paruni->tack();
-  //while(( paruni->tack() - t) < delta) {
-    //std::cerr << t << paruni->tack() << std::endl;
-  //};
+  paruni->tack();
   if (paruni->timeout()) return spacehero_next; // XXX
   if ((won = paruni->won())) return spacehero_next;
 
-  return handleEvents();
+  display.handleEvents(0,*paruni);
+  return state;
 }
 
 Spacehero::SpaceheroState Spacehero::handleEvents() {

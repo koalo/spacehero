@@ -103,8 +103,8 @@ class Star;
 
 class Galaxy : public SkyMass {
   private:
-    static const int R_MIN_CENTER = 0.02;
-    static const int R_MIN = 0.0005;
+    static const double R_MIN_CENTER = 0.02;
+    static const double R_MIN = 0.0005;
 
   public:
     Galaxy(std::ifstream &in) {
