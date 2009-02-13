@@ -54,16 +54,16 @@ class SkyMass : public SkyObject {
       r3 = hypot(AX,AY);
       r3 = r3*r3*r3;
 
-      AX = -AX/r3;
-      AY = -AY/r3;
+      AX = AX/r3;
+      AY = AY/r3;
 
-      a1 = SUNGRAVTIMEWIDTH*m.mass;
-      vx += a1*AX;
-      vy += a1*AY;  
+      a1 = SUNGRAVTIMEWIDTH*mass;
+      m.vx += a1*AX;
+      m.vy += a1*AY;  
 
-      a2 = SUNGRAVTIMEWIDTH*mass;
-      m.vx -= a2*AX;
-      m.vy -= a2*AY;
+      a2 = SUNGRAVTIMEWIDTH*m.mass;
+      vx -= a2*AX;
+      vy -= a2*AY;
     };
 
     inline void move(double delta) {

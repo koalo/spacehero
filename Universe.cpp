@@ -10,7 +10,7 @@
 
 Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
 {
-  x=y=z=vx=vy=vz=0;
+  //x=y=z=vx=vy=vz=0;
   x = R * cos(phi * M_PI/180) + g.x;
   y = R * sin(phi * M_PI/180) + g.y;
   z = z + g.z;
@@ -47,7 +47,7 @@ Level::Level(std::ifstream &in)
 
 std::vector<Star> Galaxy::getStars(int seed) {
   double NStars = mass / 4e8;
-  double NOrbits = mass / 4e10;
+  double NOrbits = mass / 2e10;
   double NStarsPerOrbit = NStars/NOrbits;
   std::vector<Star> accu;
 
@@ -55,9 +55,8 @@ std::vector<Star> Galaxy::getStars(int seed) {
 
   int n=NOrbits;
   double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
-  orb *= 10.0;
   while (n--) {
-    orb += R_MIN + 10.0* ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
+    orb += R_MIN + ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
     double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
     int m=NStarsPerOrbit;
     while (m--) {
@@ -92,6 +91,9 @@ void Universe::move(double delta)
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       *i ^ *k;
     }
+    //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
+        //*i ^ *l;
+    //}
   }
 // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
