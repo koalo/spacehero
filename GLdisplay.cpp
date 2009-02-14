@@ -240,22 +240,22 @@ int GLdisplay::LoadGLTextures(GLuint texture[])
   glGenTextures( TEXTURES, texture ); /* Texturen vorbereiten */
 
   /* Textur einladen */
-  if( (TextureImage[0] = SDL_LoadBMP( "data/star.bmp" )) &&
-      (TextureImage[1] = SDL_LoadBMP( "data/hole.bmp" )) &&
-      (TextureImage[2] = SDL_LoadBMP( "data/black.bmp" )) &&
-      (TextureImage[3] = SDL_LoadBMP( "data/goal.bmp" ))  &&
-      (TextureImage[4] = SDL_LoadBMP( "data/panel_MASS.bmp" ))  &&
-      (TextureImage[5] = SDL_LoadBMP( "data/panel_TIME.bmp" ))  &&
-      (TextureImage[6] = SDL_LoadBMP( "data/green.bmp" ))  &&
-      (TextureImage[7] = SDL_LoadBMP( "data/button_start.bmp" )) &&
-      (TextureImage[8] = SDL_LoadBMP( "data/button_stop.bmp" )) &&
-      (TextureImage[9] = SDL_LoadBMP( "data/button_replay.bmp" )) &&
-      (TextureImage[10] = SDL_LoadBMP( "data/x.bmp" )) &&
-      (TextureImage[11] = SDL_LoadBMP( "data/spacehero.bmp" )) &&
-      (TextureImage[12] = SDL_LoadBMP( "data/bulge.bmp" )) &&
-      (TextureImage[13] = SDL_LoadBMP( "data/accomplished.bmp" )) &&
-      (TextureImage[14] = SDL_LoadBMP( "data/timesup.bmp" )) &&
-      (TextureImage[15] = SDL_LoadBMP( "data/red.bmp" )) )
+  if( (TextureImage[0] = SDL_LoadBMP( "/usr/share/games/spacehero/data/star.bmp" )) &&
+      (TextureImage[1] = SDL_LoadBMP( "/usr/share/games/spacehero/data/hole.bmp" )) &&
+      (TextureImage[2] = SDL_LoadBMP( "/usr/share/games/spacehero/data/black.bmp" )) &&
+      (TextureImage[3] = SDL_LoadBMP( "/usr/share/games/spacehero/data/goal.bmp" ))  &&
+      (TextureImage[4] = SDL_LoadBMP( "/usr/share/games/spacehero/data/panel_MASS.bmp" ))  &&
+      (TextureImage[5] = SDL_LoadBMP( "/usr/share/games/spacehero/data/panel_TIME.bmp" ))  &&
+      (TextureImage[6] = SDL_LoadBMP( "/usr/share/games/spacehero/data/green.bmp" ))  &&
+      (TextureImage[7] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_start.bmp" )) &&
+      (TextureImage[8] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_stop.bmp" )) &&
+      (TextureImage[9] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_replay.bmp" )) &&
+      (TextureImage[10] = SDL_LoadBMP( "/usr/share/games/spacehero/data/x.bmp" )) &&
+      (TextureImage[11] = SDL_LoadBMP( "/usr/share/games/spacehero/data/spacehero.bmp" )) &&
+      (TextureImage[12] = SDL_LoadBMP( "/usr/share/games/spacehero/data/bulge.bmp" )) &&
+      (TextureImage[13] = SDL_LoadBMP( "/usr/share/games/spacehero/data/accomplished.bmp" )) &&
+      (TextureImage[14] = SDL_LoadBMP( "/usr/share/games/spacehero/data/timesup.bmp" )) &&
+      (TextureImage[15] = SDL_LoadBMP( "/usr/share/games/spacehero/data/red.bmp" )) )
   {
     success = 1;
 
