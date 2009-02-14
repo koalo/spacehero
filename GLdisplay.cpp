@@ -1,6 +1,6 @@
 #include "GLdisplay.h"
 
-GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
+GLdisplay::GLdisplay(std::string path, bool fullscreen, int width, int height, int bpp):
   surface(0)
   ,videoFlags(0)
   ,videoInfo(0)
@@ -82,8 +82,9 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   glClearDepth( 1.0f );                                /* Tiefenbuffer */
   glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST ); /* Perspektivenberechnung */
 
+
   /* Textur laden */
-  if (!LoadGLTextures(texture))
+  if (!LoadGLTextures(texture, path))
   {
     fprintf( stderr, "Textur konnte nicht geladen werden\n" );
   }
@@ -232,30 +233,31 @@ bool AbstractButtonFlags::checkFlag(int action)
 }
 
 
-int GLdisplay::LoadGLTextures(GLuint texture[])
+int GLdisplay::LoadGLTextures(GLuint texture[],std::string path)
 {
   int i, success = 0;
   SDL_Surface *TextureImage[TEXTURES]; 
 
+  std::cerr << "trying to load textures from: " << path << std::endl;
   glGenTextures( TEXTURES, texture ); /* Texturen vorbereiten */
 
   /* Textur einladen */
-  if( (TextureImage[0] = SDL_LoadBMP( "/usr/share/games/spacehero/data/star.bmp" )) &&
-      (TextureImage[1] = SDL_LoadBMP( "/usr/share/games/spacehero/data/hole.bmp" )) &&
-      (TextureImage[2] = SDL_LoadBMP( "/usr/share/games/spacehero/data/black.bmp" )) &&
-      (TextureImage[3] = SDL_LoadBMP( "/usr/share/games/spacehero/data/goal.bmp" ))  &&
-      (TextureImage[4] = SDL_LoadBMP( "/usr/share/games/spacehero/data/panel_MASS.bmp" ))  &&
-      (TextureImage[5] = SDL_LoadBMP( "/usr/share/games/spacehero/data/panel_TIME.bmp" ))  &&
-      (TextureImage[6] = SDL_LoadBMP( "/usr/share/games/spacehero/data/green.bmp" ))  &&
-      (TextureImage[7] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_start.bmp" )) &&
-      (TextureImage[8] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_stop.bmp" )) &&
-      (TextureImage[9] = SDL_LoadBMP( "/usr/share/games/spacehero/data/button_replay.bmp" )) &&
-      (TextureImage[10] = SDL_LoadBMP( "/usr/share/games/spacehero/data/x.bmp" )) &&
-      (TextureImage[11] = SDL_LoadBMP( "/usr/share/games/spacehero/data/spacehero.bmp" )) &&
-      (TextureImage[12] = SDL_LoadBMP( "/usr/share/games/spacehero/data/bulge.bmp" )) &&
-      (TextureImage[13] = SDL_LoadBMP( "/usr/share/games/spacehero/data/accomplished.bmp" )) &&
-      (TextureImage[14] = SDL_LoadBMP( "/usr/share/games/spacehero/data/timesup.bmp" )) &&
-      (TextureImage[15] = SDL_LoadBMP( "/usr/share/games/spacehero/data/red.bmp" )) )
+  if( (TextureImage[0]  = SDL_LoadBMP( (path + "star.bmp").c_str() )) &&
+      (TextureImage[1]  = SDL_LoadBMP( (path + "hole.bmp").c_str() )) &&
+      (TextureImage[2]  = SDL_LoadBMP( (path + "black.bmp").c_str() )) &&
+      (TextureImage[3]  = SDL_LoadBMP( (path + "goal.bmp").c_str() ))  &&
+      (TextureImage[4]  = SDL_LoadBMP( (path + "panel_MASS.bmp").c_str() ))  &&
+      (TextureImage[5]  = SDL_LoadBMP( (path + "panel_TIME.bmp").c_str() ))  &&
+      (TextureImage[6]  = SDL_LoadBMP( (path + "green.bmp").c_str() ))  &&
+      (TextureImage[7]  = SDL_LoadBMP( (path + "button_start.bmp").c_str() )) &&
+      (TextureImage[8]  = SDL_LoadBMP( (path + "button_stop.bmp").c_str() )) &&
+      (TextureImage[9]  = SDL_LoadBMP( (path + "button_replay.bmp").c_str() )) &&
+      (TextureImage[10] = SDL_LoadBMP( (path + "x.bmp").c_str() )) &&
+      (TextureImage[11] = SDL_LoadBMP( (path + "spacehero.bmp").c_str() )) &&
+      (TextureImage[12] = SDL_LoadBMP( (path + "bulge.bmp").c_str() )) &&
+      (TextureImage[13] = SDL_LoadBMP( (path + "accomplished.bmp").c_str() )) &&
+      (TextureImage[14] = SDL_LoadBMP( (path + "timesup.bmp").c_str() )) &&
+      (TextureImage[15] = SDL_LoadBMP( (path + "red.bmp").c_str() )) )
   {
     success = 1;
 
@@ -271,6 +273,9 @@ int GLdisplay::LoadGLTextures(GLuint texture[])
       /* Textur erstellen */
       glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage[i]->w, TextureImage[i]->h, 0, GL_BGR, GL_UNSIGNED_BYTE, TextureImage[i]->pixels );
     }
+  } else {
+
+    std::cerr << "error loading textures from:" << path << std::cerr;
   }
 
   /* Speicherplatz freigeben */

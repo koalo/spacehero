@@ -105,7 +105,7 @@ class GLdisplay
     GLuint fontbase;
 
   public:
-    GLdisplay(bool fullscreen=false, int width=600, int height=600, int bpp=16);
+    GLdisplay(std::string path, bool fullscreen=false, int width=600, int height=600, int bpp=16);
     virtual ~GLdisplay();
 
     void resizeWindow(int width, int height);
@@ -125,7 +125,7 @@ class GLdisplay
     void glPrint(float red, float green, float blue, float x, float y, const char *format, ... );
 
   private:
-    int LoadGLTextures(GLuint texture[]);
+    int LoadGLTextures(GLuint texture[],std::string path);
 };
 
 
