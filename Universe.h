@@ -29,6 +29,8 @@ class SkyObject {
   public:
     SkyObject():x(0),y(0),z(0),exists(true),level(false) {};
     void setlevel() { level = true; };
+    bool setexists(bool b=true) { return exists = b; };
+    bool getexists() { return exists; };
     friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
 };
 
@@ -47,6 +49,7 @@ class SkyMass : public SkyObject {
     inline void newton(SkyMass &m, double delta) {
       double AX, AY, a1, a2, r3;
       //std::cerr << *this << m << std::endl;
+      if( (!getexists()) || (!m.getexists()) ) return;
 
       AX = x - m.x;
       AY = y - m.y;
@@ -168,6 +171,7 @@ class Universe: public Level
   //bool play(GLdisplay &d);
   void move(double delta);
   bool won() {return false;};
+  void eventHorizon();
 
 };
 

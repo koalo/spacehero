@@ -113,61 +113,25 @@ void Universe::move(double delta)
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     i->move(delta);
   }
+  eventHorizon();
 }
-
-#if 0
-
-
-
-
-skymass::skymass(const skymass& p):
-  x(p.x),y(p.y),z(p.z),
-  vx(p.vx),
-  vy(p.vy),
-  vz(p.vz),
-  fx(p.fx),
-  fy(p.fy),
-  fz(p.fz),
-  mass(p.mass),
-  inLevel(p.inLevel),
-  exists(p.exists),
-  nograv(p.nograv)
-{}
-
 
 void Universe::eventHorizon()
 {
-  /* fuer jede Stern wird geprueft ob die sich zu nah zu Black Hole befindet */
-  /* wenn der Abstand kleiner als r ist, dann soll die verschwinden -> stars[j].exist = 0 statt 1 */ 
-
-  int i, j;
-  double r, x, y;
-
-
-  for(i = 0; i < holesSize; i++)
-  {
-    for(j = 0; j < starsSize; j++)
-    {
-      x = holes[i].x - stars[j].x;
-      y = holes[i].y - stars[j].y;
-      r = sqrt(x*x + y*y);
-      if(r < HOLESIZE*0.5*sqrt(holes[i].mass/HOLEMEDIUMMASS))
-      {
-        stars[j].exists = 0;
-      }
+  // fuer jede Stern wird geprueft ob die sich zu nah zu Black Hole befindet
+  // wenn der Abstand kleiner als r ist, dann soll die verschwinden -> stars[j].exist = 0 statt 1 
+  for(std::vector<Blackhole>::iterator i = holes.begin(); i!= holes.end(); i++) {
+    for(std::vector<Star>::iterator j = stars.begin(); j!= stars.end(); j++) {
+      double r = hypot(i->x - j->x,i->y - j->y);
+        if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
+          j->setexists(false);
     }
-    /*fuer MittelPunkten von Galxies auch */
-    for(j = 0; j < galaxiesSize; j++)
-    {
-      x = holes[i].x - galaxies[j].x;
-      y = holes[i].y - galaxies[j].y;
-      r = sqrt(x*x + y*y);
-      if(r < HOLESIZE*0.5*sqrt(holes[i].mass/HOLEMEDIUMMASS))
-      {
-        galaxies[j].exists = 0;
-      }
+    // fuer MittelPunkten von Galxies auch
+    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+      double r = hypot(i->x - j->x,i->y - j->y);
+        if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
+          j->setexists(false);
     }
 
   }
 }
-#endif
