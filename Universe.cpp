@@ -23,32 +23,6 @@ Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
   this->mass = mass;
 }
 
-
-Level::Level(std::ifstream &in)
-{
-  goal = Goal(in);
-  while(in.good()) {
-    char c;
-    in >> c;
-    std::cerr << "Type: " << c << std::endl;
-    switch(c) {
-      case 'M': 
-        galaxies.push_back( Galaxy(in,true) );
-        break;
-      case 'G': 
-        galaxies.push_back( Galaxy(in) );
-        break;
-      case 'H':
-        holes.push_back( Blackhole(in) );
-        break;
-      case 'S':
-        in >> seed;
-        break;
-    }
-  }
-  maxtime = 30.0;
-}
-
 std::vector<Star> Galaxy::getStars(int seed) {
   double NStars = mass / 4e8;
   double NOrbits = mass / 2e10;
@@ -73,7 +47,9 @@ std::vector<Star> Galaxy::getStars(int seed) {
 }
 
 Universe::Universe(Level &l) :
-  Level(l)
+  Level(l),
+  m_won(false),
+  stars()
 {
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
     std::vector<Star> gstars = i->getStars(seed);

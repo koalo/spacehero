@@ -29,6 +29,7 @@ CXXFLAGS+=-O3
 
 SRC+=BStatus.cpp 
 SRC+=GLdisplay.cpp 
+SRC+=Level.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
@@ -38,6 +39,8 @@ SRC+=output.cpp
 SRC+=main.cpp
 
 OBJS=$(SRC:.cpp=.o)
+
+all: spacehero
 
 spacehero: $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $@

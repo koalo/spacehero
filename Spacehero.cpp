@@ -2,9 +2,9 @@
 #include <sys/time.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
-  :display(d), universe(u)
+  : state(spacehero_edit), won(false),
+    display(d), universe(u), paruni(0)
 {
-  state = spacehero_edit;
 }
 
 bool Spacehero::play()

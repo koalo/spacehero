@@ -30,9 +30,10 @@ class AbstractButtonFlags
   void activateFlag(Actions action);
   bool checkFlag(int action); /* statt int waer enum besser, aber geht nicht da kein Enum-Prototyping - loescht auch das Flag */
   AbstractButtonFlags()
+    : flags(0)
   {
-    flags = 0;
   }
+  virtual ~AbstractButtonFlags() {};
 };
 
 #include "ButtonFlags.h"
@@ -59,6 +60,9 @@ class Kamera
 
 class GLdisplay
 {
+  private:
+    GLdisplay(const GLdisplay&);
+    const GLdisplay& operator=(const GLdisplay&);
   public:
     enum Images {
    		IMG_STAR = 0,
@@ -102,7 +106,7 @@ class GLdisplay
 
   public:
     GLdisplay(bool fullscreen=false, int width=600, int height=600, int bpp=16);
-    ~GLdisplay();
+    virtual ~GLdisplay();
 
     void resizeWindow(int width, int height);
 
