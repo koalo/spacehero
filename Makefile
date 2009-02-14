@@ -49,6 +49,14 @@ clean:
 	rm -f spacehero $(OBJS)
 	rm -f .depend
 
+install:
+	install -d $(DESTDIR)/usr/games/
+	install spacehero $(DESTDIR)/usr/games/
+	install -d $(DESTDIR)/usr/share/games/spacehero/level
+	install -d $(DESTDIR)/usr/share/games/spacehero/data
+	install level/* $(DESTDIR)/usr/share/games/spacehero/level
+	install data/* $(DESTDIR)/usr/share/games/spacehero/data
+
 dist:
 	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > spacehero.tgz
 
