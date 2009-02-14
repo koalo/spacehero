@@ -83,8 +83,8 @@ Universe::Universe(Level &l) :
 
 void Universe::move(double delta)
 {
-  //std::cerr << "moving Universe with delta: " << delta << std::endl;
-// star: hole, galaxy
+  delta *= 30; // speedup
+  // star: hole, galaxy
   for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       i->newton(*j,delta);
@@ -92,15 +92,14 @@ void Universe::move(double delta)
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
-    //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
-        //*i ^ *l;
-    //}
+//    for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
+//      if(i!=l) i->newton(*l,delta);
+//    }
   }
-// galaxy: hole, galaxy
+  // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
     for(std::vector<Galaxy>::iterator j = i+1; j!= galaxies.end(); j++) {
-      if(i!=j) 
-      i->newton(*j,delta);
+      if(i!=j) i->newton(*j,delta);
     }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
