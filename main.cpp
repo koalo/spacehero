@@ -15,7 +15,6 @@ using namespace boost::filesystem;
 int main(int argc, char *argv[])
 { 
   std::vector<std::string> path;
-  path.push_back( "./" );
   path.push_back( "~/.spacehero/" );
   path.push_back( "/usr/share/games/spacehero/" );
 
