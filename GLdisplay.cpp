@@ -242,22 +242,22 @@ int GLdisplay::LoadGLTextures(GLuint texture[],std::string path)
   glGenTextures( TEXTURES, texture ); /* Texturen vorbereiten */
 
   /* Textur einladen */
-  if( (TextureImage[0]  = SDL_LoadBMP( (path + "star.bmp").c_str() )) &&
-      (TextureImage[1]  = SDL_LoadBMP( (path + "hole.bmp").c_str() )) &&
-      (TextureImage[2]  = SDL_LoadBMP( (path + "black.bmp").c_str() )) &&
-      (TextureImage[3]  = SDL_LoadBMP( (path + "goal.bmp").c_str() ))  &&
-      (TextureImage[4]  = SDL_LoadBMP( (path + "panel_MASS.bmp").c_str() ))  &&
-      (TextureImage[5]  = SDL_LoadBMP( (path + "panel_TIME.bmp").c_str() ))  &&
-      (TextureImage[6]  = SDL_LoadBMP( (path + "green.bmp").c_str() ))  &&
-      (TextureImage[7]  = SDL_LoadBMP( (path + "button_start.bmp").c_str() )) &&
-      (TextureImage[8]  = SDL_LoadBMP( (path + "button_stop.bmp").c_str() )) &&
-      (TextureImage[9]  = SDL_LoadBMP( (path + "button_replay.bmp").c_str() )) &&
-      (TextureImage[10] = SDL_LoadBMP( (path + "x.bmp").c_str() )) &&
-      (TextureImage[11] = SDL_LoadBMP( (path + "spacehero.bmp").c_str() )) &&
-      (TextureImage[12] = SDL_LoadBMP( (path + "bulge.bmp").c_str() )) &&
-      (TextureImage[13] = SDL_LoadBMP( (path + "accomplished.bmp").c_str() )) &&
-      (TextureImage[14] = SDL_LoadBMP( (path + "timesup.bmp").c_str() )) &&
-      (TextureImage[15] = SDL_LoadBMP( (path + "red.bmp").c_str() )) )
+  if( (TextureImage[0]  = IMG_Load( (path + "star.png").c_str() )) &&
+      (TextureImage[1]  = IMG_Load( (path + "hole.png").c_str() )) &&
+      (TextureImage[2]  = IMG_Load( (path + "black.png").c_str() )) &&
+      (TextureImage[3]  = IMG_Load( (path + "goal.png").c_str() ))  &&
+      (TextureImage[4]  = IMG_Load( (path + "panel_MASS.png").c_str() ))  &&
+      (TextureImage[5]  = IMG_Load( (path + "panel_TIME.png").c_str() ))  &&
+      (TextureImage[6]  = IMG_Load( (path + "green.png").c_str() ))  &&
+      (TextureImage[7]  = IMG_Load( (path + "button_start.png").c_str() )) &&
+      (TextureImage[8]  = IMG_Load( (path + "button_stop.png").c_str() )) &&
+      (TextureImage[9]  = IMG_Load( (path + "button_replay.png").c_str() )) &&
+      (TextureImage[10] = IMG_Load( (path + "x.png").c_str() )) &&
+      (TextureImage[11] = IMG_Load( (path + "spacehero.png").c_str() )) &&
+      (TextureImage[12] = IMG_Load( (path + "bulge.png").c_str() )) &&
+      (TextureImage[13] = IMG_Load( (path + "accomplished.png").c_str() )) &&
+      (TextureImage[14] = IMG_Load( (path + "timesup.png").c_str() )) &&
+      (TextureImage[15] = IMG_Load( (path + "red.png").c_str() )) )
   {
     success = 1;
 
@@ -271,7 +271,7 @@ int GLdisplay::LoadGLTextures(GLuint texture[],std::string path)
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
       /* Textur erstellen */
-      glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage[i]->w, TextureImage[i]->h, 0, GL_BGR, GL_UNSIGNED_BYTE, TextureImage[i]->pixels );
+      glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage[i]->w, TextureImage[i]->h, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[i]->pixels );
     }
   } else {
 

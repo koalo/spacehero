@@ -5,10 +5,13 @@ CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
 CXXFLAGS+=`sdl-config --cflags`
 CXXFLAGS+=-g
-LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lboost_filesystem-mt
+LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
 
 #CFLAGS+=-ftree-vectorize
 #CFLAGS+=-funroll-all-loops
+
+# Lokal
+CFLAGS+=-DDEV
 
 # Vollbild
 #CFLAGS+=-DFULLSCREEN

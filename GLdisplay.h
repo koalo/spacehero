@@ -12,6 +12,7 @@ class Kamera;
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <SDL.h>
+#include <SDL_image.h>
 #include <math.h>
 
 #include "Universe.h"
