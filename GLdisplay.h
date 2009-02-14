@@ -68,8 +68,6 @@ class GLdisplay
     enum Images {
    		IMG_STAR = 0,
     	IMG_HOLE,
-    	IMG_BLACK,
-    	IMG_GOAL,
     	IMG_PANEL_MASS,
     	IMG_PANEL_TIME,
     	IMG_BUTTON,

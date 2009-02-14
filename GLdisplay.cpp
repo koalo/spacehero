@@ -244,20 +244,18 @@ int GLdisplay::LoadGLTextures(GLuint texture[],std::string path)
   /* Textur einladen */
   if( (TextureImage[0]  = IMG_Load( (path + "star.png").c_str() )) &&
       (TextureImage[1]  = IMG_Load( (path + "hole.png").c_str() )) &&
-      (TextureImage[2]  = IMG_Load( (path + "black.png").c_str() )) &&
-      (TextureImage[3]  = IMG_Load( (path + "goal.png").c_str() ))  &&
-      (TextureImage[4]  = IMG_Load( (path + "panel_MASS.png").c_str() ))  &&
-      (TextureImage[5]  = IMG_Load( (path + "panel_TIME.png").c_str() ))  &&
-      (TextureImage[6]  = IMG_Load( (path + "green.png").c_str() ))  &&
-      (TextureImage[7]  = IMG_Load( (path + "button_start.png").c_str() )) &&
-      (TextureImage[8]  = IMG_Load( (path + "button_stop.png").c_str() )) &&
-      (TextureImage[9]  = IMG_Load( (path + "button_replay.png").c_str() )) &&
-      (TextureImage[10] = IMG_Load( (path + "x.png").c_str() )) &&
-      (TextureImage[11] = IMG_Load( (path + "spacehero.png").c_str() )) &&
-      (TextureImage[12] = IMG_Load( (path + "bulge.png").c_str() )) &&
-      (TextureImage[13] = IMG_Load( (path + "accomplished.png").c_str() )) &&
-      (TextureImage[14] = IMG_Load( (path + "timesup.png").c_str() )) &&
-      (TextureImage[15] = IMG_Load( (path + "red.png").c_str() )) )
+      (TextureImage[3]  = IMG_Load( (path + "panel_MASS.png").c_str() ))  &&
+      (TextureImage[4]  = IMG_Load( (path + "panel_TIME.png").c_str() ))  &&
+      (TextureImage[5]  = IMG_Load( (path + "green.png").c_str() ))  &&
+      (TextureImage[6]  = IMG_Load( (path + "button_start.png").c_str() )) &&
+      (TextureImage[7]  = IMG_Load( (path + "button_stop.png").c_str() )) &&
+      (TextureImage[8]  = IMG_Load( (path + "button_replay.png").c_str() )) &&
+      (TextureImage[9] = IMG_Load( (path + "x.png").c_str() )) &&
+      (TextureImage[10] = IMG_Load( (path + "spacehero.png").c_str() )) &&
+      (TextureImage[11] = IMG_Load( (path + "bulge.png").c_str() )) &&
+      (TextureImage[12] = IMG_Load( (path + "accomplished.png").c_str() )) &&
+      (TextureImage[13] = IMG_Load( (path + "timesup.png").c_str() )) &&
+      (TextureImage[14] = IMG_Load( (path + "red.png").c_str() )) )
   {
     success = 1;
 
