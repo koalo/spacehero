@@ -1,4 +1,8 @@
+
+
+
 CXXFLAGS+=-Wall -Wextra -Wparentheses
+#CXXFLAGS+=-Weffc++
 CXXFLAGS+=`sdl-config --cflags`
 CXXFLAGS+=-g
 LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lboost_filesystem-mt

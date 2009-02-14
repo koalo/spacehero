@@ -105,20 +105,23 @@ class Blackhole : public SkyMass {
 class Star;
 
 class Galaxy : public SkyMass {
+    bool master;
   private:
     static const double R_MIN_CENTER = 0.02;
     static const double R_MIN = 0.0005;
 
   public:
-    Galaxy(std::ifstream &in) {
+    Galaxy(std::ifstream &in, bool master=false) {
       in >> x >> y >> z; 
       in >> vx >> vy >> vz; 
       in >> mass; 
       lr=true;
+      this->master = master;
     };
     bool lr; // links true /rechts
 
     std::vector<Star> getStars(int seed);
+    bool getmaster() { return master; };
 
   public:
     friend std::ostream& operator<< (std::ostream &o, const Galaxy &g);
@@ -164,13 +167,14 @@ class Level {
 
 class Universe: public Level
 {
+  bool m_won;
   public:
   std::vector<Star> stars;
   public:
   Universe(Level &l);
   //bool play(GLdisplay &d);
   void move(double delta);
-  bool won() {return false;};
+  bool won();
   void eventHorizon();
 
 };

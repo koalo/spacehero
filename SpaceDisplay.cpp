@@ -59,6 +59,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 	}
 	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
 	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
+	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
 	/* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
 	/*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
 	putImage( (view==PutView)?GLdisplay::IMG_PANEL_MASS:GLdisplay::IMG_PANEL_TIME, this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);

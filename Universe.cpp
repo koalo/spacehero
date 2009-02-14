@@ -32,6 +32,9 @@ Level::Level(std::ifstream &in)
     in >> c;
     std::cerr << "Type: " << c << std::endl;
     switch(c) {
+      case 'M': 
+        galaxies.push_back( Galaxy(in,true) );
+        break;
       case 'G': 
         galaxies.push_back( Galaxy(in) );
         break;
@@ -89,6 +92,9 @@ void Universe::move(double delta)
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       i->newton(*j,delta);
     }
+    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+      i->newton(*j,delta);
+    }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
@@ -134,4 +140,13 @@ void Universe::eventHorizon()
     }
 
   }
+}
+
+bool Universe::won() {
+  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
+    if( i->getmaster() )
+      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius ) 
+        m_won = true;
+  }
+  return m_won;
 }
