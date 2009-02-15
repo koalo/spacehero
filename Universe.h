@@ -109,6 +109,7 @@ class Level {
     int seed;
   public:
     Level(std::ifstream &in);
+    Level():t0(),maxtime(0),lastt(0),m_delta(0),holes(),galaxies(),goal(),seed(0) {};
     virtual ~Level() {};
 
   public:
@@ -135,7 +136,8 @@ class Universe: public Level
   std::vector<Star> stars;  
   public:
   Universe(Level &l);
-  Universe();
+  Universe() :m_won(false),stars() {};
+
   //bool play(GLdisplay &d);
   void move(double delta);
   bool won();

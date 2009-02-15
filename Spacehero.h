@@ -7,6 +7,10 @@
 
 class Spacehero
 {
+  private:
+    Spacehero(const Spacehero&);
+    Spacehero& operator=(const Spacehero&);
+  private:
   // Zustaende des Spielautomaten
   //
   // Endzustaende: next und exit
