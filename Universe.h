@@ -135,6 +135,7 @@ class Universe: public Level
   std::vector<Star> stars;  
   public:
   Universe(Level &l);
+  Universe();
   //bool play(GLdisplay &d);
   void move(double delta);
   bool won();

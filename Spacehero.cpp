@@ -2,7 +2,7 @@
 #include <sys/time.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
-  : state(spacehero_edit), won(false), bflags(), editor(),
+  : state(spacehero_edit), won(false), bflags(), editor(u),
     display(d), universe(u), paruni(0)
 {
 }
@@ -48,7 +48,7 @@ bool Spacehero::play()
 
 Spacehero::SpaceheroState Spacehero::edit()
 {
-  display.handleEvents(SpaceDisplay::PutView, universe, bflags, editor);
+  display.handleEvents(SpaceDisplay::PutView, bflags, editor);
 
   if(bflags.checkFlag(ButtonFlags::startSimulation))
   {
@@ -81,7 +81,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
   double delta=paruni->delta();
   paruni->move(delta);
 
-  display.handleEvents(SpaceDisplay::SimulationView, *paruni, bflags, editor);
+  display.handleEvents(SpaceDisplay::SimulationView, bflags, editor);
 
   if(bflags.checkFlag(ButtonFlags::breakSimulation))
   {
@@ -96,9 +96,30 @@ Spacehero::SpaceheroState Spacehero::simulate()
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
   paruni->tack();
-  if (paruni->timeout()) return spacehero_edit; // XXX
   if ((won = paruni->won())) return spacehero_next;
 
+  if(paruni->timeout())
+  {
+    display.showLost();
+    return spacehero_edit;
+  }
+#if 0
+      } else {
+        /* WIN */
+        win = 1;
+        putImage( IMG_WIN, 0.5-((629.0/102)*0.12)*0.5, 0.5-(0.12*0.5), (629.0/102)*0.12, 0.12, display );
+        SDL_GL_SwapBuffers();
+        for(i = 0; i < 500; i++)
+        {
+          handleEvents( display, SIMULATION, &uni );
+          if(display->state.breakSimulation || display->state.replaySimulation || display->state.exit)
+          {
+            break;
+          }
+          usleep(10000);
+        }
+      }
+#endif
   return state;
 }
 

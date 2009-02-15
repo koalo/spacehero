@@ -332,8 +332,29 @@ glPopMatrix();
   glDisable(GL_LIGHT1);
 }
 
+void SpaceDisplay::showLost()
+{
+  unsigned int i;
+  ButtonFlags flags;
+  Universe uni();
+  Editor editor(uni);
 
-void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags, Editor &editor)
+  textures.useTexture("lost");
+  illustrator.putImage( 0.5-((265.0/102)*0.12)*0.5, 0.5-(0.12*0.5), (265.0/102)*0.12, 0.12 );
+  SDL_GL_SwapBuffers();
+
+  for(i = 0; i < 200; i++)
+  {
+    handleEvents(SpaceDisplay::SimulationView, flags, editor);
+    if(flags.checkFlag(ButtonFlags::replaySimulation) || flags.checkFlag(ButtonFlags::breakSimulation) || flags.checkFlag(ButtonFlags::exit))
+    {
+      break;
+    }
+    usleep(10000);
+  }
+}
+
+void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor)
 {
   GLdouble modelMatrix[16];
   GLdouble projMatrix[16];
@@ -384,20 +405,13 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
             
             mousey = 1.0-mousey;
 
-            editor.check(mousex,mousey,uni);            
+            editor.check(mousex,mousey);
           }
-          drawBridge(uni,SpaceDisplay::PutView);
         }
         break;
       case SDL_VIDEORESIZE:
         /* Groesse vom Fenster geaendert */
         display.resizeWindow( event.resize.w, event.resize.h );
-        
-        if(view == SpaceDisplay::PutView)
-        {
-          drawBridge(uni,SpaceDisplay::PutView);
-        }
-        /* Simulation wird sowieso gleich wieder gezeichnet */
         break;
       case SDL_QUIT:
           exit(0);

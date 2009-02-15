@@ -5,11 +5,14 @@
 
 class Editor
 {
+  private:
+    Universe &uni;
+
   public:
+    Editor(Universe &universe);
     double massreserve;
     double holeWeight;
-    void check(double mousex, double mousey, Universe &universe);
-    Editor():massreserve(MAXSTARTRESERVE),holeWeight(HOLEMEDIUMMASS){};
+    void check(double mousex, double mousey);
 };
 
 #endif

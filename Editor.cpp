@@ -1,6 +1,10 @@
 #include "Editor.h"
 
-void Editor::check(double mousex, double mousey, Universe &uni)
+Editor::Editor(Universe &universe) : uni(universe),massreserve(MAXSTARTRESERVE),holeWeight(HOLEMEDIUMMASS)
+{
+}
+
+void Editor::check(double mousex, double mousey)
 {
   unsigned int i, remove = 0;
 
