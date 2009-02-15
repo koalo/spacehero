@@ -64,9 +64,6 @@ void Universe::move(double delta)
     for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       i->newton(*j,delta);
     }
-    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
-      i->newton(*j,delta);
-    }
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
