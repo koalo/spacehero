@@ -1,10 +1,7 @@
 #include "Universe.h"
 
-#include "display.h"
 #include "GLdisplay.h"
-#include "BStatus.h"
 
-#include "displayUniverse.h"
 
 #include "local.h"
 
