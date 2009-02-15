@@ -13,7 +13,7 @@ int PictureBook::addTexture(std::string texture)
   
   glGenTextures( 1, &textureName );
 
-  if( (textureImage  = IMG_Load( (path + "star.png").c_str() )) )
+  if( (textureImage  = IMG_Load( (path + texture + ".png").c_str() )) )
   {
     /* Textur einstellen */
     glBindTexture( GL_TEXTURE_2D, textureName );

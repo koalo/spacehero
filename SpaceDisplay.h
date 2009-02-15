@@ -32,7 +32,7 @@
 class SpaceDisplay : public GLdisplay
 {
   public:
-    SpaceDisplay(std::string path) : GLdisplay(path) {}; 
+    SpaceDisplay(std::string path);
   public:
     enum BridgeView { 
       SimulationView,

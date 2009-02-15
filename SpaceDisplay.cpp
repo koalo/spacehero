@@ -2,151 +2,163 @@
 #include "local.h"
 #include "Spacehero.h"
 
-SpaceDisplay::SpaceDisplay()
+SpaceDisplay::SpaceDisplay(std::string path) : GLdisplay(path)
 {
+  textures.addTexture("star");
+  textures.addTexture("hole");
+  textures.addTexture("panel_MASS");
+  textures.addTexture("panel_TIME");
+  textures.addTexture("button_green");
+  textures.addTexture("button_start");
+  textures.addTexture("button_stop");
+  textures.addTexture("button_replay");
+  textures.addTexture("button_red");
+  textures.addTexture("button_x");
+  textures.addTexture("spacehero");
+  textures.addTexture("bulge");
+  textures.addTexture("accomplished");
+  textures.addTexture("timesup");
 }
 
 void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 {
-	double center;
-	int mrx, mry, y;
+  double center;
+  int mrx, mry, y;
   unsigned int i;
-	double mrangle =0, curse;
-	double width, height;
+  double mrangle =0, curse;
+  double width, height;
 
-	/* Bildschirm loeschen */
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  /* Bildschirm loeschen */
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	width = this->width-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
-	height = this->height-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
+  width = this->width-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
+  height = this->height-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
 
-	/* Auf Projektionsmodus umschalten */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glViewport(0,0,this->width,this->height);
+  /* Auf Projektionsmodus umschalten */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glViewport(0,0,this->width,this->height);
+  glOrtho(0,this->width,0,this->height,0,128);
 
-	/* Projektion einstellen */
-	/* blending */
-	glDisable( GL_BLEND );
-	glOrtho(0,this->width,0,this->height,0,128);  
+  /* Blending */
+  glDisable(GL_BLEND);
+  
+  /* Zurueckschalten und Ansicht einstellen */
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
 
-	/* Zurueckschalten und Ansicht zuruecksetzen */
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
+  glScalef(1.0f, -1.0f, 1.0f);
+  glTranslatef(0.0f, -this->height, 0.0f);
 
-	glScalef(1.0f, -1.0f, 1.0f);
-	glTranslatef(0.0f, -this->height, 0.0f);
+  /* Infotext */
+  y = 0; 
+  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
+  for(i = 0; i < uni.galaxies.size(); i++)
+  {
+    if(uni.galaxies[i].exists)
+    {
+      curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
+      curse = (curse < 0)?curse+2*M_PI:curse;
+      curse = curse*(180/M_PI);
+      glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
+    }
+  }
 
-	/* INFOTEXT */
-	/*
-	   1.0  PI -> 0.75 PI
-	   0.5  PI -> 0.0  PI
-	   0.0  PI -> 0.5  PI
-	   -0.5 PI -> 1.0  PI
+  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
+  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
+  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
+  /* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
+  /*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
+  if(view == PutView)
+  {
+    textures.useTexture("panel_MASS");
+  }
+  else if(view == SimulationView)
+  {
+    textures.useTexture("panel_TIME");
+  }
 
-	   (x-0.25*PI)
-	   (x-0.5*PI)
-	   (x+0.5*PI)
-	   (x+1.5*PI)
-	   */  
-	y = 0; 
-	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
-	for(i = 0; i < uni.galaxies.size(); i++)
-	{
-		if(uni.galaxies[i].exists)
-		{
-			curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
-			curse = (curse < 0)?curse+2*M_PI:curse;
-			curse = curse*(180/M_PI);
-			glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
-		}
-	}
-	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
-	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
-	glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
-	/* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
-	/*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
-	putImage( (view==PutView)?GLdisplay::IMG_PANEL_MASS:GLdisplay::IMG_PANEL_TIME, this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
+  putImage(this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
 
-	center = this->width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  center = this->width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
-	if(view == PutView)
-	{
-		alignPutButtons();
+  if(view == PutView)
+  {
+    alignPutButtons();
 /*		mrangle = (double)(uni.massreserve)/(double)(MAXSTARTRESERVE);*/
-	}
+  }
 
-	if(view == SimulationView)
-	{
-		alignSimulButtons();
-	/*	mrangle = (double)(MAXTIME-time)/(double)(MAXTIME);*/
-	}
+  if(view == SimulationView)
+  {
+    alignSimulButtons();
+  /*	mrangle = (double)(MAXTIME-time)/(double)(MAXTIME);*/
+  }
 
-	glEnable(GL_POLYGON_SMOOTH);
+  glEnable(GL_POLYGON_SMOOTH);
 
-	if(view == PutView || view == SimulationView)
-	{
-		/* Zeigerposition berechnen */
-		mrangle = (mrangle < 0)?0:mrangle;
-		mrangle = mrangle*80-40;
-		mrx = - (-this->height*0.11 * sin(mrangle * M_PI/180));
-		mry = (-this->height*0.11 * cos(mrangle * M_PI/180));
+  if(view == PutView || view == SimulationView)
+  {
+    /* Zeigerposition berechnen */
+    mrangle = (mrangle < 0)?0:mrangle;
+    mrangle = mrangle*80-40;
+    mrx = - (-this->height*0.11 * sin(mrangle * M_PI/180));
+    mry = (-this->height*0.11 * cos(mrangle * M_PI/180));
 
-		glLineWidth(4);
+    glLineWidth(4);
 
-		glColor3f(0,0,0);
-		glBegin( GL_LINES );
-		glVertex3f( center+mrx, this->height*0.28+mry, 0.0 );
-		glVertex3f( center, this->height*0.28, 0.0 );
-		glEnd();
-		glColor3f(1,1,1);
-	}
+    glColor3f(0,0,0);
+    glBegin( GL_LINES );
+    glVertex3f( center+mrx, this->height*0.28+mry, 0.0 );
+    glVertex3f( center, this->height*0.28, 0.0 );
+    glEnd();
+    glColor3f(1,1,1);
+  }
 
-	drawButtons();
+  drawButtons();
 
-	glDisable(GL_POLYGON_SMOOTH);
+  glDisable(GL_POLYGON_SMOOTH);
 
-	drawButtons();
+  drawButtons();
 
-	displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
+  displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
 
-	/* Versteckten Buffer aktivieren */
-	SDL_GL_SwapBuffers();
+  /* Versteckten Buffer aktivieren */
+  SDL_GL_SwapBuffers();
 }
 
 
 void SpaceDisplay::alignSimulButtons()
 {
-	double center;
+  double center;
 
-	clearButtons();
-	center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  clearButtons();
+  center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
-	/* Simulation stoppen */
-	addButton(GLdisplay::IMG_STOP, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
+  /* Simulation stoppen */
+  addButton("button_stop", center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
 
-	/* Replay */
-	addButton(GLdisplay::IMG_REPLAY, center+REPLAY_BUTTON, height-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
+  /* Replay */
+  addButton("button_replay", center+REPLAY_BUTTON, height-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
 
-	/* Exit */
-	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
+  /* Exit */
+  addButton("button_x", width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 }
 
 void SpaceDisplay::alignPutButtons()
 {
-	double center, ypos, margin;
+  double center, ypos, margin;
 
-	clearButtons();
-	center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  clearButtons();
+  center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
-	/* Simulation starten */
-	addButton(GLdisplay::IMG_START, center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
+  /* Simulation starten */
+  addButton("button_start", center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
 
-	/* Exit */
-	addButton(GLdisplay::IMG_EXIT, width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
+  /* Exit */
+  addButton("button_x", width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 
-	ypos = height*0.35;
-	margin = UNIVERSE_RIGHT*0.3;
+  ypos = height*0.35;
+  margin = UNIVERSE_RIGHT*0.3;
 
 #define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) 
 /*	addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
@@ -161,8 +173,8 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   GLfloat ratio;
   float zoomX, zoomY, viewrad;
   GLUquadricObj *pObj = gluNewQuadric();
-GLfloat LightPosition[]= { 0.0f, 0.0f, 2.0f, 1.0f };
-GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };	
+  GLfloat LightPosition[]= { 0.0f, 0.0f, 2.0f, 1.0f };
+  GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };	
 
   /* Universum zeichnen */
   /* blending */
@@ -246,7 +258,7 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
 
 
   /* Galaxienmittelpunkte */
-  glBindTexture( GL_TEXTURE_2D, texture[GLdisplay::IMG_BULGE] );
+  textures.useTexture("bulge");
 
   if(uni.galaxies[0].exists)
   {
@@ -264,7 +276,7 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
   }
   
   /* Sterne */
-  glBindTexture( GL_TEXTURE_2D, texture[0] );
+  textures.useTexture("star");
 
   for(i = 0; i < uni.stars.size(); i++)
   {
@@ -275,7 +287,7 @@ GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
   }
 
   /* Schwarze Loecher */
-  glBindTexture( GL_TEXTURE_2D, texture[1] );
+  textures.useTexture("hole");
 
   for(i = 0; i < uni.holes.size(); i++)
   {
@@ -295,7 +307,7 @@ glPushMatrix();
   glTranslatef( uni.goal.x, uni.goal.y, 0.0f );
   glRotatef(51.0,0.6,0.4,0.0);
   gluQuadricTexture(pObj, 1);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  textures.noTexture();
   gluSphere(pObj, uni.goal.radius, 20, 20);
   glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );
   glColor3f(1,1,1);

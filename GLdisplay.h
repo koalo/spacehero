@@ -43,12 +43,13 @@ class AbstractButtonFlags
 class Button
 {
   public:
- 	  int texture;
- 	  float x;
-	  float y;
-	  float r;
-	  int active;
-	  ButtonFlags::Actions action;
+   std::string texture;
+   float x;
+   float y;
+   float r;
+   int active;
+   ButtonFlags::Actions action;
+   Button() : texture(""), x(0), y(0), r(0), active(0), action((ButtonFlags::Actions)4096) {}
 };
 
 
@@ -65,37 +66,18 @@ class GLdisplay
   private:
     GLdisplay(const GLdisplay&);
     const GLdisplay& operator=(const GLdisplay&);
-  public:
-    enum Images {
-   		IMG_STAR = 0,
-    	IMG_HOLE,
-    	IMG_PANEL_MASS,
-    	IMG_PANEL_TIME,
-    	IMG_BUTTON,
-    	IMG_START,
-    	IMG_STOP,
-    	IMG_REPLAY,
-    	IMG_EXIT,
-    	IMG_SPACEHERO,
-    	IMG_BULGE,
-    	IMG_WIN,
-    	IMG_LOST,
-    	IMG_ACTIVE,
-    	TEXTURES
-    };
 
   protected:
-    PictureBook &textures;
+    PictureBook textures;
 
   private:
     SDL_Surface *surface;
     int videoFlags; /* Flags fuer Videoinitialisierung */
-   const SDL_VideoInfo *videoInfo; /* Infos ueber Video */
+    const SDL_VideoInfo *videoInfo; /* Infos ueber Video */
    
   protected:
     int isActive; /* Fenster hat Fokus? */
     SDL_Event event;
-    GLuint texture[TEXTURES]; /* Texturspeicher */  
     float zoom;
     int width;
     int height;
@@ -113,12 +95,12 @@ class GLdisplay
 
     void resizeWindow(int width, int height);
 
-    void putImage(Images t, float x, float y, float width, float height);
+    void putImage(float x, float y, float width, float height);
     void drawRect(float red, float green, float blue, float x, float y, float width, float height);
-    void drawSphere(Images t, float x, float y, float r);
-    void drawDisk(int t, float x, float y, float r);
+    void drawSphere(float x, float y, float r);
+    void drawDisk(float x, float y, float r);
 
-    void addButton(Images t, float x, float y, float r, ButtonFlags::Actions action);
+    void addButton(std::string texture, float x, float y, float r, ButtonFlags::Actions action);
     void clearButtons();
     void drawButtons();
     void checkButtons(ButtonFlags &flags);

@@ -111,11 +111,8 @@ void GLdisplay::resizeWindow(int width, int height)
   this->height = height;
 }
 
-void GLdisplay::putImage(Images t, float x, float y, float width, float height)
+void GLdisplay::putImage(float x, float y, float width, float height)
 {
-  /* Textur auswahlen */
-  glBindTexture( GL_TEXTURE_2D, texture[t] );
-
   /* Objekt zeichnen */
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0f, 0.0f ); glVertex3f( x, y, 0.0f );
@@ -141,7 +138,7 @@ void GLdisplay::drawRect(float red, float green, float blue, float x, float y, f
   glColor3f(1,1,1);
 }
 
-void GLdisplay::drawSphere(Images t, float x, float y, float r)
+void GLdisplay::drawSphere(float x, float y, float r)
 {
   GLUquadricObj *pObj = gluNewQuadric();
 
@@ -149,7 +146,6 @@ void GLdisplay::drawSphere(Images t, float x, float y, float r)
 
   glTranslatef( x, y, 0.0f );
   gluQuadricTexture(pObj, 1);
-  glBindTexture(GL_TEXTURE_2D, texture[t]);
   gluSphere(pObj, r, 30, 30);
   glTranslatef( -x, -y, 0.0f );
   gluDeleteQuadric(pObj);
@@ -157,13 +153,12 @@ void GLdisplay::drawSphere(Images t, float x, float y, float r)
   glDisable(GL_LIGHT3);
 }
 
-void GLdisplay::drawDisk(int t, float x, float y, float r)
+void GLdisplay::drawDisk(float x, float y, float r)
 {
   GLUquadricObj *pObj = gluNewQuadric();
 
   glTranslatef( x, y, 0.0f );
   gluQuadricTexture(pObj, 1);
-  glBindTexture(GL_TEXTURE_2D, texture[t]);
   gluDisk(pObj, 0, r, 40, 1);
   glTranslatef( -x, -y, 0.0f );
 
@@ -182,14 +177,14 @@ void GLdisplay::clearButtons()
   buttonSize = 0;
 }
 
-void GLdisplay::addButton(Images t, float x, float y, float r, ButtonFlags::Actions action)
+void GLdisplay::addButton(std::string texture, float x, float y, float r, ButtonFlags::Actions action)
 {
   Button newButton;
 
   newButton.x = x;
   newButton.y = y;
   newButton.r = r;
-  newButton.texture = t;
+  newButton.texture = texture;
   newButton.active = 1;
   newButton.action = action;
   buttons[buttonSize++] = newButton;
@@ -205,7 +200,8 @@ void GLdisplay::drawButtons()
           glBlendFunc(GL_SRC_ALPHA,GL_ONE);
           drawDisk(IMG_BULGE,display->buttons[i].x,display->buttons[i].y,display->buttons[i].r*3,display);
           glDisable( GL_BLEND );*/
-    drawDisk(buttons[i].texture,buttons[i].x,buttons[i].y,buttons[i].r);
+    textures.useTexture(buttons[i].texture);
+    drawDisk(buttons[i].x,buttons[i].y,buttons[i].r);
   }
 }
 
@@ -232,62 +228,6 @@ bool AbstractButtonFlags::checkFlag(int action)
   bool ret = ((flags & action) == action);
   flags = flags & ~action;
   return ret;
-}
-
-
-int GLdisplay::LoadGLTextures(GLuint texture[],std::string path)
-{
-  int i, success = 0;
-  SDL_Surface *TextureImage[TEXTURES]; 
-
-  std::cerr << "trying to load textures from: " << path << std::endl;
-  glGenTextures( TEXTURES, texture ); /* Texturen vorbereiten */
-
-  /* Textur einladen */
-  if( (TextureImage[0]  = IMG_Load( (path + "star.png").c_str() )) &&
-      (TextureImage[1]  = IMG_Load( (path + "hole.png").c_str() )) &&
-      (TextureImage[2]  = IMG_Load( (path + "panel_MASS.png").c_str() ))  &&
-      (TextureImage[3]  = IMG_Load( (path + "panel_TIME.png").c_str() ))  &&
-      (TextureImage[4]  = IMG_Load( (path + "green.png").c_str() ))  &&
-      (TextureImage[5]  = IMG_Load( (path + "button_start.png").c_str() )) &&
-      (TextureImage[6]  = IMG_Load( (path + "button_stop.png").c_str() )) &&
-      (TextureImage[7]  = IMG_Load( (path + "button_replay.png").c_str() )) &&
-      (TextureImage[8] = IMG_Load( (path + "x.png").c_str() )) &&
-      (TextureImage[9] = IMG_Load( (path + "spacehero.png").c_str() )) &&
-      (TextureImage[10] = IMG_Load( (path + "bulge.png").c_str() )) &&
-      (TextureImage[11] = IMG_Load( (path + "accomplished.png").c_str() )) &&
-      (TextureImage[12] = IMG_Load( (path + "timesup.png").c_str() )) &&
-      (TextureImage[13] = IMG_Load( (path + "red.png").c_str() )) )
-  {
-    success = 1;
-
-
-    for (i=0; i < TEXTURES; i++)
-    {
-      glBindTexture( GL_TEXTURE_2D, texture[i] ); /* Textur einstellen */
-
-      /* Filter */
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-      /* Textur erstellen */
-      glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage[i]->w, TextureImage[i]->h, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[i]->pixels );
-    }
-  } else {
-
-    std::cerr << "error loading textures from:" << path << std::cerr;
-  }
-
-  /* Speicherplatz freigeben */
-  for(i=0; i < TEXTURES; i++)
-  {
-    if (TextureImage[i])
-    {
-      SDL_FreeSurface(TextureImage[i]);
-    }
-  }
-
-  return success;
 }
 
 void GLdisplay::KillFont( )
