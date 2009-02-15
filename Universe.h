@@ -14,6 +14,8 @@
 #include <iostream>
 #include <climits>
 
+
+
 using boost::timer;
 using boost::progress_timer;
 using boost::progress_display;
@@ -23,8 +25,10 @@ class SkyObject {
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
     bool exists;
     bool level;
+    double radius;
   public:
-    SkyObject():x(0),y(0),z(0),exists(true),level(false) {};
+    SkyObject():x(0),y(0),z(0),exists(true),level(false),radius(0) {};
+    SkyObject(double ix, double iy, double iradius) : x(ix), y(iy), z(0), exists(true), level(false), radius(iradius) {};
     virtual ~SkyObject() {};
     void setlevel() { level = true; };
     bool setexists(bool b=true) { return exists = b; };
@@ -40,19 +44,17 @@ class SkyMass : public SkyObject {
     double mass; /* in Sonnenmassen */
   public:
     SkyMass(): vx(0),vy(0),vz(0),mass(0) {};
-
+    SkyMass(double ix, double iy, double imass, double iradius) : SkyObject(ix,iy,iradius), vx(0), vy(0), vz(0), mass(imass) {};
+    
     inline void newton(SkyMass &m, double delta);
     inline void move(double delta);
   public:
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 };
 
-
 class Goal : public SkyObject {
   public:
-    double radius;
-  public:
-    Goal(): radius(0) {};
+    Goal() {};
     Goal(std::ifstream &in);
   public:
     friend std::ostream& operator<< (std::ostream &o, const Goal &g);
@@ -61,6 +63,7 @@ class Goal : public SkyObject {
 class Blackhole : public SkyMass {
   public:
     Blackhole(std::ifstream &in);
+    Blackhole(double ix, double iy, double imass) : SkyMass(ix, iy, imass, HOLESIZE*sqrt(imass/HOLEMEDIUMMASS)) {};
   public:
     friend std::ostream& operator<< (std::ostream &o, const Blackhole &g);
 };
@@ -128,7 +131,7 @@ class Universe: public Level
 {
   bool m_won;
   public:
-  std::vector<Star> stars;
+  std::vector<Star> stars;  
   public:
   Universe(Level &l);
   //bool play(GLdisplay &d);

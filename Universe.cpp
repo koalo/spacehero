@@ -1,8 +1,6 @@
 #include "Universe.h"
 
 #include "GLdisplay.h"
-
-
 #include "local.h"
 
 Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
@@ -18,6 +16,7 @@ Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
   vz = 0+g.vz;
 
   this->mass = mass;
+  radius = STARSIZE;
 }
 
 std::vector<Star> Galaxy::getStars(int seed) {

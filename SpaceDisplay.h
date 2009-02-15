@@ -32,6 +32,7 @@
 #include "ButtonMaster.h"
 #include "PictureBook.h"
 #include "Illustrator.h"
+#include "Editor.h"
 
 class SpaceDisplay
 {
@@ -47,7 +48,7 @@ class SpaceDisplay
 
     void displayUniverse( Universe &uni, int projection, int width, int height );
     void drawBridge(Universe &uni, BridgeView view);
-    void handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags);
+    void handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags, Editor &editor);
 
   private:
     GLdisplay display;
@@ -61,13 +62,13 @@ class SpaceDisplay
     SDL_Event event;
     float zoom;
 
-    inline void drawSkymass(SkyMass body, float size)
+    inline void drawSkymass(SkyMass body)
     {
       glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, -size+body.y, body.z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  size+body.x, -size+body.y, body.z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  size+body.x,  size+body.y, body.z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -size+body.x,  size+body.y, body.z );
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, body.z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, body.z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, body.z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, body.z );
       glEnd();
       /* Objekt zeichnen */
       /*
