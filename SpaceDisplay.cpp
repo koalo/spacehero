@@ -270,7 +270,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   if(uni.galaxies[0].exists)
   {
     if(uni.galaxies[0].level) glColor3f(0.0f,1.0f,0.0f);
-    drawSkymass(uni.galaxies[0], BULGESIZE);
+    drawSkymass(uni.galaxies[0]);
     glColor3f(1.0f,1.0f,1.0f);
   }
 
@@ -278,7 +278,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   {
     if(uni.galaxies[i].exists)
     {
-      drawSkymass(uni.galaxies[i], BULGESIZE);
+      drawSkymass(uni.galaxies[i]);
     }
   }
   
@@ -289,7 +289,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   {
     if(uni.stars[i].exists)
     {
-      drawSkymass(uni.stars[i], STARSIZE);
+      drawSkymass(uni.stars[i]);
     }
   }
 
@@ -298,7 +298,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
 
   for(i = 0; i < uni.holes.size(); i++)
   {
-    drawSkymass(uni.holes[i], HOLESIZE*(sqrt(uni.holes[i].mass/HOLEMEDIUMMASS)));
+    drawSkymass(uni.holes[i]);
   }
 
   /* Ziel */  
@@ -328,10 +328,8 @@ glPopMatrix();
 }
 
 
-void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags)
+void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags, Editor &editor)
 {
-  unsigned int i, remove;
-
   GLdouble modelMatrix[16];
   GLdouble projMatrix[16];
   int viewport[4];
@@ -362,15 +360,13 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
         /* Nur fuer Setzfenster */
         if(view == SpaceDisplay::PutView)
         {        
-          /* schwarzes Loch setzen */
+          /* Objekt setzen? */
           if(event.motion.x > UNIVERSE_LEFT && 
              event.motion.x < display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
              event.motion.y > UNIVERSE_TOP && 
              event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
             )
-          {
-            remove = 0;
-                        
+          {                        
             /* Mausposition umrechnen */
             glGetIntegerv(GL_VIEWPORT,viewport);
             glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
@@ -382,39 +378,8 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
             );
             
             mousey = 1.0-mousey;
-            
-            for(i = 0; i < uni.holes.size(); i++)
-            {
-              if( (pow(mousex-uni.holes[i].x,2)+pow(mousey-uni.holes[i].y,2))
-                    <= pow(HOLESIZE*(sqrt(uni.holes[i].mass/HOLEMEDIUMMASS)),2) )
-              {
-                remove = 1;
-                
-                /* pruefen ob der ueberhaupt geloescht werden darf */
-                if(!uni.holes[i].level)
-                {
-                /*  uni.massreserve += uni.holes[i].mass;*/
 
-                  /* die danach nachruecken lassen */
-                  uni.holes.erase(uni.holes.begin()+i);
-                  /*for(j = i; j < (uni.holes.size()-1); j++)
-                  {
-                    uni.holes[j] = uni.holes[j+1];
-                  }
-                  uni.holesSize--;*/
-                }
-              }
-            }
-            
-            if(!remove/* && uni.massreserve >= state.m_holeWeight*/)
-            {
-          /*    newHole.x = mousex;
-              newHole.y = mousey;
-              newHole.mass = state.m_holeWeight;*/
-             /* uni.massreserve -= newHole.mass;*/
-             /* uni.holes.push_back(newHole);*/
-            }
-            
+            editor.check(mousex,mousey,uni);            
           }
           drawBridge(uni,SpaceDisplay::PutView);
         }
@@ -430,17 +395,13 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
         /* Simulation wird sowieso gleich wieder gezeichnet */
         break;
       case SDL_QUIT:
-        /*free(uni.stars);*/
-        // exitApp( ); XXX is now implicit constructor call
-	exit(0);
+          exit(0);
         break;
       case SDL_KEYDOWN:
         switch(event.key.keysym.sym)
         {
           case SDLK_ESCAPE:
-          /*  free(uni.stars);*/
-            //exitApp( display );
-	exit(0);
+            exit(0);
             break;
           case SDLK_SPACE:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);

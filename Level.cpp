@@ -34,8 +34,7 @@ Level::Level(std::ifstream &in) :
   maxtime = 30.0;
 }
 
-Goal::Goal(std::ifstream &in) :
-  radius(0)
+Goal::Goal(std::ifstream &in)
 {
   in >> x >> y >> z;
   in >> radius;
@@ -47,6 +46,7 @@ Blackhole::Blackhole(std::ifstream &in) {
   in >> x >> y >> z; 
   in >> t >> t >> t; 
   in >> mass; 
+  radius = HOLESIZE*sqrt(mass/HOLEMEDIUMMASS);
   setlevel();
 };
 
@@ -57,4 +57,5 @@ Galaxy::Galaxy(std::ifstream &in, bool master) :
   in >> x >> y >> z; 
   in >> vx >> vy >> vz; 
   in >> mass; 
+  radius = BULGESIZE;
 };

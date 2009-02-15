@@ -2,19 +2,22 @@
 #include <sys/time.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
-  : state(spacehero_edit), won(false),
+  : state(spacehero_edit), won(false), bflags(), editor(),
     display(d), universe(u), paruni(0)
 {
 }
 
 bool Spacehero::play()
-{
-  ButtonFlags bflags;
-  
-  while (true) {
-    display.handleEvents(SpaceDisplay::SimulationView, universe, bflags);
-    if(bflags.checkFlag(ButtonFlags::breakSimulation)) state = spacehero_next;   
-    switch (state) {
+{  
+  while (true)
+  {
+    if(bflags.checkFlag(ButtonFlags::exit))
+    {
+      state = spacehero_exit;
+    }
+
+    switch (state)
+    {
       case spacehero_edit:
         state = edit();
         break;
@@ -44,19 +47,37 @@ bool Spacehero::play()
   }
 }
 
-Spacehero::SpaceheroState Spacehero::edit() {
+Spacehero::SpaceheroState Spacehero::edit()
+{
+  display.handleEvents(SpaceDisplay::PutView, universe, bflags, editor);
 
-  return spacehero_startsimu;
-/*  display.drawEditor(universe);*/
-  //return handleEvents(); // das ding muesste mir irgendwie mitteilen, was als naechstes passieren soll
+  if(bflags.checkFlag(ButtonFlags::startSimulation))
+  {
+    state = spacehero_startsimu;
+  }
 
+  display.drawBridge(universe,SpaceDisplay::PutView);
+  return state;
 }
 
 #define min(a,b) (a)<(b)?(a):(b)
 #define max(a,b) (a)<(b)?(b):(a)
-Spacehero::SpaceheroState Spacehero::simulate() {
+Spacehero::SpaceheroState Spacehero::simulate()
+{
   double delta=paruni->delta();
   paruni->move(delta);
+
+  display.handleEvents(SpaceDisplay::SimulationView, *paruni, bflags, editor);
+
+  if(bflags.checkFlag(ButtonFlags::breakSimulation))
+  {
+    state = spacehero_next;
+  }
+
+  if(bflags.checkFlag(ButtonFlags::replaySimulation))
+  {
+    state = spacehero_startsimu;
+  }
 
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 

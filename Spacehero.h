@@ -3,6 +3,7 @@
 
 #include "SpaceDisplay.h"
 #include "Universe.h"
+#include "ButtonFlags.h"
 
 class Spacehero
 {
@@ -20,9 +21,13 @@ class Spacehero
 
 	bool won;
 
+  ButtonFlags bflags;
+  Editor editor;
+
 	SpaceDisplay &display;
 	Universe &universe;
   Universe *paruni;
+
 
   static const double minframerate = 1.0/20.0;
   static const double maxframerate = 1.0/100.0;
