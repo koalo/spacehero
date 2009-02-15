@@ -1,6 +1,4 @@
 
-
-
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
 CXXFLAGS+=`sdl-config --cflags`
@@ -11,7 +9,8 @@ LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
 #CFLAGS+=-funroll-all-loops
 
 # Lokal
-CFLAGS+=-DDEV
+# z.b. -DDEV
+-include Makefile.local
 
 # Vollbild
 #CFLAGS+=-DFULLSCREEN
@@ -30,13 +29,17 @@ CXXFLAGS+=-O3
 
 #SRC=displaySpacehero.c displayAbstract.c galaxy.c game.c spacehero.c buttons.c glprint.c levelladen.c
 
-SRC+=BStatus.cpp 
+# eigene OpenGL-Bibliothek
 SRC+=GLdisplay.cpp 
+SRC+=PictureBook.cpp
+SRC+=Illustrator.cpp
+SRC+=ButtonMaster.cpp
+
+# SpaceHero
 SRC+=Level.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
-SRC+=handleEvents.cpp 
 SRC+=intro.cpp
 SRC+=output.cpp
 SRC+=main.cpp

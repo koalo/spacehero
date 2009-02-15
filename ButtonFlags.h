@@ -1,8 +1,6 @@
 #ifndef BUTTONFLAGS_H
 #define BUTTONFLAGS_H
 
-#include "GLdisplay.h"
-
 class ButtonFlags : public AbstractButtonFlags
 {
   public:
