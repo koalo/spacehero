@@ -34,8 +34,8 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
 
   if(fullscreen) {
     videoFlags |= SDL_FULLSCREEN;
-    width = videoInfo->current_w;
-    height = videoInfo->current_h;
+    this->width = videoInfo->current_w;
+    this->height = videoInfo->current_h;
   } else {
   }
 
@@ -59,7 +59,7 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
   /* Surface aktivieren */
-  surface = SDL_SetVideoMode( width, height, bpp , videoFlags );
+  surface = SDL_SetVideoMode( this->width, this->height, bpp , videoFlags );
 
   if ( !surface )
   {

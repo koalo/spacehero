@@ -27,7 +27,6 @@ bool Spacehero::play()
         state = spacehero_simulate;
         break;
       case spacehero_simulate:
-        //std::cerr << i << std::endl;
         state = simulate();
         break;
       case spacehero_stopsimu:
@@ -56,6 +55,21 @@ Spacehero::SpaceheroState Spacehero::edit()
     state = spacehero_startsimu;
   }
 
+  if(bflags.checkFlag(ButtonFlags::smallHole))
+  {
+    editor.holeWeight = HOLESMALLMASS;
+  }
+
+  if(bflags.checkFlag(ButtonFlags::mediumHole))
+  {
+    editor.holeWeight = HOLEMEDIUMMASS;
+  }
+
+  if(bflags.checkFlag(ButtonFlags::largeHole))
+  {
+    editor.holeWeight = HOLELARGEMASS;
+  }
+
   display.drawBridge(universe,SpaceDisplay::PutView);
   return state;
 }
@@ -71,7 +85,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
 
   if(bflags.checkFlag(ButtonFlags::breakSimulation))
   {
-    state = spacehero_next;
+    state = spacehero_edit;
   }
 
   if(bflags.checkFlag(ButtonFlags::replaySimulation))
@@ -82,7 +96,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
   paruni->tack();
-  if (paruni->timeout()) return spacehero_next; // XXX
+  if (paruni->timeout()) return spacehero_edit; // XXX
   if ((won = paruni->won())) return spacehero_next;
 
   return state;

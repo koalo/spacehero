@@ -3,7 +3,11 @@
 #include "Spacehero.h"
 
 SpaceDisplay::SpaceDisplay(std::string path) : 
+#ifdef FULLSCREEN
+  display(true)
+#else
   display()
+#endif
   ,textures(path)
   ,illustrator()
   ,buttons(textures, illustrator)
@@ -167,11 +171,11 @@ void SpaceDisplay::alignPutButtons()
   ypos = display.getHeight()*0.35;
   margin = UNIVERSE_RIGHT*0.3;
 
-#define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) 
-/*	addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
-	addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
-	addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);*/
-#undef TEXTURE
+/*#define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) */
+  buttons.addButton("button_green", center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
+  buttons.addButton("button_green", center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
+  buttons.addButton("button_green", center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);
+/*#undef TEXTURE*/
 }
 
 void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height )
@@ -267,20 +271,21 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   /* Galaxienmittelpunkte */
   textures.useTexture("bulge");
 
-  if(uni.galaxies[0].exists)
-  {
-    if(uni.galaxies[0].level) glColor3f(0.0f,1.0f,0.0f);
-    drawSkymass(uni.galaxies[0]);
-    glColor3f(1.0f,1.0f,1.0f);
-  }
-
-  for(i = 1; i < uni.galaxies.size(); i++)
+  for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].exists)
     {
+      if(uni.galaxies[i].getmaster())
+      {
+        glColor3f(0.0f,1.0f,0.0f);
+      } else {
+        glColor3f(1.0f,1.0f,1.0f);
+      }
       drawSkymass(uni.galaxies[i]);
     }
   }
+
+  glColor3f(1.0f,1.0f,1.0f);
   
   /* Sterne */
   textures.useTexture("star");

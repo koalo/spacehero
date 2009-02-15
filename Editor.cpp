@@ -14,6 +14,7 @@ void Editor::check(double mousex, double mousey, Universe &uni)
       /* pruefen ob der ueberhaupt geloescht werden darf */
       if(!uni.holes[i].level)
       {
+        massreserve += uni.holes[i].mass;
         uni.holes.erase(uni.holes.begin()+i);
       }
     }
