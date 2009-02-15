@@ -332,21 +332,29 @@ glPopMatrix();
   glDisable(GL_LIGHT1);
 }
 
-void SpaceDisplay::showLost()
+void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
 {
   unsigned int i;
-  ButtonFlags flags;
-  Universe uni();
+  Universe uni;
   Editor editor(uni);
+  double width;
 
-  textures.useTexture("lost");
-  illustrator.putImage( 0.5-((265.0/102)*0.12)*0.5, 0.5-(0.12*0.5), (265.0/102)*0.12, 0.12 );
+  if(win)
+  {
+    textures.useTexture("accomplished");
+    width = 629.0;
+  } else {
+    textures.useTexture("timesup");
+    width = 265.0;
+  }
+
+  illustrator.putImage( 0.5-((width/102)*0.12)*0.5, 0.5-(0.12*0.5), (width/102)*0.12, 0.12 );
   SDL_GL_SwapBuffers();
 
-  for(i = 0; i < 200; i++)
+  for(i = 0; i < 400; i++)
   {
     handleEvents(SpaceDisplay::SimulationView, flags, editor);
-    if(flags.checkFlag(ButtonFlags::replaySimulation) || flags.checkFlag(ButtonFlags::breakSimulation) || flags.checkFlag(ButtonFlags::exit))
+    if(flags.viewFlag(ButtonFlags::replaySimulation) || flags.viewFlag(ButtonFlags::breakSimulation) || flags.viewFlag(ButtonFlags::exit))
     {
       break;
     }

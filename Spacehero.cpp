@@ -96,30 +96,27 @@ Spacehero::SpaceheroState Spacehero::simulate()
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
   paruni->tack();
-  if ((won = paruni->won())) return spacehero_next;
 
   if(paruni->timeout())
   {
-    display.showLost();
+    display.showEnd(false,bflags);
+    if(bflags.checkFlag(ButtonFlags::replaySimulation))
+    { 
+      return spacehero_startsimu;
+    }
     return spacehero_edit;
   }
-#if 0
-      } else {
-        /* WIN */
-        win = 1;
-        putImage( IMG_WIN, 0.5-((629.0/102)*0.12)*0.5, 0.5-(0.12*0.5), (629.0/102)*0.12, 0.12, display );
-        SDL_GL_SwapBuffers();
-        for(i = 0; i < 500; i++)
-        {
-          handleEvents( display, SIMULATION, &uni );
-          if(display->state.breakSimulation || display->state.replaySimulation || display->state.exit)
-          {
-            break;
-          }
-          usleep(10000);
-        }
-      }
-#endif
+
+  if((won = paruni->won()))
+  {
+    display.showEnd(true,bflags);
+    if(bflags.checkFlag(ButtonFlags::replaySimulation))
+    {
+      return spacehero_startsimu;
+    }
+    return spacehero_next;
+  }
+
   return state;
 }
 

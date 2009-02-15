@@ -49,7 +49,7 @@ class SpaceDisplay
     void displayUniverse( Universe &uni, int projection, int width, int height );
     void drawBridge(Universe &uni, BridgeView view);
     void handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor);
-    void showLost();
+    void showEnd(bool win, ButtonFlags &flags);
 
   private:
     GLdisplay display;

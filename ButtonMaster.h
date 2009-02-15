@@ -23,6 +23,7 @@ class AbstractButtonFlags
   public:
   void activateFlag(Actions action);
   bool checkFlag(int action); /* statt int waer enum besser, aber geht nicht da kein Enum-Prototyping - loescht auch das Flag */
+  bool viewFlag(int action); /* loescht nicht! */
   AbstractButtonFlags()
     : flags(0)
   {
