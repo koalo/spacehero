@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
 { 
   std::vector<std::string> path;
 
-  path.push_back( "~/.spacehero/" );
-  path.push_back( "/usr/share/games/spacehero/" );
 #ifdef DEV
   path.push_back( "./" );
 #endif
+  path.push_back( "~/.spacehero/" );
+  path.push_back( "/usr/share/games/spacehero/" );
 
   std::string dir;
   for(std::vector<std::string>::iterator l = path.begin(); l!=path.end(); l++) {
