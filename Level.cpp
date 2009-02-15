@@ -15,6 +15,7 @@ Level::Level(std::ifstream &in) :
   while(in.good()) {
     char c;
     in >> c;
+    if(!in.good()) break;
     std::cerr << "Type: " << c << std::endl;
     switch(c) {
       case 'M': 

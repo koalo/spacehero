@@ -78,6 +78,7 @@ class Galaxy : public SkyMass {
     static const double R_MIN_CENTER = 0.02;
     static const double R_MIN = 0.0005;
 
+    Galaxy();
   public:
     Galaxy(std::ifstream &in, bool master=false);
 
