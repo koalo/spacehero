@@ -1,7 +1,8 @@
 #include "GLdisplay.h"
 
 GLdisplay::GLdisplay(std::string path, bool fullscreen, int width, int height, int bpp):
-  surface(0)
+  textures(path)
+  ,surface(0)
   ,videoFlags(0)
   ,videoInfo(0)
   ,isActive(0)
@@ -84,11 +85,12 @@ GLdisplay::GLdisplay(std::string path, bool fullscreen, int width, int height, i
 
 
   /* Textur laden */
+/*  loadTextures()
   if (!LoadGLTextures(texture, path))
   {
     fprintf( stderr, "Textur konnte nicht geladen werden\n" );
   }
-
+*/
   /* Font einladen */
   buildFont();
 }

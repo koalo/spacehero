@@ -1,6 +1,3 @@
-
-
-
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
 CXXFLAGS+=`sdl-config --cflags`
@@ -32,6 +29,7 @@ CXXFLAGS+=-O3
 
 SRC+=BStatus.cpp 
 SRC+=GLdisplay.cpp 
+SRC+=PictureBook.cpp
 SRC+=Level.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp

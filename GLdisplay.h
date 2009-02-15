@@ -16,6 +16,7 @@ class Kamera;
 #include <math.h>
 
 #include "Universe.h"
+#include "PictureBook.h"
 
 class AbstractButtonFlags
 {
@@ -82,6 +83,9 @@ class GLdisplay
     	IMG_ACTIVE,
     	TEXTURES
     };
+
+  protected:
+    PictureBook &textures;
 
   private:
     SDL_Surface *surface;

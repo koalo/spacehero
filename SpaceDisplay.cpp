@@ -2,6 +2,10 @@
 #include "local.h"
 #include "Spacehero.h"
 
+SpaceDisplay::SpaceDisplay()
+{
+}
+
 void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 {
 	double center;
