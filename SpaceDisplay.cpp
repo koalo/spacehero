@@ -2,7 +2,14 @@
 #include "local.h"
 #include "Spacehero.h"
 
-SpaceDisplay::SpaceDisplay(std::string path) : GLdisplay(path)
+SpaceDisplay::SpaceDisplay(std::string path) : 
+  display()
+  ,textures(path)
+  ,illustrator()
+  ,buttons(textures, illustrator)
+  ,isActive(1)
+  ,event()
+  ,zoom(0.0)
 {
   textures.addTexture("star");
   textures.addTexture("hole");
@@ -31,14 +38,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
   /* Bildschirm loeschen */
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  width = this->width-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
-  height = this->height-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
+  width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
+  height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
 
   /* Auf Projektionsmodus umschalten */
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glViewport(0,0,this->width,this->height);
-  glOrtho(0,this->width,0,this->height,0,128);
+  glViewport(0,0,display.getWidth(),display.getHeight());
+  glOrtho(0,display.getWidth(),0,display.getHeight(),0,128);
 
   /* Blending */
   glDisable(GL_BLEND);
@@ -48,11 +55,11 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
   glLoadIdentity();
 
   glScalef(1.0f, -1.0f, 1.0f);
-  glTranslatef(0.0f, -this->height, 0.0f);
+  glTranslatef(0.0f, -display.getHeight(), 0.0f);
 
   /* Infotext */
   y = 0; 
-  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
+  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
   for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].exists)
@@ -60,14 +67,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
       curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
       curse = (curse < 0)?curse+2*M_PI:curse;
       curse = curse*(180/M_PI);
-      glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
+      illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
     }
   }
 
-  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
-  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
-  glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
-  /* putImage( IMG_BACKGROUND, 0, 0, display->width, display->height, display );*/
+  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
+  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
+  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
+  /* putImage( IMG_BACKGROUND, 0, 0, display.getWidth(), display.getHeight(), display );*/
   /*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
   if(view == PutView)
   {
@@ -78,9 +85,9 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
     textures.useTexture("panel_TIME");
   }
 
-  putImage(this->width-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, this->height);
+  illustrator.putImage(display.getWidth()-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, display.getHeight());
 
-  center = this->width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
   if(view == PutView)
   {
@@ -101,24 +108,24 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
     /* Zeigerposition berechnen */
     mrangle = (mrangle < 0)?0:mrangle;
     mrangle = mrangle*80-40;
-    mrx = - (-this->height*0.11 * sin(mrangle * M_PI/180));
-    mry = (-this->height*0.11 * cos(mrangle * M_PI/180));
+    mrx = - (-display.getHeight()*0.11 * sin(mrangle * M_PI/180));
+    mry = (-display.getHeight()*0.11 * cos(mrangle * M_PI/180));
 
     glLineWidth(4);
 
     glColor3f(0,0,0);
     glBegin( GL_LINES );
-    glVertex3f( center+mrx, this->height*0.28+mry, 0.0 );
-    glVertex3f( center, this->height*0.28, 0.0 );
+    glVertex3f( center+mrx, display.getHeight()*0.28+mry, 0.0 );
+    glVertex3f( center, display.getHeight()*0.28, 0.0 );
     glEnd();
     glColor3f(1,1,1);
   }
 
-  drawButtons();
+  buttons.drawButtons();
 
   glDisable(GL_POLYGON_SMOOTH);
 
-  drawButtons();
+  buttons.drawButtons();
 
   displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
 
@@ -131,33 +138,33 @@ void SpaceDisplay::alignSimulButtons()
 {
   double center;
 
-  clearButtons();
-  center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  buttons.clearButtons();
+  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
   /* Simulation stoppen */
-  addButton("button_stop", center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
+  buttons.addButton("button_stop", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
 
   /* Replay */
-  addButton("button_replay", center+REPLAY_BUTTON, height-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
+  buttons.addButton("button_replay", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
 
   /* Exit */
-  addButton("button_x", width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
+  buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 }
 
 void SpaceDisplay::alignPutButtons()
 {
   double center, ypos, margin;
 
-  clearButtons();
-  center = width-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+  buttons.clearButtons();
+  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
   /* Simulation starten */
-  addButton("button_start", center, height-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
+  buttons.addButton("button_start", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
 
   /* Exit */
-  addButton("button_x", width-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
+  buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 
-  ypos = height*0.35;
+  ypos = display.getHeight()*0.35;
   margin = UNIVERSE_RIGHT*0.3;
 
 #define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) 
@@ -349,7 +356,7 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
         /* Buttons */
         if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView)
         {
-          checkButtons(flags);
+          buttons.checkButtons(flags,event.motion.x,event.motion.y);
         }
               
         /* Nur fuer Setzfenster */
@@ -357,9 +364,9 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
         {        
           /* schwarzes Loch setzen */
           if(event.motion.x > UNIVERSE_LEFT && 
-             event.motion.x < width-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
+             event.motion.x < display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
              event.motion.y > UNIVERSE_TOP && 
-             event.motion.y < height-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
+             event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
             )
           {
             remove = 0;
@@ -414,7 +421,7 @@ void SpaceDisplay::handleEvents(BridgeView view, Universe &uni, ButtonFlags &fla
         break;
       case SDL_VIDEORESIZE:
         /* Groesse vom Fenster geaendert */
-        resizeWindow( event.resize.w, event.resize.h );
+        display.resizeWindow( event.resize.w, event.resize.h );
         
         if(view == SpaceDisplay::PutView)
         {

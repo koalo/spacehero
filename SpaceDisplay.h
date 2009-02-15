@@ -9,7 +9,7 @@
 #define UNIVERSE_BOTTOM 0
 
 #define PANELRATIO 0.205962059620
-#define UNIVERSE_RIGHT (PANELRATIO*this->height)
+#define UNIVERSE_RIGHT (PANELRATIO*display.getHeight())
 
 #define START_BUTTON (UNIVERSE_RIGHT*0.4)
 #define REPLAY_BUTTON (UNIVERSE_RIGHT*0.2)
@@ -28,11 +28,16 @@
 #define TEXTB 0.0f
 
 #include "GLdisplay.h"
+#include "Universe.h"
+#include "ButtonMaster.h"
+#include "PictureBook.h"
+#include "Illustrator.h"
 
-class SpaceDisplay : public GLdisplay
+class SpaceDisplay
 {
   public:
     SpaceDisplay(std::string path);
+
   public:
     enum BridgeView { 
       SimulationView,
@@ -45,8 +50,16 @@ class SpaceDisplay : public GLdisplay
     void handleEvents(BridgeView view, Universe &uni, ButtonFlags &flags);
 
   private:
+    GLdisplay display;
+    PictureBook textures;
+    Illustrator illustrator;
+    ButtonMaster buttons;
+
     void alignSimulButtons();
     void alignPutButtons();
+    int isActive; /* Fenster hat Fokus? */
+    SDL_Event event;
+    float zoom;
 
     inline void drawSkymass(SkyMass body, float size)
     {
