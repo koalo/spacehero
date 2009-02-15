@@ -1,3 +1,4 @@
+
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
 CXXFLAGS+=`sdl-config --cflags`
@@ -8,7 +9,8 @@ LDFLAGS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
 #CFLAGS+=-funroll-all-loops
 
 # Lokal
-CFLAGS+=-DDEV
+# z.b. -DDEV
+-include Makefile.local
 
 # Vollbild
 #CFLAGS+=-DFULLSCREEN

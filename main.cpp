@@ -16,10 +16,9 @@ int main(int argc, char *argv[])
 { 
   std::vector<std::string> path;
 
-#ifdef DEV
   path.push_back( "~/.spacehero/" );
   path.push_back( "/usr/share/games/spacehero/" );
-#else
+#ifdef DEV
   path.push_back( "./" );
 #endif
 
