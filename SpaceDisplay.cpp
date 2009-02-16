@@ -116,18 +116,28 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   /* Exit */
   buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
 
-  if(view == PutView)
-  {
+  if(view == PutView || view == EditorView)
+  {  
+    if(view == EditorView)
+    {
+      buttons.addButton("hole", center, display.getHeight()*0.2, START_BUTTON, ButtonFlags::putHole);
+      buttons.addButton("bulge", center, display.getHeight()*0.4, START_BUTTON, ButtonFlags::putBulge);
+      buttons.addButton("button_green", center, display.getHeight()*0.6, START_BUTTON, ButtonFlags::putGoal);
+
+      ypos = display.getHeight()*0.8;
+    } else {
+      ypos = display.getHeight()*0.35;
+    }
+
     /* Simulation starten */
     buttons.addButton("button_start", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
 
-    ypos = display.getHeight()*0.35;
     margin = UNIVERSE_RIGHT*0.3;
 
     #define TEXTURE(size) ((holeWeight-(HOLESMALLMASS/2) < (size) && holeWeight+(HOLESMALLMASS/2) > (size))?"button_red":"button_green")
-    buttons.addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
-    buttons.addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
-    buttons.addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);
+    buttons.addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::small);
+    buttons.addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, ButtonFlags::medium);
+    buttons.addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, ButtonFlags::large);
     #undef TEXTURE
   }
 
@@ -338,7 +348,7 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
 {
   unsigned int i;
   Universe uni;
-  Editor editor(uni);
+  Editor editor(uni,false);
   double width;
 
   if(win)
@@ -388,13 +398,13 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
         break;
       case SDL_MOUSEBUTTONDOWN:
         /* Buttons */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView)
+        if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
         {
           buttons.checkButtons(flags,event.motion.x,event.motion.y);
         }
               
         /* Nur fuer Setzfenster */
-        if(view == SpaceDisplay::PutView)
+        if(view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView)
         {        
           /* Objekt setzen? */
           if(event.motion.x > UNIVERSE_LEFT && 

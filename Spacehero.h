@@ -15,6 +15,7 @@ class Spacehero
   //
   // Endzustaende: next und exit
 	enum SpaceheroState { 
+		spacehero_put, 
 		spacehero_edit, 
     spacehero_startsimu,
 		spacehero_simulate, 
@@ -41,7 +42,7 @@ public:
 
 	bool play();
 
-	SpaceheroState edit();
+	SpaceheroState edit(bool leveleditor);
 	SpaceheroState simulate();
 	SpaceheroState handleEvents();
 

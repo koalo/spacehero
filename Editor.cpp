@@ -1,6 +1,6 @@
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),massreserve(maxreserve),holeWeight(HOLEMEDIUMMASS)
+Editor::Editor(Universe &universe, bool allowall) : uni(universe),maxreserve(MAXSTARTRESERVE),all(allowall),massreserve(maxreserve),size(medium)
 {
 }
 
@@ -18,20 +18,57 @@ void Editor::check(double mousex, double mousey)
       /* pruefen ob der ueberhaupt geloescht werden darf */
       if(!uni.holes[i].level)
       {
-        massreserve += uni.holes[i].mass;
+        if(!all) massreserve += uni.holes[i].mass;
         uni.holes.erase(uni.holes.begin()+i);
       }
     }
   }
   
-  if(!remove && massreserve >= holeWeight)
+  if(!remove && (massreserve >= getHoleWeight() || all))
   {
-    massreserve -= holeWeight;
-    uni.holes.push_back(Blackhole(mousex,mousey,holeWeight));
+    if(!all) massreserve -= getHoleWeight();
+    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
   }
 }
 
 double Editor::getQuotient()
 {
   return massreserve/maxreserve;
+}
+
+double Editor::getHoleWeight()
+{
+  switch(size)
+  {
+    case small:
+      return HOLESMALLMASS;
+      break;
+    case medium:
+      return HOLEMEDIUMMASS;
+      break;
+    case large:
+      return HOLELARGEMASS;
+      break;
+    default:
+      return 0;
+      break;
+  }
+}
+
+void Editor::parseButtons(ButtonFlags &flags)
+{
+  if(flags.checkFlag(ButtonFlags::small))
+  {
+    size = small;
+  }
+
+  if(flags.checkFlag(ButtonFlags::medium))
+  {
+    size = medium;
+  }
+
+  if(flags.checkFlag(ButtonFlags::large))
+  {
+    size = large;
+  }
 }
