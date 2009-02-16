@@ -1,9 +1,6 @@
 #ifndef _SPACEDISPLAY_H_
 #define _SPACEDISPLAY_H_
 
-#define PUT 3463
-#define SIMULATION 46584
-
 #define UNIVERSE_LEFT 0
 #define UNIVERSE_TOP 0
 #define UNIVERSE_BOTTOM 0

@@ -39,6 +39,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   double mrangle =0, curse;
   double width, height;
 
+  /**************************
+   * BILDSCHIRM VORBEREITEN *
+   **************************/
+
   /* Bildschirm loeschen */
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -51,7 +55,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   glViewport(0,0,display.getWidth(),display.getHeight());
   glOrtho(0,display.getWidth(),0,display.getHeight(),0,128);
 
-  /* Blending */
+  /* Blending aus */
   glDisable(GL_BLEND);
   
   /* Zurueckschalten und Ansicht einstellen */
@@ -61,7 +65,11 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   glScalef(1.0f, -1.0f, 1.0f);
   glTranslatef(0.0f, -display.getHeight(), 0.0f);
 
-  /* Infotext */
+
+
+  /**************************
+   *        INFOTEXT        *
+   **************************/
   y = 0; 
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "Task: Navigate the green galaxy into the green target area.");
   for(i = 0; i < uni.galaxies.size(); i++)
@@ -79,6 +87,11 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
 
+
+
+  /**************************
+   *    PANEL EINRICHTEN    *
+   **************************/
   if(view == PutView)
   {
     textures.useTexture("panel_MASS");
@@ -90,6 +103,11 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 
   illustrator.putImage(display.getWidth()-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, display.getHeight());
 
+
+
+  /**************************
+   *        BUTTONS         *
+   **************************/
   center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
   buttons.clearButtons();
@@ -122,6 +140,13 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     buttons.addButton("button_replay", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
   }
 
+  buttons.drawButtons();
+
+
+
+  /**************************
+   *         ZEIGER         *
+   **************************/
   glEnable(GL_POLYGON_SMOOTH);
 
   if(view == PutView || view == SimulationView)
@@ -142,17 +167,19 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     glColor3f(1,1,1);
   }
 
-  /*buttons.drawButtons();*/
 
-  glDisable(GL_POLYGON_SMOOTH);
 
-  buttons.drawButtons();
-
+  /**************************
+   *       UNIVERSUM        *
+   **************************/
   displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
+
 
   /* Versteckten Buffer aktivieren */
   SDL_GL_SwapBuffers();
 }
+
+
 
 void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height )
 {
@@ -289,18 +316,17 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
   
   glLineWidth(1);
-glPushMatrix();
 
-  glColor3f(0.0,0.1,0.0);
-  glTranslatef( uni.goal.x, uni.goal.y, 0.0f );
-  glRotatef(51.0,0.6,0.4,0.0);
-  gluQuadricTexture(pObj, 1);
-  textures.noTexture();
-  gluSphere(pObj, uni.goal.radius, 20, 20);
-  glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );
-  glColor3f(1,1,1);
-
-glPopMatrix();
+  glPushMatrix();
+    glColor3f(0.0,0.1,0.0);
+    glTranslatef( uni.goal.x, uni.goal.y, 0.0f );
+    glRotatef(51.0,0.6,0.4,0.0);
+    gluQuadricTexture(pObj, 1);
+    textures.noTexture();
+    gluSphere(pObj, uni.goal.radius, 20, 20);
+    /*glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );*/
+    glColor3f(1,1,1);
+  glPopMatrix();
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   gluDeleteQuadric(pObj);
