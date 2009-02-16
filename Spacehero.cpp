@@ -71,7 +71,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     editor.holeWeight = HOLELARGEMASS;
   }
 
-  display.drawBridge(universe,SpaceDisplay::PutView);
+  display.drawBridge(universe,SpaceDisplay::PutView,editor.getQuotient(),editor.holeWeight);
   return state;
 }
 
@@ -80,7 +80,7 @@ Spacehero::SpaceheroState Spacehero::edit()
 Spacehero::SpaceheroState Spacehero::simulate()
 {
   paruni->tick();
-  paruni->move(1/50.0);
+  paruni->move(maxframerate);
 
   display.handleEvents(SpaceDisplay::SimulationView, bflags, editor);
 
@@ -94,13 +94,11 @@ Spacehero::SpaceheroState Spacehero::simulate()
     state = spacehero_startsimu;
   }
 
-  display.drawBridge(*paruni,SpaceDisplay::SimulationView);
+  display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
 
   // ZEIT verballern
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   if(0 != usleep(sleep)) std::cerr << "usleep failed" << std::endl;
-  paruni->tack();
-  std::cerr << paruni->delta() << "|" << paruni->ldelta() << "|" << sleep << std::endl;
 
   if(paruni->timeout())
   {
@@ -122,6 +120,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
     return spacehero_next;
   }
 
+  paruni->tack();
   return state;
 }
 

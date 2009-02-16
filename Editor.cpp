@@ -1,6 +1,6 @@
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),massreserve(MAXSTARTRESERVE),holeWeight(HOLEMEDIUMMASS)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),massreserve(maxreserve),holeWeight(HOLEMEDIUMMASS)
 {
 }
 
@@ -29,4 +29,9 @@ void Editor::check(double mousex, double mousey)
     massreserve -= holeWeight;
     uni.holes.push_back(Blackhole(mousex,mousey,holeWeight));
   }
+}
+
+double Editor::getQuotient()
+{
+  return massreserve/maxreserve;
 }

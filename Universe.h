@@ -116,7 +116,7 @@ class Level {
     virtual ~Level() {};
 
   public:
-    void tinit() { t0 = timer(); m_delta=1/50.0; }; // start time measure
+    void tinit() { t0 = timer(); }; // start time measure
     double elapsed() { return t0.elapsed(); }; // get elapsed time
 
     void tick() { lastt=elapsed(); };
@@ -125,12 +125,13 @@ class Level {
     //  lastt=elapsed(); 
     }; // measure round time
 
-    double ldelta() { return elapsed() - lastt; }; // unfiltered delta
+    double ldelta(double weight=0.1 ) { return weight*m_delta + (1-weight)*(elapsed()-lastt); };
     double delta() { return m_delta; }; // filtered delta
 
-    bool timeout() {return t0.elapsed() > maxtime; };
+    double getmaxtime() { return maxtime; }; // get maxtime
+    bool timeout() {return elapsed() > maxtime; }; // TODO: fix to use summed movement time
 
-    double fps(double weight=0.9) {
+    double fps() {
       //m_fps = weight*m_fps * (1-weight)*(elapsed() - m_fpst);
       //m_fpst = elapsed();
       return 1/m_delta;

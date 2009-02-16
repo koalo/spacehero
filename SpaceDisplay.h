@@ -1,9 +1,6 @@
 #ifndef _SPACEDISPLAY_H_
 #define _SPACEDISPLAY_H_
 
-#define PUT 3463
-#define SIMULATION 46584
-
 #define UNIVERSE_LEFT 0
 #define UNIVERSE_TOP 0
 #define UNIVERSE_BOTTOM 0
@@ -47,7 +44,7 @@ class SpaceDisplay
     };
 
     void displayUniverse( Universe &uni, int projection, int width, int height );
-    void drawBridge(Universe &uni, BridgeView view);
+    void drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight = 0);
     void handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor);
     void showEnd(bool win, ButtonFlags &flags);
 
