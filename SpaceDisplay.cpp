@@ -75,7 +75,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
     }
   }
 
-  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
+  illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",uni.fps());
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
   /* putImage( IMG_BACKGROUND, 0, 0, display.getWidth(), display.getHeight(), display );*/

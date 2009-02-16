@@ -5,6 +5,8 @@ Level::Level(std::ifstream &in) :
   maxtime(30.0),
   lastt(0),
   m_delta(0),
+  m_fpst(0),
+  m_fps(0),
   holes(),
   galaxies(),
   goal(),

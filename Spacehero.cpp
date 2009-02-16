@@ -1,5 +1,6 @@
 #include "Spacehero.h"
 #include <sys/time.h>
+#include <unistd.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   : state(spacehero_edit), won(false), bflags(), editor(u),
@@ -23,7 +24,7 @@ bool Spacehero::play()
         break;
       case spacehero_startsimu:
         paruni = new Universe(universe);
-        paruni->tick();
+        paruni->tinit();
         state = spacehero_simulate;
         break;
       case spacehero_simulate:
@@ -74,12 +75,12 @@ Spacehero::SpaceheroState Spacehero::edit()
   return state;
 }
 
-#define min(a,b) (a)<(b)?(a):(b)
-#define max(a,b) (a)<(b)?(b):(a)
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)<(b))?(b):(a))
 Spacehero::SpaceheroState Spacehero::simulate()
 {
-  double delta=paruni->delta();
-  paruni->move(delta);
+  paruni->tick();
+  paruni->move(1/50.0);
 
   display.handleEvents(SpaceDisplay::SimulationView, bflags, editor);
 
@@ -95,7 +96,11 @@ Spacehero::SpaceheroState Spacehero::simulate()
 
   display.drawBridge(*paruni,SpaceDisplay::SimulationView);
 
+  // ZEIT verballern
+  useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
+  if(0 != usleep(sleep)) std::cerr << "usleep failed" << std::endl;
   paruni->tack();
+  std::cerr << paruni->delta() << "|" << paruni->ldelta() << "|" << sleep << std::endl;
 
   if(paruni->timeout())
   {

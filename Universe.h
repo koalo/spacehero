@@ -101,6 +101,9 @@ class Level {
     double maxtime;
     double lastt;
     double m_delta;
+
+    double m_fpst;
+    double m_fps;
   public:
     std::vector<Blackhole> holes;
     std::vector<Galaxy> galaxies;
@@ -109,20 +112,29 @@ class Level {
     int seed;
   public:
     Level(std::ifstream &in);
-    Level():t0(),maxtime(0),lastt(0),m_delta(0),holes(),galaxies(),goal(),seed(0) {};
+    Level():t0(),maxtime(0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),galaxies(),goal(),seed(0) {};
     virtual ~Level() {};
 
   public:
-    void tick() { t0 = timer(); }; // start time measure
-    double tack(double weight=0.99) {
-      m_delta = weight*m_delta + (1-weight)*(elapsed()-lastt);
-      return lastt=elapsed(); 
-    }; // get elapsed time
+    void tinit() { t0 = timer(); m_delta=1/50.0; }; // start time measure
     double elapsed() { return t0.elapsed(); }; // get elapsed time
-    double delta() {
-      return m_delta;
-    };
+
+    void tick() { lastt=elapsed(); };
+    void tack(double weight=0.9) {
+      m_delta = weight*m_delta + (1-weight)*(elapsed()-lastt);
+    //  lastt=elapsed(); 
+    }; // measure round time
+
+    double ldelta() { return elapsed() - lastt; }; // unfiltered delta
+    double delta() { return m_delta; }; // filtered delta
+
     bool timeout() {return t0.elapsed() > maxtime; };
+
+    double fps(double weight=0.9) {
+      //m_fps = weight*m_fps * (1-weight)*(elapsed() - m_fpst);
+      //m_fpst = elapsed();
+      return 1/m_delta;
+    }
 
   public:
     friend std::ostream& operator<< (std::ostream &o, const Level &l);

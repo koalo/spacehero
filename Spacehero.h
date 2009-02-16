@@ -33,8 +33,7 @@ class Spacehero
   Universe *paruni;
 
 
-  static const double minframerate = 1.0/20.0;
-  static const double maxframerate = 1.0/100.0;
+  static const double maxframerate = 1.0/50.0;
 
 public:
 
