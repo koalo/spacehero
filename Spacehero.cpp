@@ -70,7 +70,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     editor.holeWeight = HOLELARGEMASS;
   }
 
-  display.drawBridge(universe,SpaceDisplay::PutView);
+  display.drawBridge(universe,SpaceDisplay::PutView,editor.getQuotient(),editor.holeWeight);
   return state;
 }
 
@@ -93,7 +93,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
     state = spacehero_startsimu;
   }
 
-  display.drawBridge(*paruni,SpaceDisplay::SimulationView);
+  display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
 
   paruni->tack();
 

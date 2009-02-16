@@ -31,9 +31,9 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("timesup");
 }
 
-void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
+void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight)
 {
-  double center;
+  double center, ypos, margin;
   int mrx, mry, y;
   unsigned int i;
   double mrangle =0, curse;
@@ -78,8 +78,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "fps: %07.2f",1/uni.delta());
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "elapsed: %2.2f",uni.elapsed());
   illustrator.glPrint( TEXTR, TEXTG, TEXTB, 0.0f, TEXTSPACE*(y++), "won: %d",uni.won());
-  /* putImage( IMG_BACKGROUND, 0, 0, display.getWidth(), display.getHeight(), display );*/
-  /*  drawRect( 0.0, 0.0, 0.0, UNIVERSE_LEFT, UNIVERSE_TOP, width, height );*/
+
   if(view == PutView)
   {
     textures.useTexture("panel_MASS");
@@ -93,16 +92,34 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 
   center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
 
+  buttons.clearButtons();
+  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
+
+  /* Exit */
+  buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
+
   if(view == PutView)
   {
-    alignPutButtons();
-/*		mrangle = (double)(uni.massreserve)/(double)(MAXSTARTRESERVE);*/
+    /* Simulation starten */
+    buttons.addButton("button_start", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
+
+    ypos = display.getHeight()*0.35;
+    margin = UNIVERSE_RIGHT*0.3;
+
+    #define TEXTURE(size) ((holeWeight-(HOLESMALLMASS/2) < (size) && holeWeight+(HOLESMALLMASS/2) > (size))?"button_red":"button_green")
+    buttons.addButton(TEXTURE(HOLESMALLMASS), center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
+    buttons.addButton(TEXTURE(HOLEMEDIUMMASS), center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
+    buttons.addButton(TEXTURE(HOLELARGEMASS), center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);
+    #undef TEXTURE
   }
 
   if(view == SimulationView)
   {
-    alignSimulButtons();
-  /*	mrangle = (double)(MAXTIME-time)/(double)(MAXTIME);*/
+    /* Simulation stoppen */
+    buttons.addButton("button_stop", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
+
+    /* Replay */
+    buttons.addButton("button_replay", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
   }
 
   glEnable(GL_POLYGON_SMOOTH);
@@ -110,7 +127,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
   if(view == PutView || view == SimulationView)
   {
     /* Zeigerposition berechnen */
-    mrangle = (mrangle < 0)?0:mrangle;
+    mrangle = (indicator < 0)?0:indicator;
     mrangle = mrangle*80-40;
     mrx = - (-display.getHeight()*0.11 * sin(mrangle * M_PI/180));
     mry = (-display.getHeight()*0.11 * cos(mrangle * M_PI/180));
@@ -125,7 +142,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
     glColor3f(1,1,1);
   }
 
-  buttons.drawButtons();
+  /*buttons.drawButtons();*/
 
   glDisable(GL_POLYGON_SMOOTH);
 
@@ -135,47 +152,6 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view)
 
   /* Versteckten Buffer aktivieren */
   SDL_GL_SwapBuffers();
-}
-
-
-void SpaceDisplay::alignSimulButtons()
-{
-  double center;
-
-  buttons.clearButtons();
-  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
-
-  /* Simulation stoppen */
-  buttons.addButton("button_stop", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
-
-  /* Replay */
-  buttons.addButton("button_replay", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
-
-  /* Exit */
-  buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
-}
-
-void SpaceDisplay::alignPutButtons()
-{
-  double center, ypos, margin;
-
-  buttons.clearButtons();
-  center = display.getWidth()-UNIVERSE_RIGHT+(UNIVERSE_RIGHT/2.0);
-
-  /* Simulation starten */
-  buttons.addButton("button_start", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
-
-  /* Exit */
-  buttons.addButton("button_x", display.getWidth()-2*EXIT_BUTTON, UNIVERSE_TOP+2*EXIT_BUTTON, EXIT_BUTTON, ButtonFlags::exit);
-
-  ypos = display.getHeight()*0.35;
-  margin = UNIVERSE_RIGHT*0.3;
-
-/*#define TEXTURE(size) ((state.m_holeWeight-(HOLESMALLMASS/2) < (size) && state.m_holeWeight+(HOLESMALLMASS/2) > (size))?GLdisplay::IMG_ACTIVE:GLdisplay::IMG_BUTTON) */
-  buttons.addButton("button_green", center-margin, ypos, SMALL_HOLE, ButtonFlags::smallHole);
-  buttons.addButton("button_green", center, ypos, MEDIUM_HOLE, ButtonFlags::mediumHole);
-  buttons.addButton("button_green", center+margin, ypos, LARGE_HOLE, ButtonFlags::largeHole);
-/*#undef TEXTURE*/
 }
 
 void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height )

@@ -119,6 +119,7 @@ class Level {
       return lastt=elapsed(); 
     }; // get elapsed time
     double elapsed() { return t0.elapsed(); }; // get elapsed time
+    double getmaxtime() { return maxtime; }; // get maxtime
     double delta() {
       return m_delta;
     };
