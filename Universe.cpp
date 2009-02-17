@@ -47,6 +47,14 @@ Universe::Universe(Level &l) :
   m_won(false),
   stars()
 {
+  calcStars();
+}
+
+
+void Universe::calcStars()
+{
+  stars.clear();
+
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
     std::vector<Star> gstars = i->getStars(seed);
     std::cerr << "got " << gstars.size() << " stars" << std::endl;
@@ -54,7 +62,6 @@ Universe::Universe(Level &l) :
   }
   std::cerr << "universe has " << stars.size() << " stars" << std::endl;
 }
-
 
 void Universe::move(double delta)
 {
@@ -111,11 +118,20 @@ void Universe::eventHorizon()
   }
 }
 
-bool Universe::won() {
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
+bool Universe::won()
+{
+  int master = 0;
+  int ingoal = 0;
+  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) 
+  {
     if( i->getmaster() )
-      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius ) 
-        m_won = true;
+    {
+      master++;
+      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->exists )
+      { 
+        ingoal++;
+      }
+    }
   }
-  return m_won;
+  return (m_won = (ingoal == master));
 }

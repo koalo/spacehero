@@ -17,8 +17,11 @@ SpaceDisplay::SpaceDisplay(std::string path) :
 {
   textures.addTexture("star");
   textures.addTexture("hole");
+  textures.addTexture("goal");
+  textures.addTexture("galaxy");
   textures.addTexture("panel_MASS");
   textures.addTexture("panel_TIME");
+  textures.addTexture("panel_EMPTY");
   textures.addTexture("button_green");
   textures.addTexture("button_start");
   textures.addTexture("button_stop");
@@ -100,6 +103,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   {
     textures.useTexture("panel_TIME");
   }
+  else if(view == EditorView)
+  {
+    textures.useTexture("panel_EMPTY");
+  }
 
   illustrator.putImage(display.getWidth()-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, display.getHeight());
 
@@ -121,10 +128,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     if(view == EditorView)
     {
       buttons.addButton("hole", center, display.getHeight()*0.2, START_BUTTON, ButtonFlags::putHole);
-      buttons.addButton("bulge", center, display.getHeight()*0.4, START_BUTTON, ButtonFlags::putBulge);
-      buttons.addButton("button_green", center, display.getHeight()*0.6, START_BUTTON, ButtonFlags::putGoal);
+      buttons.addButton("galaxy", center, display.getHeight()*0.4, START_BUTTON, ButtonFlags::putBulge);
+      buttons.addButton("goal", center, display.getHeight()*0.6, START_BUTTON, ButtonFlags::putGoal);
 
-      ypos = display.getHeight()*0.8;
+      ypos = display.getHeight()*0.75;
     } else {
       ypos = display.getHeight()*0.35;
     }
@@ -348,7 +355,7 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
 {
   unsigned int i;
   Universe uni;
-  Editor editor(uni,false);
+  Editor editor(uni);
   double width;
 
   if(win)
@@ -441,6 +448,9 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
         {
           case SDLK_ESCAPE:
             exit(0);
+            break;
+          case SDLK_e:
+            flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::startEditor);
             break;
           case SDLK_SPACE:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);

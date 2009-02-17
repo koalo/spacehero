@@ -29,7 +29,8 @@
 #include "ButtonMaster.h"
 #include "PictureBook.h"
 #include "Illustrator.h"
-#include "Editor.h"
+
+class Editor;
 
 class SpaceDisplay
 {
@@ -86,5 +87,6 @@ class SpaceDisplay
     };
 };
 
+#include "Editor.h"
 
 #endif

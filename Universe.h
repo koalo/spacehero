@@ -56,6 +56,9 @@ class Goal : public SkyObject {
   public:
     Goal() {};
     Goal(std::ifstream &in);
+    void setX(double ix){x = ix;}
+    void setY(double iy){y = iy;}
+    void setRadius(double iradius){radius = iradius;}
   public:
     friend std::ostream& operator<< (std::ostream &o, const Goal &g);
 };
@@ -81,6 +84,7 @@ class Galaxy : public SkyMass {
     Galaxy();
   public:
     Galaxy(std::ifstream &in, bool master=false);
+    Galaxy(double ix, double iy, double imass, bool imaster, bool ilr) : SkyMass(ix, iy, imass, BULGESIZE), master(imaster), lr(ilr) {};
 
     std::vector<Star> getStars(int seed);
     bool getmaster() { return master; };
@@ -150,6 +154,7 @@ class Universe: public Level
   public:
   Universe(Level &l);
   Universe() :m_won(false),stars() {};
+  void calcStars();
 
   //bool play(GLdisplay &d);
   void move(double delta);

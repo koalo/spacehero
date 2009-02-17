@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
-  : state(spacehero_put), won(false), bflags(), editor(u),
+  : state(spacehero_edit), won(false), bflags(), editor(u),
     display(d), universe(u), paruni(0)
 {
 }
@@ -19,11 +19,16 @@ bool Spacehero::play()
 
     switch (state)
     {
-      case spacehero_put:
-        state = edit(false);
+      case spacehero_starteditor:
+        editor.setAllowAll(true);
+        state = spacehero_edit;
+        break;
+      case spacehero_stopeditor:
+        editor.setAllowAll(false);
+        state = spacehero_edit;
         break;
       case spacehero_edit:
-        state = edit(true);
+        state = edit();
         break;
       case spacehero_startsimu:
         paruni = new Universe(universe);
@@ -35,7 +40,7 @@ bool Spacehero::play()
         break;
       case spacehero_stopsimu:
         delete(paruni);
-        state = spacehero_put;
+        state = spacehero_edit;
         break;
       case spacehero_next:
         return true;
@@ -50,13 +55,10 @@ bool Spacehero::play()
   }
 }
 
-Spacehero::SpaceheroState Spacehero::edit(bool leveleditor)
+Spacehero::SpaceheroState Spacehero::edit()
 {
-  SpaceDisplay::BridgeView view = (leveleditor)?SpaceDisplay::EditorView:SpaceDisplay::PutView;
+  display.handleEvents(editor.getView(), bflags, editor);
 
-  display.handleEvents(view, bflags, editor);
-
-  editor.setAllowAll(leveleditor);
   editor.parseButtons(bflags);
 
   if(bflags.checkFlag(ButtonFlags::startSimulation))
@@ -64,7 +66,13 @@ Spacehero::SpaceheroState Spacehero::edit(bool leveleditor)
     state = spacehero_startsimu;
   }
 
-  display.drawBridge(universe,view,editor.getQuotient(),editor.getHoleWeight());
+  if(bflags.checkFlag(ButtonFlags::startEditor))
+  {
+    state = spacehero_starteditor;
+  }
+
+  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+
   return state;
 }
 
@@ -79,7 +87,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
 
   if(bflags.checkFlag(ButtonFlags::breakSimulation))
   {
-    state = spacehero_put;
+    state = spacehero_edit;
   }
 
   if(bflags.checkFlag(ButtonFlags::replaySimulation))
@@ -100,7 +108,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
     { 
       return spacehero_startsimu;
     }
-    return spacehero_put;
+    return spacehero_edit;
   }
 
   if((won = paruni->won()))
@@ -110,7 +118,12 @@ Spacehero::SpaceheroState Spacehero::simulate()
     {
       return spacehero_startsimu;
     }
-    return spacehero_next;
+    else if(editor.isAllowAll())
+    {
+      return spacehero_edit;
+    } else {
+      return spacehero_next;
+    }
   }
 
   paruni->tack();

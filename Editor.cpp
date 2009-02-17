@@ -1,17 +1,17 @@
 #include "Editor.h"
 
-Editor::Editor(Universe &universe, bool allowall) : uni(universe),maxreserve(MAXSTARTRESERVE),all(allowall),massreserve(maxreserve),size(medium)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),size(medium),type(hole)
 {
 }
 
+#define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
 void Editor::check(double mousex, double mousey)
 {
   unsigned int i, remove = 0;
 
   for(i = 0; i < uni.holes.size(); i++)
   {
-    if( (pow(mousex-uni.holes[i].x,2)+pow(mousey-uni.holes[i].y,2))
-	  <= pow(HOLESIZE*(sqrt(uni.holes[i].mass/HOLEMEDIUMMASS)),2) )
+    if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
     {
       remove = 1;
       
@@ -23,11 +23,52 @@ void Editor::check(double mousex, double mousey)
       }
     }
   }
-  
-  if(!remove && (massreserve >= getHoleWeight() || all))
+
+  if(all && !remove)
   {
-    if(!all) massreserve -= getHoleWeight();
-    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
+    for(i = 0; i < uni.galaxies.size(); i++)
+    {
+      if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+      {
+        remove = 1;
+        uni.galaxies.erase(uni.galaxies.begin()+i);
+        uni.calcStars();
+      }
+    }
+  }
+  
+  if(!remove)
+  {
+    if(!all)
+    {
+      if(massreserve >= getHoleWeight())
+      {
+        massreserve -= getHoleWeight();
+        uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+      }
+    }
+    else
+    {
+      switch(type)
+      {
+        case hole:
+          uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
+          break;
+        case bulge:
+          srand(time(NULL));
+          uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+          uni.calcStars();
+          break;
+        case goal:
+          uni.goal.setX(mousex);
+          uni.goal.setY(mousey);
+          uni.goal.setRadius(getGoalRadius());
+          break;
+        default:
+          // nix setzen
+          break;
+      }
+    }
   }
 }
 
@@ -55,6 +96,46 @@ double Editor::getHoleWeight()
   }
 }
 
+double Editor::getBulgeWeight()
+{
+  switch(size)
+  {
+    case small:
+      return BULGESMALLMASS;
+      break;
+    case medium:
+      return BULGEMEDIUMMASS;
+      break;
+    case large:
+      return BULGELARGEMASS;
+      break;
+    default:
+      return 0;
+      break;
+  }
+}
+
+
+
+double Editor::getGoalRadius()
+{
+  switch(size)
+  {
+    case small:
+      return SMALLGOAL;
+      break;
+    case medium:
+      return MEDIUMGOAL;
+      break;
+    case large:
+      return LARGEGOAL;
+      break;
+    default:
+      return 0;
+      break;
+  }
+}
+
 void Editor::parseButtons(ButtonFlags &flags)
 {
   if(flags.checkFlag(ButtonFlags::small))
@@ -71,4 +152,24 @@ void Editor::parseButtons(ButtonFlags &flags)
   {
     size = large;
   }
+
+  if(flags.checkFlag(ButtonFlags::putHole))
+  {
+    type = hole;
+  }
+
+  if(flags.checkFlag(ButtonFlags::putBulge))
+  {
+    type = bulge;
+  }
+
+  if(flags.checkFlag(ButtonFlags::putGoal))
+  {
+    type = goal;
+  }
+}
+
+SpaceDisplay::BridgeView Editor::getView()
+{
+  return (all)?SpaceDisplay::EditorView:SpaceDisplay::PutView;
 }
