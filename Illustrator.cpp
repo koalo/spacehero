@@ -1,7 +1,7 @@
 #include "Illustrator.h"
 
 Illustrator::Illustrator() :
-  fontbase(0), font(0)
+  fontbase(0), font(0), fontsize(0)
 {
   int i;
   float fx, fy;
@@ -18,8 +18,12 @@ Illustrator::Illustrator() :
 
     /* Textur erstellen */
     glTexImage2D( GL_TEXTURE_2D, 0, 3, fontImage->w, fontImage->h, 0, GL_RGB, GL_UNSIGNED_BYTE, fontImage->pixels );
- 
+    fontsize = fontImage->w/(float)16;
+
     SDL_FreeSurface(fontImage);
+  } else {
+    printf("Font nicht vorhanden!\n");
+    exit(1);
   }
 
   /* Fontliste erzeugen einladen */
@@ -35,24 +39,24 @@ Illustrator::Illustrator() :
     glNewList( fontbase + (255-i), GL_COMPILE );
       glBegin( GL_QUADS );
         /* unten links */
-        glTexCoord2f( fx - 0.0625, fy );
+        glTexCoord2f( fx - 1/fontsize, fy );
         glVertex2i( 0, 0 );
 
         /* unten rechts */
         glTexCoord2f( fx, fy );
-        glVertex2i( 16, 0 );
+        glVertex2f( fontsize, 0 );
 
         /* oben rechts */
-        glTexCoord2f( fx, fy - 0.0625f );
-        glVertex2i( 16, 16 );
+        glTexCoord2f( fx, fy - 1/fontsize );
+        glVertex2f( fontsize, fontsize );
 
         /* oben links */
-        glTexCoord2f( fx - 0.0625f, fy - 0.0625f);
-        glVertex2i( 0, 16 );
+        glTexCoord2f( fx - 1/fontsize, fy - 1/fontsize);
+        glVertex2f( 0, fontsize );
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
-      glTranslated( 10, 0, 0 );
+      glTranslatef( fontsize*0.5, 0, 0 );
     glEndList( );
   }
 }
@@ -116,9 +120,8 @@ void Illustrator::drawDisk(float x, float y, float r)
   gluDeleteQuadric(pObj);
 }
 
-void Illustrator::glPrint(float red, float green, float blue, float x, float y, const char *format, ... )
+void Illustrator::glPrint(float size, float red, float green, float blue, float x, float y, const char *format, ... )
 {
-  int italic = 0;
   va_list ap;
   char text[256];
 
@@ -134,12 +137,11 @@ void Illustrator::glPrint(float red, float green, float blue, float x, float y, 
   glPushMatrix();
   glEnable(GL_BLEND);
   glPushAttrib( GL_LIST_BIT );
-  glListBase( fontbase - 32 + (128*italic) );
+  glListBase( fontbase - 32 );
 
-  /* Position anpassen */
-  y += 18.0f;
-  x += 3.0f;
-  glScalef(1.0,-1.0,1.0);
+  /* Groesse und Position anpassen */
+  glScalef((size/fontsize),-(size/fontsize),1.0);
+  y += size+3.0f;
 
   /* richtige Schrift */
   glColor3f(red,green,blue);

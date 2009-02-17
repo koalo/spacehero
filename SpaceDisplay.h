@@ -19,7 +19,6 @@
 
 #define VIEWANGLE 45
 
-#define TEXTSPACE 15
 #define TEXTR 0.0f
 #define TEXTG 1.0f
 #define TEXTB 0.0f

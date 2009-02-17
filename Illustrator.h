@@ -12,6 +12,7 @@ class Illustrator
   private:
     GLuint fontbase;
     GLuint font;
+    float fontsize;
 
   public:
     Illustrator();
@@ -23,7 +24,8 @@ class Illustrator
     void drawDisk(float x, float y, float r);
 
     void buildFont();
-    void glPrint(float red, float green, float blue, float x, float y, const char *format, ... );
+    void glPrint(float size, float red, float green, float blue, float x, float y, const char *format, ... );
+    float getFontsize(){return fontsize;}
 };
 
 #endif
