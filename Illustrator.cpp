@@ -1,27 +1,60 @@
 #include "Illustrator.h"
 
 Illustrator::Illustrator() :
-  fontbase(0)
+  fontbase(0), font(0)
 {
-  /* Font einladen */
-  XFontStruct *fontInfo;
-  Display *tmpdisplay;
+  int i;
+  float fx, fy;
+  SDL_Surface *fontImage;
 
-  /* Display oeffnen, Font auswaehlen */
-  tmpdisplay = XOpenDisplay( NULL );
-  fontbase = glGenLists( 96 );
-  fontInfo = XLoadQueryFont( tmpdisplay, "-adobe-courier-bold-r-*-*-*-100-*-*-*-*-*-*" ); /* xfontsel -print */
-
-  if ( fontInfo == NULL )
+  if ((fontImage = IMG_Load( "data/font.png" )))
   {
-    printf("Schrift nicht verfuegbar.\n");
+    glGenTextures( 1, &font );
+    glBindTexture( GL_TEXTURE_2D, font );
+
+    /* Filter */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    /* Textur erstellen */
+    glTexImage2D( GL_TEXTURE_2D, 0, 3, fontImage->w, fontImage->h, 0, GL_RGB, GL_UNSIGNED_BYTE, fontImage->pixels );
+ 
+    SDL_FreeSurface(fontImage);
   }
 
-  glXUseXFont( fontInfo->fid, 32, 96, fontbase );
+  /* Fontliste erzeugen einladen */
+  fontbase  = glGenLists( 256 );
+  glBindTexture( GL_TEXTURE_2D, font );
 
-  /* Aufraeumen */
-  XFreeFont( tmpdisplay, fontInfo );
-  XCloseDisplay( tmpdisplay );
+  for(i = 0; i < 256; i++)
+  {
+    /* Berechnung der aktuellen Koordinaten */
+    fx = 1 - ((i%16) / 16.0f);
+    fy = 1 - ((i/16) / 16.0f);
+
+    glNewList( fontbase + (255-i), GL_COMPILE );
+      glBegin( GL_QUADS );
+        /* unten links */
+        glTexCoord2f( fx - 0.0625, fy );
+        glVertex2i( 0, 0 );
+
+        /* unten rechts */
+        glTexCoord2f( fx, fy );
+        glVertex2i( 16, 0 );
+
+        /* oben rechts */
+        glTexCoord2f( fx, fy - 0.0625f );
+        glVertex2i( 16, 16 );
+
+        /* oben links */
+        glTexCoord2f( fx - 0.0625f, fy - 0.0625f);
+        glVertex2i( 0, 16 );
+      glEnd( );
+
+      /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
+      glTranslated( 10, 0, 0 );
+    glEndList( );
+  }
 }
 
 Illustrator::~Illustrator()
@@ -85,6 +118,7 @@ void Illustrator::drawDisk(float x, float y, float r)
 
 void Illustrator::glPrint(float red, float green, float blue, float x, float y, const char *format, ... )
 {
+  int italic = 0;
   va_list ap;
   char text[256];
 
@@ -96,26 +130,25 @@ void Illustrator::glPrint(float red, float green, float blue, float x, float y, 
   va_end( ap );
 
   /* Aussehen und Textur shiften einstellen */
-  glBindTexture( GL_TEXTURE_2D, 0 );
-  glDisable(GL_BLEND);
+  glBindTexture( GL_TEXTURE_2D, font );
+  glPushMatrix();
+  glEnable(GL_BLEND);
   glPushAttrib( GL_LIST_BIT );
-  glListBase( fontbase - 32 );
+  glListBase( fontbase - 32 + (128*italic) );
 
   /* Position anpassen */
-  y += 12.0f;
+  y += 18.0f;
   x += 3.0f;
-
-  /* Schatten */
-  glColor3f(0.3,0.3,0.3);
-  glRasterPos2f(x+0.001,y+0.002);
-  glCallLists( strlen( text ), GL_UNSIGNED_BYTE, text );
+  glScalef(1.0,-1.0,1.0);
 
   /* richtige Schrift */
   glColor3f(red,green,blue);
-  glRasterPos2f( x, y );
-  glCallLists( strlen( text ), GL_UNSIGNED_BYTE, text );
+  glTranslatef(x,-y,0.0);
+  glCallLists( strlen(text), GL_BYTE, text );
 
-  glPopAttrib();
-
+  /* zurueckstellen */
   glColor3f(1,1,1);
+  glPopAttrib();
+  glDisable( GL_BLEND );
+  glPopMatrix();
 }

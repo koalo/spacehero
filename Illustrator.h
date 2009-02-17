@@ -3,7 +3,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glx.h>
+#include <SDL_image.h>
 #include <SDL.h>
 #include <iostream>
 
@@ -11,6 +11,7 @@ class Illustrator
 {
   private:
     GLuint fontbase;
+    GLuint font;
 
   public:
     Illustrator();
