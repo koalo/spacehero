@@ -389,6 +389,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
   GLdouble projMatrix[16];
   int viewport[4];
   double mousex, mousey, mousez, zpos;
+  FileManager saveas;
 
   while ( SDL_PollEvent( &event ) )
   {
@@ -453,6 +454,9 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
             break;
           case SDLK_e:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::startEditor);
+            break;
+          case SDLK_s:
+            std::cout << "Wuerde jetzt gespeichert werden in: " << saveas.getFile() << std::endl;
             break;
           case SDLK_SPACE:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);

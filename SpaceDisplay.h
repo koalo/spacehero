@@ -29,6 +29,8 @@
 #include "PictureBook.h"
 #include "Illustrator.h"
 
+#include "FileManager.h"
+
 class Editor;
 
 class SpaceDisplay
