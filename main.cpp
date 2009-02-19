@@ -48,10 +48,11 @@ int main(int argc, char *argv[])
       for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) {
         std::cerr << "trying to load level: " << itr->path() << std::endl;
         std::ifstream level(itr->path().string().c_str());
+        std::ofstream levelwrite("/tmp/level.out");
         if(level) {
           try { 
             Level l(level); 
-            std::cerr << l << std::endl;
+            levelwrite << l;
             Universe u(l);
             Spacehero s(display,u);
             s.play();

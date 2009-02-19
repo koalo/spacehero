@@ -141,7 +141,7 @@ class Level {
     double ldelta(double weight=0.1 ) { return weight*m_delta + (1-weight)*(elapsed()-lastt); };
     double delta() { return m_delta; }; // filtered delta
 
-    double getmaxtime() { return maxtime; }; // get maxtime
+    double getmaxtime() const { return maxtime; }; // get maxtime
     bool timeout() {return elapsed() > maxtime; }; // TODO: fix to use summed movement time
 
     double fps() {
