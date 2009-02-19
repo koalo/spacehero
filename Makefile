@@ -22,6 +22,7 @@ SRC+=GLdisplay.cpp
 SRC+=PictureBook.cpp
 SRC+=Illustrator.cpp
 SRC+=ButtonMaster.cpp
+SRC+=FileManager.cpp
 
 # SpaceHero
 SRC+=Level.cpp
