@@ -8,3 +8,5 @@ spacehero
 gmon.out
 
 *.o
+
+.*.swp
