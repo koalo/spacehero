@@ -20,6 +20,15 @@ using boost::timer;
 using boost::progress_timer;
 using boost::progress_display;
 
+namespace Error {
+  class ParseLevel {
+    const char *p;
+    public:
+    ParseLevel(const char* q): p(q) {}
+    const char* msg() {return p;}
+  };
+}
+
 class SkyObject {
   public:
     double x, y, z; /* in 600000 LJ (0.5 = 300000 LJ = Mitte vom Spielfeld) */
