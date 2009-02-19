@@ -19,22 +19,26 @@ std::ostream& operator<< (std::ostream &o, const Goal &g) {
   o << "D " << std::endl;
   o << static_cast<SkyObject>(g) << std::endl;
   o << "R " << g.radius << std::endl;
+  o << "D " << std::endl;
   return o;
 }
 std::ostream& operator<< (std::ostream &o, const Blackhole &g) {
   o << "H" << std::endl;
   o << static_cast<SkyMass>(g) << std::endl;
+  o << "H" << std::endl;
   return o;
 }
 std::ostream& operator<< (std::ostream &o, const Star &g) {
   o << "S" << std::endl;
   o << static_cast<SkyMass>(g) << std::endl;
+  o << "S" << std::endl;
   return o;
 }
 std::ostream& operator<< (std::ostream &o, const Galaxy &g) {
   o << "G" << std::endl;
   o << (g.master?" M ":"") << std::endl;
   o << static_cast<SkyMass>(g) << std::endl;
+  o << "G" << std::endl;
   return o;
 }
 
