@@ -33,7 +33,7 @@ std::ostream& operator<< (std::ostream &o, const Star &g) {
 }
 std::ostream& operator<< (std::ostream &o, const Galaxy &g) {
   o << "G" << std::endl;
-  o << g.master?" M ":"" << std::endl;
+  o << (g.master?" M ":"") << std::endl;
   o << static_cast<SkyMass>(g) << std::endl;
   return o;
 }
