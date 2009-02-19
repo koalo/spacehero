@@ -15,45 +15,80 @@ Level::Level(std::ifstream &in) :
 
 {
   char c; int i;
+  bool D=false,G=false;
+  std::ios_base::iostate s = in.exceptions();
   in.exceptions(std::ios_base::badbit|std::ios_base::failbit|std::ios_base::eofbit);
   in >> c >> i;
   if(c!='V' && i!=1) throw Error::ParseLevel("wrong version in level file");
-  while( in >> c, in.good()) {
-    switch(c) {
-      case 'D': 
-        goal = Goal(in);
-        break;
-      case 'G': 
-        galaxies.push_back( Galaxy(in) );
-        break;
-      case 'H':
-        holes.push_back( Blackhole(in) );
-        break;
-      case 'S':
-        in >> seed;
-        break;
-      case 'T':
-        in >> maxtime;
-        break;
-      default:
-        throw Error::ParseLevel("funny data in level");
+  try {
+    while( in >> c, in.good()) {
+      std::cerr << "level: trying to read: " << c << std::endl;
+      switch(c) {
+        case 'D': 
+          goal = Goal(in);
+          D=true;
+          break;
+        case 'G': 
+          {
+            Galaxy g(in);
+            galaxies.push_back( g );
+            std::cerr << "master galaxy? " << g.getmaster() << std::endl;
+            if(g.getmaster()) G=true; // at least one master galaxy needed
+          }
+          break;
+        case 'H':
+          holes.push_back( Blackhole(in) );
+          break;
+        case 'S':
+          in >> seed;
+          break;
+        case 'T':
+          in >> maxtime;
+          break;
+        default:
+          std::cerr << "unexpected char: " << c << std::endl;
+          throw Error::ParseLevel("funny data in level");
+      }
+      std::cerr << "---" << std::endl;
+    }
+  } catch (std::ios_base::failure) {
+    std::ios_base::iostate r = in.exceptions();
+    if(r&std::ios_base::eofbit) {
+      // end of level reached
+      if(!(D&&G)) {
+        if (!D) throw Error::ParseLevel("at least one goal needed");
+        if (!G) throw Error::ParseLevel("at least one master galaxy needed");
+      }
+    } else {
+      throw;
     }
   }
+  in.exceptions(s);
 }
 
 Goal::Goal(std::ifstream &in)
 {
   bool P=false,R=false;
   char c;
-  while( in >> c, in.good()) {
+  bool done=false;
+  while( !done) {
+    in >> c, in.good();
+    std::cerr << "goal: trying to read: " << c << std::endl;
     switch(c) {
-      case 'P': P=true;
-                in >> x >> y >> z;
-                break;
-      case 'R': R=true;
-                in >> radius;
+      case 'D':
+        done=true;
+        break;
+      case 'P': 
+        in >> x >> y >> z;
+        P=true;
+        break;
+      case 'R': 
+        in >> radius;
+        R=true;
+        break;
       default:
-                throw Error::ParseLevel("funny data in level");
+        std::cerr << "unexpected char: " << c << std::endl;
+        throw Error::ParseLevel("funny data in goal");
     }
   }
   if(!P) throw Error::ParseLevel("Missing Position for Goal");
@@ -64,19 +99,29 @@ Goal::Goal(std::ifstream &in)
 Blackhole::Blackhole(std::ifstream &in) {
   bool P=false,W=false;
   char c;
-  while( in >> c, in.good()) {
+  bool done=false;
+  while( !done) {
+    in >> c, in.good();
+    std::cerr << "hole: trying to read: " << c << std::endl;
     switch(c) {
+      case 'H':
+        done=true;
+        break;
       case 'P': 
         in >> x >> y >> z;
+        P=true;
         break;
       case 'V':
         double t;
         in >> t >> t >> t; 
-
-      case 'W':
+        break;
+      case 'W': 
         in >> mass;
+        W=true;
+        break;
       default:
-        throw Error::ParseLevel("funny data in level");
+        std::cerr << "unexpected char: " << c << std::endl;
+        throw Error::ParseLevel("funny data in hole");
     }
   }
   if(!P) throw Error::ParseLevel("Missing Position for Hole");
@@ -85,32 +130,46 @@ Blackhole::Blackhole(std::ifstream &in) {
   setlevel();
 };
 
-Galaxy::Galaxy(std::ifstream &in, bool master) :
-  master(master),
+Galaxy::Galaxy(std::ifstream &in) :
+  master(false),
   lr(true)
 {
   bool P=false,V=false,W=false;
   char c;
-  while( in >> c, in.good()) {
+  bool done=false;
+  while( !done) {
+    in >> c, in.good();
+    std::cerr << "galaxy: trying to read: " << c << std::endl;
     switch(c) {
+      case 'G':
+        done=true;
+        break;
       case 'P': 
         in >> x >> y >> z;
+        P=true;
         break;
-      case 'V':
+      case 'V': 
         in >> vx >> vy >> vz; 
+        V=true;
         break;
       case 'M':
         master=true;
+        std::cerr << "Setting Galaxy as master" << std::endl;
         break;
       case 'W':
         in >> mass;
+        W=true;
+        break;
       default:
-        throw Error::ParseLevel("funny data in level");
+        std::cerr << "unexpected char: " << c << std::endl;
+        throw Error::ParseLevel("funny data in galaxy");
     }
   }
   if(!P) throw Error::ParseLevel("Missing Position for Galaxy");
   if(!V) throw Error::ParseLevel("Missing Velocity for Galaxy");
   if(!W) throw Error::ParseLevel("Missing Weight for Galaxy");
+  if(getmaster()) std::cerr << "this galaxy thinks it is master" << std::endl;
+ 
   setlevel();
   radius = BULGESIZE;
 };

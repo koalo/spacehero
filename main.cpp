@@ -49,11 +49,15 @@ int main(int argc, char *argv[])
         std::cerr << "trying to load level: " << itr->path() << std::endl;
         std::ifstream level(itr->path().string().c_str());
         if(level) {
-          Level l(level);
-          std::cerr << l << std::endl;
-          Universe u(l);
-          Spacehero s(display,u);
-          s.play();
+          try { 
+            Level l(level); 
+            std::cerr << l << std::endl;
+            Universe u(l);
+            Spacehero s(display,u);
+            s.play();
+          } catch (Error::ParseLevel e) {
+            std::cerr << e.msg() << std::endl;
+          }
 
         }
       }

@@ -92,7 +92,7 @@ class Galaxy : public SkyMass {
 
     Galaxy();
   public:
-    Galaxy(std::ifstream &in, bool master=false);
+    Galaxy(std::ifstream &in);
     Galaxy(double ix, double iy, double imass, bool imaster, bool ilr) : SkyMass(ix, iy, imass, BULGESIZE), master(imaster), lr(ilr) {};
 
     std::vector<Star> getStars(int seed);
