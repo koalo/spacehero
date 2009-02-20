@@ -25,7 +25,7 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   display()
 #endif
   ,textures(path)
-  ,illustrator()
+  ,illustrator(path)
   ,buttons(textures, illustrator)
   ,isActive(1)
   ,event()

@@ -16,14 +16,14 @@
  */
 #include "Illustrator.h"
 
-Illustrator::Illustrator() :
+Illustrator::Illustrator(std::string path) :
   fontbase(0), font(0), fontsize(0)
 {
   int i;
   float fx, fy;
   SDL_Surface *fontImage;
 
-  if ((fontImage = IMG_Load( "data/font.png" )))
+  if ((fontImage = IMG_Load( (path + "data/font.png").c_str() )))
   {
     glGenTextures( 1, &font );
     glBindTexture( GL_TEXTURE_2D, font );

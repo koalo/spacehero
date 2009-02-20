@@ -22,6 +22,7 @@
 #include <SDL_image.h>
 #include <SDL.h>
 #include <iostream>
+#include <string>
 
 class Illustrator
 {
@@ -31,7 +32,7 @@ class Illustrator
     float fontsize;
 
   public:
-    Illustrator();
+    Illustrator(std::string path);
     ~Illustrator();
 
     void putImage(float x, float y, float width, float height);
