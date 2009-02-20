@@ -62,7 +62,7 @@ dist:
 GBPFLAGS+= --git-pristine-tar --git-export-dir=/tmp/gbp
 	
 debs:
-	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage $(GBPFLAGS)  -B
+	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage $(GBPFLAGS)
 	git-buildpackage $(GBPFLAGS) 
 
 .depend: $(SRC)
