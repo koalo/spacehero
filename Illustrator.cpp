@@ -23,7 +23,7 @@ Illustrator::Illustrator(std::string path) :
   float fx, fy;
   SDL_Surface *fontImage;
 
-  if ((fontImage = IMG_Load( (path + "data/font.png").c_str() )))
+  if ((fontImage = IMG_Load( (path + "font.png").c_str() )))
   {
     glGenTextures( 1, &font );
     glBindTexture( GL_TEXTURE_2D, font );
@@ -38,7 +38,7 @@ Illustrator::Illustrator(std::string path) :
 
     SDL_FreeSurface(fontImage);
   } else {
-    printf("Font nicht vorhanden!\n");
+    std::cerr << "Font nicht vorhanden: " << (path + "data/font.png") << std::endl;
     exit(1);
   }
 
