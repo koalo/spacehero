@@ -75,8 +75,9 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    **************************/
   float fontsize = 18;
   float fmargin = 3;
-  y = 0;
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, fontsize*(y++)+fmargin, "Task: Navigate the green galaxy into the green target area.");
+  y = 1;
+  #define Y display.getHeight()-(fontsize*(y++)+fmargin)
+  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "Task: Navigate the green galaxy into the green target area.");
   for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].exists)
@@ -84,14 +85,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
       curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
       curse = (curse < 0)?curse+2*M_PI:curse;
       curse = curse*(180/M_PI);
-      illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, fontsize*(y++)+fmargin, "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
+      illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
     }
   }
 
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, fontsize*(y++)+fmargin, "fps: %07.2f",uni.fps());
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, fontsize*(y++)+fmargin, "elapsed: %2.2f",uni.elapsed());
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, fontsize*(y++)+fmargin, "won: %d",uni.won());
-
+  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "fps: %07.2f",uni.fps());
+  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
+  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
+  #undef Y
 
 
   /**************************
@@ -389,7 +390,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
   GLdouble projMatrix[16];
   int viewport[4];
   double mousex, mousey, mousez, zpos;
-  FileManager saveas;
+  FileManager saveas(illustrator, display);
 
   while ( SDL_PollEvent( &event ) )
   {

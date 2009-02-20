@@ -135,17 +135,18 @@ void Illustrator::glPrint(float size, float red, float green, float blue, float 
   /* Aussehen und Textur shiften einstellen */
   glBindTexture( GL_TEXTURE_2D, font );
   glPushMatrix();
+  glLoadIdentity();
   glEnable(GL_BLEND);
   glPushAttrib( GL_LIST_BIT );
   glListBase( fontbase - 32 );
 
   /* Groesse und Position anpassen */
-  glScalef((size/fontsize),-(size/fontsize),1.0);
+  glTranslatef(x,y,0.0);
+  glScalef((size/fontsize),(size/fontsize),1.0);
   y += size+3.0f;
 
   /* richtige Schrift */
   glColor3f(red,green,blue);
-  glTranslatef(x,-y,0.0);
   glCallLists( strlen(text), GL_BYTE, text );
 
   /* zurueckstellen */
