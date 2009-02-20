@@ -1,3 +1,19 @@
+/* 
+ * This file is part of Spacehero.
+ * 
+ * Spacehero is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Foobar is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _UNIVERSE_H_
 #define _UNIVERSE_H_
 
@@ -19,6 +35,15 @@
 using boost::timer;
 using boost::progress_timer;
 using boost::progress_display;
+
+namespace Error {
+  class ParseLevel {
+    const char *p;
+    public:
+    ParseLevel(const char* q): p(q) {}
+    const char* msg() {return p;}
+  };
+}
 
 class SkyObject {
   public:
@@ -83,7 +108,7 @@ class Galaxy : public SkyMass {
 
     Galaxy();
   public:
-    Galaxy(std::ifstream &in, bool master=false);
+    Galaxy(std::ifstream &in);
     Galaxy(double ix, double iy, double imass, bool imaster, bool ilr) : SkyMass(ix, iy, imass, BULGESIZE), master(imaster), lr(ilr) {};
 
     std::vector<Star> getStars(int seed);
@@ -132,7 +157,7 @@ class Level {
     double ldelta(double weight=0.1 ) { return weight*m_delta + (1-weight)*(elapsed()-lastt); };
     double delta() { return m_delta; }; // filtered delta
 
-    double getmaxtime() { return maxtime; }; // get maxtime
+    double getmaxtime() const { return maxtime; }; // get maxtime
     bool timeout() {return elapsed() > maxtime; }; // TODO: fix to use summed movement time
 
     double fps() {

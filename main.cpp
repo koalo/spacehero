@@ -1,3 +1,19 @@
+/* 
+ * This file is part of Spacehero.
+ * 
+ * Spacehero is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Foobar is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "boost/filesystem.hpp"
 #include <iostream>
@@ -48,12 +64,17 @@ int main(int argc, char *argv[])
       for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) {
         std::cerr << "trying to load level: " << itr->path() << std::endl;
         std::ifstream level(itr->path().string().c_str());
+        std::ofstream levelwrite("/tmp/level.out");
         if(level) {
-          Level l(level);
-          std::cerr << l << std::endl;
-          Universe u(l);
-          Spacehero s(display,u);
-          s.play();
+          try { 
+            Level l(level); 
+            levelwrite << l;
+            Universe u(l);
+            Spacehero s(display,u);
+            s.play();
+          } catch (Error::ParseLevel e) {
+            std::cerr << e.msg() << std::endl;
+          }
 
         }
       }

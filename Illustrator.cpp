@@ -1,13 +1,29 @@
+/* 
+ * This file is part of Spacehero.
+ * 
+ * Spacehero is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Foobar is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "Illustrator.h"
 
-Illustrator::Illustrator() :
+Illustrator::Illustrator(std::string path) :
   fontbase(0), font(0), fontsize(0)
 {
   int i;
   float fx, fy;
   SDL_Surface *fontImage;
 
-  if ((fontImage = IMG_Load( "data/font.png" )))
+  if ((fontImage = IMG_Load( (path + "font.png").c_str() )))
   {
     glGenTextures( 1, &font );
     glBindTexture( GL_TEXTURE_2D, font );
@@ -22,7 +38,7 @@ Illustrator::Illustrator() :
 
     SDL_FreeSurface(fontImage);
   } else {
-    printf("Font nicht vorhanden!\n");
+    std::cerr << "Font nicht vorhanden: " << (path + "font.png") << std::endl;
     exit(1);
   }
 
