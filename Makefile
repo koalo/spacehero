@@ -1,19 +1,15 @@
 
+# Lokal: z.b. -DDEV
+-include Makefile.local
+
 CPPFLAGS+=`sdl-config --cflags`
 
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
-CXXFLAGS+=-g
+
 LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
 
-# Lokal
-# z.b. -DDEV
--include Makefile.local
-
-# schnell aber nicht ansi
-CXXFLAGS+=-DFAST -DBETTER
-CXXFLAGS+=-O2
-
+# Profiler stuff
 #CFLAGS+=-pg
 #LDFLAGS+=-pg
 
@@ -22,11 +18,11 @@ SRC+=GLdisplay.cpp
 SRC+=PictureBook.cpp
 SRC+=Illustrator.cpp
 SRC+=ButtonMaster.cpp
-SRC+=FileManager.cpp
 
 # SpaceHero
 SRC+=Level.cpp
 SRC+=Editor.cpp
+SRC+=FileManager.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
@@ -45,16 +41,29 @@ clean:
 	rm -f spacehero $(OBJS)
 	rm -f .depend
 
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
+INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
+
+DIR_BIN=$(DESTDIR)/usr/games
+DIR_SHARED=$(DESTDIR)/usr/share/games/spacehero
+
 install:
-	install -d $(DESTDIR)/usr/games/
-	install spacehero $(DESTDIR)/usr/games/
-	install -d $(DESTDIR)/usr/share/games/spacehero/level
-	install -d $(DESTDIR)/usr/share/games/spacehero/data
-	install level/* $(DESTDIR)/usr/share/games/spacehero/level
-	install data/* $(DESTDIR)/usr/share/games/spacehero/data
+	$(INSTALL_DIR) $(DIR_BIN) $(DIR_SHARED)/level $(DIR_SHARED)/data
+	$(INSTALL_PROGRAM) spacehero $(DIR_BIN)
+	$(INSTALL_FILE) level/* $(DIR_SHARED)/level
+	$(INSTALL_FILE) data/* $(DIR_SHARED)/data
 
 dist:
 	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > spacehero.tgz
+
+GBPFLAGS+= --git-pristine-tar --git-export-dir=/tmp/gbp
+	
+debs:
+	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage $(GBPFLAGS)  -B
+	git-buildpackage $(GBPFLAGS) 
 
 .depend: $(SRC)
 	$(CXX) $(CXXFLAGS) -E -MM $(SRC) > .depend
