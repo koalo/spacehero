@@ -38,7 +38,7 @@ Illustrator::Illustrator(std::string path) :
 
     SDL_FreeSurface(fontImage);
   } else {
-    std::cerr << "Font nicht vorhanden: " << (path + "data/font.png") << std::endl;
+    std::cerr << "Font nicht vorhanden: " << (path + "font.png") << std::endl;
     exit(1);
   }
 
