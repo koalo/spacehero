@@ -25,12 +25,15 @@
 class FileManager
 {
   private:
+    FileManager(const FileManager&);
+    FileManager& operator=(const FileManager&);
+  private:
     std::string name;
-    Illustrator &illustrator;
-    GLdisplay &display;
+    Illustrator *illustrator;
+    GLdisplay *display;
     bool doinput;
   public:
-    FileManager(Illustrator &illu, GLdisplay &disp) : name(""), illustrator(illu), display(disp), doinput(true) {}
+    FileManager(Illustrator *illu, GLdisplay *disp) : name(""), illustrator(illu), display(disp), doinput(true) {}
     std::string getFile();
     void draw();
     void handleEvents();

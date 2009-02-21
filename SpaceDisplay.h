@@ -45,7 +45,6 @@
 #include "PictureBook.h"
 #include "Illustrator.h"
 
-#include "FileManager.h"
 
 class Editor;
 
@@ -102,6 +101,10 @@ class SpaceDisplay
       glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
       glEnd();*/
     };
+    
+  public:
+    Illustrator* getIllustrator(){return &illustrator;}
+    GLdisplay* getDisplay(){return &display;}
 };
 
 #include "Editor.h"

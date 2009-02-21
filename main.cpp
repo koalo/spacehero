@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
     Universe u(l);
     Spacehero s(display,u);
     s.play();
-
   }
 
 

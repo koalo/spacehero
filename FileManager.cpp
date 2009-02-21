@@ -39,15 +39,15 @@ void FileManager::draw()
   /* Auf Projektionsmodus umschalten */
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glViewport(0,0,display.getWidth(),display.getHeight());
-  glOrtho(0,display.getWidth(),0,display.getHeight(),0,128);
+  glViewport(0,0,display->getWidth(),display->getHeight());
+  glOrtho(0,display->getWidth(),0,display->getHeight(),0,128);
 
   /* Zurueckschalten und Ansicht einstellen */
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
   
 /*  illustrator.drawRect(0.0,1.0,0.0,0.0,0.0,display.getWidth(),display.getHeight());*/
-  illustrator.glPrint(50.0, 0.0, 0.0, 1.0, 10.0, display.getHeight()-100.0, name.c_str());
+  illustrator->glPrint(50.0, 0.0, 0.0, 1.0, 10.0, display->getHeight()-100.0, name.c_str());
   SDL_GL_SwapBuffers();
 }
 
@@ -96,7 +96,7 @@ void FileManager::handleEvents()
 #endif
       case SDL_VIDEORESIZE:
         /* Groesse vom Fenster geaendert */
-        display.resizeWindow( event.resize.w, event.resize.h );
+        display->resizeWindow( event.resize.w, event.resize.h );
         break;
       case SDL_QUIT:
         exit(0);

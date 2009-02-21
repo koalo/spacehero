@@ -86,9 +86,19 @@ Spacehero::SpaceheroState Spacehero::edit()
   {
     state = spacehero_starteditor;
   }
+  
+  if(bflags.checkFlag(ButtonFlags::saveLevel))
+  {
+    FileManager saveas(display.getIllustrator(), display.getDisplay());
+    std::string savefile = "/tmp/"+saveas.getFile()+".txt";
+    std::cout << "Wird jetzt gespeichert in: " << savefile << std::endl;
+    std::ofstream levelwrite(savefile.c_str());
+    levelwrite << universe;
+    //state = ?
+  }
 
   display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
-
+  
   return state;
 }
 

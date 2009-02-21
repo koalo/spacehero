@@ -21,6 +21,8 @@
 #include "Universe.h"
 #include "ButtonFlags.h"
 
+#include "FileManager.h"
+
 class Spacehero
 {
   private:

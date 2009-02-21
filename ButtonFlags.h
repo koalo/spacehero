@@ -32,7 +32,8 @@ class ButtonFlags : public AbstractButtonFlags
     putHole = 256,
     putBulge = 512,
     putGoal = 1024,
-    startEditor = 2048
+    startEditor = 2048,
+    saveLevel = 4096
   };
 };
 
