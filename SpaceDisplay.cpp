@@ -207,9 +207,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 
   /**************************
    *       UNIVERSUM        *
-   **************************/
-  displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);
-
+   **************************/ 
+   if(false)
+   {
+     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height, true, true);
+     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height, true, false);
+   } else {
+     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);     
+   }
 
   /* Versteckten Buffer aktivieren */
   SDL_GL_SwapBuffers();
@@ -217,7 +222,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 
 
 
-void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height )
+void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height, bool eye, bool pleft )
 {
   unsigned int i;
   GLfloat ratio;
@@ -252,8 +257,34 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
    
     ratio = ( GLfloat )width / ( GLfloat )height;
 
-    /* Perspektive einstellen */
-    gluPerspective((float)VIEWANGLE, ratio, 0.0000001f, 10000000.0f);
+    if(eye)
+    {
+      double Zielweite = 10;
+      double Aabstand = Zielweite / 30.0;
+      double zNear = 0.1;
+      double zFar = 10000;
+      double ROeffnung = ((double)VIEWANGLE / 2)*(M_PI/180); //Halber Öffnungswinkel in RAD
+      double Breitenhaelfte = zNear * tan(ROeffnung); //Halbe Breite der Proj. Ebene
+      double NeardZielweite = zNear / Zielweite; 
+
+      double left, right;
+      if(pleft)
+      {
+	glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
+	left = - ratio * Breitenhaelfte - 0.5 *Aabstand*NeardZielweite;
+	right = ratio * Breitenhaelfte - 0.5 *Aabstand*NeardZielweite;
+      } else {
+	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
+	left = - ratio * Breitenhaelfte + 0.5 *Aabstand*NeardZielweite;
+	right = ratio * Breitenhaelfte + 0.5 *Aabstand*NeardZielweite;
+      }
+      double top = Breitenhaelfte;
+      double bottom = -Breitenhaelfte;
+      glFrustum(left, right, bottom, top, zNear, zFar);
+    } else {
+      /* Perspektive einstellen */
+      gluPerspective((float)VIEWANGLE, ratio, 0.0000001f, 10000000.0f);
+    }
 
     /* Zoom einstellen */
     viewrad = (VIEWANGLE/360.0)*(2*M_PI);
@@ -368,6 +399,21 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   gluDeleteQuadric(pObj);
 
   glDisable(GL_LIGHT1);
+
+  if(eye && projection == PERSPECTIVE)
+  {
+    if(pleft)
+    { 
+      glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+      glAccum(GL_LOAD,1.0);
+      glDrawBuffer(GL_BACK);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    } else {
+      glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+      glAccum(GL_ACCUM,1.0);
+      glAccum(GL_RETURN,1.0);
+    }
+  }
 }
 
 void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
