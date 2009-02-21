@@ -210,10 +210,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    **************************/ 
    if(false)
    {
-     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height, true, true);
-     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height, true, false);
+     displayUniverse(uni, width, height, true, true);
+     displayUniverse(uni, width, height, true, false);
    } else {
-     displayUniverse(uni, (view == SimulationView)?PERSPECTIVE:ORTHOGONAL, width, height);     
+     displayUniverse(uni, width, height);     
    }
 
   /* Versteckten Buffer aktivieren */
@@ -221,10 +221,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 }
 
 
-
-void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, int height, bool eye, bool pleft )
+void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool eye, bool pleft )
 {
   unsigned int i;
+  double eyet = 0;
   GLfloat ratio;
   float zoomX, zoomY, viewrad;
   GLUquadricObj *pObj = gluNewQuadric();
@@ -241,57 +241,22 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   glLoadIdentity();
   glViewport(UNIVERSE_LEFT,UNIVERSE_TOP,width,height);
 
-  if(projection == ORTHOGONAL)
+  /* Vor Division durch Null schuetzen */
+  if (height == 0)
   {
-    /* Projektion einstellen */
-    gluOrtho2D(0,width,0,height);
+    height = 1;
   }
-
-  if(projection == PERSPECTIVE)
-  {
-    /* Vor Division durch Null schuetzen */
-    if (height == 0)
-    {
-      height = 1;
-    }
-   
-    ratio = ( GLfloat )width / ( GLfloat )height;
-
-    if(eye)
-    {
-      double Zielweite = 10;
-      double Aabstand = Zielweite / 30.0;
-      double zNear = 0.1;
-      double zFar = 10000;
-      double ROeffnung = ((double)VIEWANGLE / 2)*(M_PI/180); //Halber Öffnungswinkel in RAD
-      double Breitenhaelfte = zNear * tan(ROeffnung); //Halbe Breite der Proj. Ebene
-      double NeardZielweite = zNear / Zielweite; 
-
-      double left, right;
-      if(pleft)
-      {
-	glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
-	left = - ratio * Breitenhaelfte - 0.5 *Aabstand*NeardZielweite;
-	right = ratio * Breitenhaelfte - 0.5 *Aabstand*NeardZielweite;
-      } else {
-	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
-	left = - ratio * Breitenhaelfte + 0.5 *Aabstand*NeardZielweite;
-	right = ratio * Breitenhaelfte + 0.5 *Aabstand*NeardZielweite;
-      }
-      double top = Breitenhaelfte;
-      double bottom = -Breitenhaelfte;
-      glFrustum(left, right, bottom, top, zNear, zFar);
-    } else {
-      /* Perspektive einstellen */
-      gluPerspective((float)VIEWANGLE, ratio, 0.0000001f, 10000000.0f);
-    }
-
-    /* Zoom einstellen */
-    viewrad = (VIEWANGLE/360.0)*(2*M_PI);
-    zoomY = (height*0.5) / tan(viewrad/2.0);
-    zoomX = (width*0.5) / tan((viewrad*ratio)/2.0);
-    zoom = (zoomX > zoomY)?zoomX:zoomY;
-  }
+ 
+  ratio = ( GLfloat )width / ( GLfloat )height;
+ 
+  /* Perspektive einstellen */
+  gluPerspective((float)VIEWANGLE, ratio, 0.0000001f, 10000000.0f);
+  
+  /* Zoom einstellen */
+  viewrad = (VIEWANGLE/360.0)*(2*M_PI);
+  zoomY = (height*0.5) / tan(viewrad/2.0);
+  zoomX = (width*0.5) / tan((viewrad*ratio)/2.0);
+  zoom = (zoomX > zoomY)?zoomX:zoomY;
 
   /* Zurueckschalten und Ansicht zuruecksetzen */
   glMatrixMode( GL_MODELVIEW );
@@ -306,23 +271,15 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
 
   glScalef(1.0f, -1.0f, 1.0f);
 
-  if(projection == ORTHOGONAL)
-  {
-    glTranslatef(0.0f, -1.0f, 0.0f);
+  glTranslatef(-0.5f,-0.5f,0.0f);
 
-    if(height > width)
-    { 
-      glTranslatef(0.0f, -0.5f*(height/(float)width)+0.5f, 0.0f);
-    } else {
-      glTranslatef(0.5f*(width/(float)height)-0.5f, 0.0f, 0.0f);
-    }    
-  }
+  glPushMatrix();
 
-  if(projection == PERSPECTIVE)
-  {
-    glTranslatef(-0.5f,-0.5f,0.0f);
-    glTranslatef(0.0f, 0.0f, -zoom);
-    
+  gluLookAt(0, 0, zoom,
+             0,
+             0,
+             0,
+             0,1,0);
 /*    glRotatef(60, 1.0f, 0.0f, 0.0f);*/
     /* fuer Drehung */
 /*    glRotatef(cam->rx, 1.0f, 0.0f, 0.0f);
@@ -335,8 +292,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
     glRotatef(90+drehung, 0.0f, 0.0f, 1.0f);
     glTranslatef( -(stars[0].x - 0.5), -(0.5 - stars[0].y), 0.0f );
     glTranslatef( stars[0].vx/500000, stars[0].vy/500000, 0.0f);*/
-  }
-
 
   /* Galaxienmittelpunkte */
   textures.useTexture("bulge");
@@ -356,8 +311,36 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
   }
 
   glColor3f(1.0f,1.0f,1.0f);
+
+  /* Schwarze Loecher */
+  textures.useTexture("hole");
+
+  for(i = 0; i < uni.holes.size(); i++)
+  {
+    drawSkymass(uni.holes[i]);
+  }
   
-  /* Sterne */
+  glPopMatrix();
+
+  /* Sterne */  
+  if(eye)
+  {
+    if(pleft)
+    {
+      glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
+      eyet = -0.03;
+    } else {
+      glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
+      eyet = 0.03;
+    }
+  }
+
+  gluLookAt(eyet, 0, zoom,
+             0,
+             0,
+             0,
+             0,1,0);
+
   textures.useTexture("star");
 
   for(i = 0; i < uni.stars.size(); i++)
@@ -368,15 +351,8 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
     }
   }
 
-  /* Schwarze Loecher */
-  textures.useTexture("hole");
-
-  for(i = 0; i < uni.holes.size(); i++)
-  {
-    drawSkymass(uni.holes[i]);
-  }
-
   /* Ziel */  
+  glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
   glEnable(GL_LIGHT1);
   glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);	
@@ -400,16 +376,15 @@ void SpaceDisplay::displayUniverse( Universe &uni, int projection, int width, in
 
   glDisable(GL_LIGHT1);
 
-  if(eye && projection == PERSPECTIVE)
+  glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+  if(eye)
   {
     if(pleft)
     { 
-      glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
       glAccum(GL_LOAD,1.0);
       glDrawBuffer(GL_BACK);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     } else {
-      glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
       glAccum(GL_ACCUM,1.0);
       glAccum(GL_RETURN,1.0);
     }
@@ -485,7 +460,32 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
              event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
             )
           {                        
-            /* Mausposition umrechnen */
+            /* Mausposition umrechnen - dazu Orthogonale Ansicht vorgaukeln */ 
+            double width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
+            double height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
+            glMatrixMode( GL_PROJECTION );
+            glLoadIdentity();
+            gluOrtho2D(0,width,0,height);
+            glMatrixMode( GL_MODELVIEW );
+            glLoadIdentity();
+
+            if(height > width)
+            { 
+              glScalef(width, width, 1.0);
+            } else {
+              glScalef(height, height, 1.0);
+            }
+
+            glScalef(1.0f, -1.0f, 1.0f);
+            glTranslatef(0.0f, -1.0f, 0.0f);
+
+            if(height > width)
+            { 
+              glTranslatef(0.0f, -0.5f*(height/(float)width)+0.5f, 0.0f);
+            } else {
+              glTranslatef(0.5f*(width/(float)height)-0.5f, 0.0f, 0.0f);
+            }
+
             glGetIntegerv(GL_VIEWPORT,viewport);
             glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
             glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);

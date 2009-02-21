@@ -32,7 +32,7 @@ void Editor::check(double mousex, double mousey)
       remove = 1;
       
       /* pruefen ob der ueberhaupt geloescht werden darf */
-      if(!uni.holes[i].level)
+      if(!uni.holes[i].level || all)
       {
         if(!all) massreserve += uni.holes[i].mass;
         uni.holes.erase(uni.holes.begin()+i);

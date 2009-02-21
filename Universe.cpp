@@ -19,23 +19,43 @@
 #include "GLdisplay.h"
 #include "local.h"
 
-Star::Star(Galaxy &g, double R, double phi, double z, double v, double mass)
+Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
 {
+  double sx,sy,sz,svx,svy,svz;
   //x=y=z=vx=vy=vz=0;
-  x = R * cos(phi * M_PI/180) + g.x;
-  y = R * sin(phi * M_PI/180) + g.y;
-  z = z + g.z;
+  sx = R * cos(phi * M_PI/180);
+  sy = R * sin(phi * M_PI/180);
+  sz = iz;
+
+  double tilt = 0.25*M_PI;
+
+  x = sx;
+  y = sy * cos(tilt) - sz * sin(tilt);
+  z = sy * sin(tilt) + sz * cos(tilt);
 
   phi += -90-(g.lr?0:180);
-  vx = 1e0 * v * cos(phi * M_PI/180) + g.vx;
-  vy = 1e0 * v * sin(phi * M_PI/180) + g.vy;
-  vz = 0+g.vz;
+  svx = 1e0 * v * cos(phi * M_PI/180);
+  svy = 1e0 * v * sin(phi * M_PI/180);
+  svz = 0;
+
+  vx = svx;
+  vy = svy * cos(tilt) - svz * sin(tilt);
+  vz = svy * sin(tilt) + svz * cos(tilt);
+
+  x += g.x;
+  y += g.y;
+  z += g.z;
+
+  vx += g.vx;
+  vy += g.vy;
+  vz += g.vz;
 
   this->mass = mass;
   radius = STARSIZE;
 }
 
 std::vector<Star> Galaxy::getStars(int seed) {
+  double v;
   double NStars = mass / 4e8;
   double NOrbits = mass / 2e10;
   double NStarsPerOrbit = NStars/NOrbits;
@@ -47,11 +67,11 @@ std::vector<Star> Galaxy::getStars(int seed) {
   double orb = R_MIN_CENTER + (double)((rand() / (RAND_MAX + 1.0)) / 150.0);
   while (n--) {
     orb += R_MIN + ((double)((rand() / (RAND_MAX + 1.0))) / 550.0);
-    double v = sqrt((GRAVKONST * mass * SUNMASS) / (orb * WIDTHINMETERS));
     int m=NStarsPerOrbit;
     while (m--) {
       double phi = (double)(360 * (rand() / (RAND_MAX + 1.0)));
-      double z = (double)((1.0/10.0) * (rand() / (RAND_MAX + 1.0)))-(1.0/20.0);
+      double z = (double)((rand() / (RAND_MAX + 1.0)) - 0.5)*(0.001/orb);
+      v = sqrt((GRAVKONST * mass * SUNMASS) / (hypot(orb,z) * WIDTHINMETERS));
       accu.push_back(Star(*this,orb,phi,z,v,1e3));
     }
   }

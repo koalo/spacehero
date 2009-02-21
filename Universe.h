@@ -196,26 +196,30 @@ inline void SkyMass::move(double delta) {
 }
 
 inline void SkyMass::newton(SkyMass &m, double delta) {
-  double AX, AY, a1, a2, r3;
+  double AX, AY, AZ, a1, a2, r3;
   //std::cerr << *this << m << std::endl;
   if( (!getexists()) || (!m.getexists()) ) return;
 
   AX = x - m.x;
   AY = y - m.y;
+  AZ = z - m.z;
 
-  r3 = hypot(AX,AY);
+  r3 = sqrt(AX*AX+AY*AY+AZ*AZ);
   r3 = r3*r3*r3;
 
   AX = AX/r3;
   AY = AY/r3;
+  AZ = AZ/r3;
 
   a1 = SUNGRAVTIMEWIDTH*mass*delta;
   m.vx += a1*AX;
   m.vy += a1*AY;  
+  m.vz += a1*AZ;  
 
   a2 = SUNGRAVTIMEWIDTH*m.mass*delta;
   vx -= a2*AX;
   vy -= a2*AY;
+  vz -= a2*AZ;
 };
 
 #endif

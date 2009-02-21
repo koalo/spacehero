@@ -33,7 +33,7 @@
 #define MEDIUM_HOLE (UNIVERSE_RIGHT*0.12)
 #define LARGE_HOLE (UNIVERSE_RIGHT*0.14)
 
-#define VIEWANGLE 45
+#define VIEWANGLE 60
 
 #define TEXTR 0.0f
 #define TEXTG 1.0f
@@ -60,7 +60,7 @@ class SpaceDisplay
       EditorView
     };
 
-    void displayUniverse( Universe &uni, int projection, int width, int height, bool eye = false, bool pleft = true );
+    void displayUniverse( Universe &uni, int width, int height, bool eye = false, bool pleft = true );
     void drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight = 0);
     void handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor);
     void showEnd(bool win, ButtonFlags &flags);
@@ -80,10 +80,10 @@ class SpaceDisplay
     inline void drawSkymass(SkyMass body)
     {
       glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, body.z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, body.z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, body.z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, body.z );
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, 1*body.z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, 1*body.z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, 1*body.z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, 1*body.z );
       glEnd();
       /* Objekt zeichnen */
       /*
