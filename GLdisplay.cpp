@@ -92,6 +92,10 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );              /* Hintergrundfarbe */
   glClearDepth( 1.0f );                                /* Tiefenbuffer */
   glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST ); /* Perspektivenberechnung */
+
+  /* Fenstergroesse neu auslesen */
+  videoInfo = SDL_GetVideoInfo( );
+  resizeWindow(videoInfo->current_w,videoInfo->current_h);
 }
 
 GLdisplay::~GLdisplay()

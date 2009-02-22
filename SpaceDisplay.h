@@ -79,11 +79,12 @@ class SpaceDisplay
 
     inline void drawSkymass(SkyMass body)
     {
+      double z = 100000*body.z*body.z*body.z;
       glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, 1*body.z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, 1*body.z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, 1*body.z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, 1*body.z );
+      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, z );
+      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, z );
+      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, z );
+      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, z );
       glEnd();
       /* Objekt zeichnen */
       /*
