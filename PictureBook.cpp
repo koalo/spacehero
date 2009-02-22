@@ -39,7 +39,12 @@ int PictureBook::addTexture(std::string texture)
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     /* Textur erstellen */
-    glTexImage2D( GL_TEXTURE_2D, 0, 3, textureImage->w, textureImage->h, 0, GL_RGB, GL_UNSIGNED_BYTE, textureImage->pixels );
+    if(textureImage->format->BytesPerPixel == 4)
+    {
+      glTexImage2D( GL_TEXTURE_2D, 0, 4, textureImage->w, textureImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureImage->pixels );
+    } else {
+      glTexImage2D( GL_TEXTURE_2D, 0, 3, textureImage->w, textureImage->h, 0, GL_RGB, GL_UNSIGNED_BYTE, textureImage->pixels );
+    }
  
     SDL_FreeSurface(textureImage);
 

@@ -77,9 +77,13 @@ class SpaceDisplay
     SDL_Event event;
     float zoom;
 
+    inline void drawStars(bool behind, bool eye, bool pleft, Universe &uni);
+
     inline void drawSkymass(SkyMass body)
     {
-      double z = 100000*body.z*body.z*body.z;
+      double z = body.z;
+      z = 8000*z*z;
+      if(body.z < 0) z = -z;
       glBegin(GL_QUADS);
       glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, z );
       glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, z );

@@ -235,7 +235,12 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   /* blending */
   glBlendFunc( GL_SRC_ALPHA, GL_ONE );
   glEnable( GL_BLEND );
-
+  /*glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   
+  glEnable(GL_ALPHA_TEST);
+  glAlphaFunc(GL_LESS, 0.1);   
+      */
   /* Auf Projektionsmodus umschalten */
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -273,6 +278,8 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
 
   glTranslatef(-0.5f,-0.5f,0.0f);
 
+  drawStars(true,eye,pleft,uni);
+
   glPushMatrix();
 
   gluLookAt(0, 0, zoom,
@@ -293,6 +300,12 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
     glTranslatef( -(stars[0].x - 0.5), -(0.5 - stars[0].y), 0.0f );
     glTranslatef( stars[0].vx/500000, stars[0].vy/500000, 0.0f);*/
 
+  glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+
+  glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+
+/*  glDisable(GL_BLEND);*/
+
   /* Galaxienmittelpunkte */
   textures.useTexture("bulge");
 
@@ -311,7 +324,8 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   }
 
   glColor3f(1.0f,1.0f,1.0f);
-
+  
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE );
   /* Schwarze Loecher */
   textures.useTexture("hole");
 
@@ -320,37 +334,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
     drawSkymass(uni.holes[i]);
   }
   
-  glPopMatrix();
-
-  /* Sterne */  
-  if(eye)
-  {
-    if(pleft)
-    {
-      glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
-      eyet = -0.03;
-    } else {
-      glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
-      eyet = 0.03;
-    }
-  }
-
-  gluLookAt(eyet, 0, zoom,
-             0,
-             0,
-             0,
-             0,1,0);
-
-  textures.useTexture("star");
-
-  for(i = 0; i < uni.stars.size(); i++)
-  {
-    if(uni.stars[i].exists)
-    {
-      drawSkymass(uni.stars[i]);
-    }
-  }
-
   /* Ziel */  
   glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
   glEnable(GL_LIGHT1);
@@ -375,6 +358,9 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   gluDeleteQuadric(pObj);
 
   glDisable(GL_LIGHT1);
+  
+  glPopMatrix();
+  drawStars(false,eye,pleft,uni);
 
   glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
   if(eye)
@@ -389,6 +375,44 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
       glAccum(GL_RETURN,1.0);
     }
   }
+}
+
+void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
+{
+  unsigned int i;
+  double eyet;
+  glPushMatrix();
+
+  /* Sterne */
+  if(eye)
+  {
+    if(pleft)
+    {
+      glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
+      eyet = -0.05;
+    } else {
+      glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
+      eyet = 0.05;
+    }
+  }
+
+  gluLookAt(eyet, 0, zoom,
+             0,
+             0,
+             0,
+             0,1,0);
+
+  textures.useTexture("star");
+
+  for(i = 0; i < uni.stars.size(); i++)
+  {
+    if(uni.stars[i].exists && ((behind && uni.stars[i].z < 0) || (!behind && uni.stars[i].z > 0)))
+    {
+      drawSkymass(uni.stars[i]);
+    }
+  }
+
+  glPopMatrix();
 }
 
 void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)

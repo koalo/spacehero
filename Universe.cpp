@@ -71,6 +71,7 @@ std::vector<Star> Galaxy::getStars(int seed) {
     while (m--) {
       double phi = (double)(360 * (rand() / (RAND_MAX + 1.0)));
       double z = (double)((rand() / (RAND_MAX + 1.0)) - 0.5)*(0.001/orb);
+      z = 0;
       v = sqrt((GRAVKONST * mass * SUNMASS) / (hypot(orb,z) * WIDTHINMETERS));
       accu.push_back(Star(*this,orb,phi,z,v,1e3));
     }
