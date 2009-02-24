@@ -32,19 +32,22 @@ int main(int argc, char *argv[])
 { 
   std::vector<std::string> path;
 
-#ifdef DEV
   path.push_back( "./" );
-#endif
   path.push_back( "~/.spacehero/" );
   path.push_back( "/usr/share/games/spacehero/" );
 
   std::string dir;
   for(std::vector<std::string>::iterator l = path.begin(); l!=path.end(); l++) {
     std::cerr << "trying: " << *l << std::endl;
-    if (is_directory(dir = *l) ) {
+    if ( is_directory(*l+"level/") && is_directory(*l+"data/") ) {
+      dir=*l;
       std::cerr << "found: " << dir << std::endl;
       break;
     }
+  }
+  if(dir == "") {
+    std::cerr << "could not find data/level dir" << std::endl;
+    return 1;
   }
 
 
