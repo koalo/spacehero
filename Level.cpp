@@ -172,6 +172,10 @@ Galaxy::Galaxy(std::ifstream &in) :
         master=true;
         std::cerr << "Setting Galaxy as master" << std::endl;
         break;
+      case 'R':
+        lr=false;
+        std::cerr << "Setting Galaxy as right" << std::endl;
+        break;
       case 'W':
         in >> mass;
         W=true;
