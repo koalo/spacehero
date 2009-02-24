@@ -1,0 +1,31 @@
+
+Website
+-------
+
+http://spacehero.koalo.de/
+
+
+Repositories
+------------
+
+http://git.koalo.de/?p=spacehero.git
+http://rasentrimmer.org/cgi-bin/gitweb.cgi?p=spacehero.git
+
+
+Build-Depends 
+-------------
+
+libsdl1.2-dev
+libboost-dev
+libboost-filesystem-dev
+libsdl-image1.2-dev
+
+
+Authoren
+--------
+
+Florian Meier
+Christoph Stanik
+Krystian Balcerowski
+Arne Wichmann
+
