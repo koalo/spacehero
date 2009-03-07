@@ -27,7 +27,7 @@ Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
   sy = R * sin(phi * M_PI/180);
   sz = iz;
 
-  double tilt = 0.25*M_PI;
+  double tilt = 0.01; //0.25*M_PI;
 
   x = sx;
   y = sy * cos(tilt) - sz * sin(tilt);
