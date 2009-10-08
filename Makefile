@@ -59,7 +59,7 @@ install:
 dist:
 	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > spacehero.tgz
 
-GBPFLAGS+= --git-pristine-tar --git-export-dir=/tmp/gbp
+GBPFLAGS+= --git-export-dir=/tmp/gbp
 	
 debs:
 	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage $(GBPFLAGS)
