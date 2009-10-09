@@ -24,7 +24,7 @@ Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
 {
 }
 
-bool Spacehero::play()
+bool Spacehero::play(bool starteditor)
 {  
   while (true)
   {

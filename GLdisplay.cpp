@@ -128,3 +128,55 @@ int GLdisplay::getWidth()
 {
   return width;
 }
+
+void GLdisplay::initDisplay()
+{
+  /* Fenstergroesse neu auslesen */
+  videoInfo = SDL_GetVideoInfo( );
+  resizeWindow(videoInfo->current_w,videoInfo->current_h);
+  
+  /* Bildschirm loeschen */
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+  /* Auf Projektionsmodus umschalten */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glViewport(0,0,getWidth(),getHeight());
+  glOrtho(0,getWidth(),0,getHeight(),0,128);
+
+  /* Blending aus */
+  glDisable(GL_BLEND);
+  
+  /* Zurueckschalten und Ansicht einstellen */
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  glScalef(1.0f, -1.0f, 1.0f);
+  glTranslatef(0.0f, -getHeight(), 0.0f);
+}
+
+void GLdisplay::handleEvents(SDL_Event &event)
+{
+  switch( event.type )
+  {
+    case SDL_VIDEORESIZE:
+      /* Groesse vom Fenster geaendert */
+      resizeWindow( event.resize.w, event.resize.h );
+      break;
+    case SDL_QUIT:
+	exit(0);
+      break;
+    case SDL_KEYDOWN:
+      switch(event.key.keysym.sym)
+      {
+	case SDLK_ESCAPE:
+	  exit(0);
+	  break;
+	default:
+	  break;
+      }
+      break;
+    default:
+      break;
+  }
+}

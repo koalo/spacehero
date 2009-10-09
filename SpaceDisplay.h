@@ -110,6 +110,7 @@ class SpaceDisplay
   public:
     Illustrator* getIllustrator(){return &illustrator;}
     GLdisplay* getDisplay(){return &display;}
+    PictureBook* getPictureBook(){return &textures;}
 };
 
 #include "Editor.h"

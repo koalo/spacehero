@@ -224,7 +224,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool eye, bool pleft )
 {
   unsigned int i;
-  double eyet = 0;
+  //double eyet = 0;
   GLfloat ratio;
   float zoomX, zoomY, viewrad;
   GLUquadricObj *pObj = gluNewQuadric();
@@ -454,6 +454,8 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
 
   while ( SDL_PollEvent( &event ) )
   {
+    display.handleEvents(event);
+
     switch( event.type )
     {
       case SDL_ACTIVEEVENT:
@@ -525,19 +527,9 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
           }
         }
         break;
-      case SDL_VIDEORESIZE:
-        /* Groesse vom Fenster geaendert */
-        display.resizeWindow( event.resize.w, event.resize.h );
-        break;
-      case SDL_QUIT:
-          exit(0);
-        break;
       case SDL_KEYDOWN:
         switch(event.key.keysym.sym)
         {
-          case SDLK_ESCAPE:
-            exit(0);
-            break;
           case SDLK_e:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::startEditor);
             break;

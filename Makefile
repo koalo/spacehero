@@ -1,3 +1,4 @@
+# Benoetigt libboost-dev libsdl-image1.2-dev libsdl1.2-dev libglu1-mesa-dev libgl1-mesa-dev
 
 # Lokal: z.b. -DDEV
 -include Makefile.local
@@ -21,6 +22,7 @@ SRC+=ButtonMaster.cpp
 
 # SpaceHero
 SRC+=Level.cpp
+SRC+=Menu.cpp
 SRC+=Editor.cpp
 SRC+=FileManager.cpp
 SRC+=Universe.cpp 

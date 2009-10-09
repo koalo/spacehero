@@ -33,7 +33,9 @@ class ButtonFlags : public AbstractButtonFlags
     putBulge = 512,
     putGoal = 1024,
     startEditor = 2048,
-    saveLevel = 4096
+    saveLevel = 4096,
+    startGame = 8192,
+    chooseLevel = 16384
   };
 };
 

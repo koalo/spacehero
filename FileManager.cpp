@@ -22,16 +22,18 @@ std::string FileManager::getFile()
   doinput = true;
   /*std::cout << "Save as: ";
   std::cin >> name;*/
+  int i;
   while(doinput)
   {
-    draw();
+    i++;
+    draw(i);
     handleEvents();
     usleep(100000);
   }
   return name;
 }
 
-void FileManager::draw()
+void FileManager::draw(int i)
 {  
   /* Bildschirm loeschen */
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
@@ -47,7 +49,13 @@ void FileManager::draw()
   glLoadIdentity();
   
 /*  illustrator.drawRect(0.0,1.0,0.0,0.0,0.0,display.getWidth(),display.getHeight());*/
-  illustrator->glPrint(50.0, 0.0, 0.0, 1.0, 10.0, display->getHeight()-100.0, name.c_str());
+  std::string sname = name;
+  if(i % 2)
+  {
+    sname = sname + "_";
+  }
+  illustrator->glPrint(60.0, 0.0, 1.0, 1.0, 10.0, display->getHeight()-120.0, sname.c_str());
+  illustrator->glPrint(60.0, 0.0, 1.0, 1.0, 10.0, display->getHeight()-70.0, "Save this Level as");
   SDL_GL_SwapBuffers();
 }
 

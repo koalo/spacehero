@@ -59,7 +59,7 @@ public:
 
 	Spacehero(SpaceDisplay &d, Universe &u);
 
-	bool play();
+	bool play(bool starteditor = false);
 
 	SpaceheroState edit();
 	SpaceheroState simulate();

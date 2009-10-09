@@ -85,3 +85,8 @@ bool AbstractButtonFlags::viewFlag(int action)
 {
   return ((flags & action) == action);
 }
+
+bool AbstractButtonFlags::isFlag()
+{
+  return (flags != 0);
+}
