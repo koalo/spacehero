@@ -27,7 +27,6 @@ using namespace boost::filesystem;
 #include "Spacehero.h"
 #include "Universe.h"
 #include "intro.h"
-#include "Menu.h"
 #include "Illustrator.h"
 
 int main(int argc, char *argv[])

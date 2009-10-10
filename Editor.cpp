@@ -27,8 +27,9 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely)
 
   if(setGalaxy)
   {
-    //SDL_GetMouseState(&mousex, &mousey);
-    uni.galaxies.back().setVX(0);
+    uni.galaxies.back().setVX(-(uni.galaxies.back().x-mousex)*2e6);
+    uni.galaxies.back().setVY(-(uni.galaxies.back().y-mousey)*2e6);
+    uni.calcStars();
     setGalaxy = false;
   } 
   else 
