@@ -64,8 +64,9 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
   height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
 
-  display.initDisplay();
-
+  display.cleanDisplay();
+  display.OrthoMode();
+  
   /**************************
    *        INFOTEXT        *
    **************************/
@@ -331,7 +332,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
     gluQuadricTexture(pObj, 1);
     textures.noTexture();
     gluSphere(pObj, uni.goal.radius, 20, 20);
-    /*glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );*/
     glColor3f(1,1,1);
   glPopMatrix();
 
@@ -436,17 +436,11 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
 
 void SpaceDisplay::showMenu(double time)
 {
-  //Universe uni;
-  //Editor editor(uni);
   double scale, herotime, buttontime;
 
   textures.useTexture("spacehero");
 
-  gluLookAt(0, 0, zoom,
-             0,
-             0,
-             0,
-             0,1,0);
+  display.PerspectiveMode(0,0,display.getWidth(),display.getHeight(),VIEWANGLE);
     
   scale = 0.9;
   herotime = 1.0-exp(-(time*100)*0.005);
@@ -456,7 +450,8 @@ void SpaceDisplay::showMenu(double time)
 
   buttons.clearButtons();
 
-  display.initDisplay(false);
+  display.OrthoMode();
+
   buttontime = 1.0-exp(-((time-3)*100)*0.009);
   buttontime = (buttontime > 0)?buttontime:0;
   buttontime = (buttontime < scale)?buttontime:scale;

@@ -74,7 +74,7 @@ class SkyMass : public SkyObject {
     SkyMass(): vx(0),vy(0),vz(0),mass(0) {};
     SkyMass(double ix, double iy, double imass, double iradius) : SkyObject(ix,iy,iradius), vx(0), vy(0), vz(0), mass(imass) {};
     
-    inline void newton(SkyMass &m, double delta);
+    inline void newton(SkyMass &m, double &delta);
     inline void move(double delta);
     void setVX(double ivx){vx = ivx;}
     void setVY(double ivy){vy = ivy;}
@@ -200,7 +200,7 @@ inline void SkyMass::move(double delta) {
   //if(hypot(vx,vy)>1) std::cerr << ".";
 }
 
-inline void SkyMass::newton(SkyMass &m, double delta) {
+inline void SkyMass::newton(SkyMass &m, double &delta) {
   double AX, AY, AZ, a1, a2, r3;
   //std::cerr << *this << m << std::endl;
   if( (!getexists()) || (!m.getexists()) ) return;

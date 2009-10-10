@@ -100,13 +100,13 @@ int main(int argc, char *argv[])
 */
 
 	  u.galaxies.push_back(Galaxy(0.1,0.1,4.3e11,false,false));
-	  u.galaxies.back().setZ(0.15);
-	  u.galaxies.back().setVX(100e3*1.7);
-	  u.galaxies.back().setVY(100e3*1.7);
+	  u.galaxies.back().setZ(0.17);
+	  u.galaxies.back().setVX(100e3*3);
+	  u.galaxies.back().setVY(100e3*3);
 	  u.galaxies.push_back(Galaxy(1.42,1.42,20e11,false,false));
-	  u.galaxies.back().setZ(0.15);
-	  u.galaxies.back().setVX(-200e3*1.7);
-	  u.galaxies.back().setVY(-200e3*1.7);
+	  u.galaxies.back().setZ(0.17);
+	  u.galaxies.back().setVX(-200e3*3);
+	  u.galaxies.back().setVY(-200e3*3);
 	  u.calcStars();
 	  u.setStargrav(true);
 	  Spacehero si(display,u);
