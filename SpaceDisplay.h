@@ -57,13 +57,15 @@ class SpaceDisplay
     enum BridgeView { 
       SimulationView,
       PutView,
-      EditorView
+      EditorView,
+      IntroView
     };
 
     void displayUniverse( Universe &uni, int width, int height, bool eye = false, bool pleft = true );
-    void drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight = 0);
+    void drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight = 0, bool settingGalaxy = false, int galaxyX = 0, int galaxyY = 0);
     void handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor);
     void showEnd(bool win, ButtonFlags &flags);
+    void showMenu(double time);
 
   private:
     GLdisplay display;
@@ -90,26 +92,12 @@ class SpaceDisplay
       glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, z );
       glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, z );
       glEnd();
-      /* Objekt zeichnen */
-      /*
-      glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( body.x, -size+body.y, -size+body.z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f( body.x, -size+body.y, size+body.z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f( body.x,  size+body.y, size+body.z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( body.x,  size+body.y, -size+body.z );
-      glEnd();
-
-      glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -size+body.x, body.y, -size+body.z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -size+body.x, body.y, size+body.z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f( size+body.x,  body.y, size+body.z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( size+body.x,  body.y, -size+body.z );
-      glEnd();*/
     };
     
   public:
     Illustrator* getIllustrator(){return &illustrator;}
     GLdisplay* getDisplay(){return &display;}
+    PictureBook* getPictureBook(){return &textures;}
 };
 
 #include "Editor.h"

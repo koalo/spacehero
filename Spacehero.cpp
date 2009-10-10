@@ -20,12 +20,28 @@
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   : state(spacehero_edit), won(false), bflags(), editor(u),
-    display(d), universe(u), paruni(0)
+    display(d), universe(u), paruni(0), view(SpaceDisplay::PutView)
 {
 }
 
-bool Spacehero::play()
-{  
+Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
+{ 
+  view = myview; 
+  switch(view)
+  {
+   case SpaceDisplay::EditorView:
+      state = spacehero_starteditor;
+      break;
+    case SpaceDisplay::IntroView:
+    case SpaceDisplay::SimulationView:
+      state = spacehero_startsimu;
+      break;
+    case SpaceDisplay::PutView:
+    default:
+      state = spacehero_edit;
+      break;
+  }
+  
   while (true)
   {
     if(bflags.checkFlag(ButtonFlags::exit))
@@ -36,6 +52,7 @@ bool Spacehero::play()
     switch (state)
     {
       case spacehero_starteditor:
+	view = SpaceDisplay::EditorView;
         editor.setAllowAll(true);
         state = spacehero_edit;
         break;
@@ -59,14 +76,13 @@ bool Spacehero::play()
         state = spacehero_edit;
         break;
       case spacehero_next:
-        return true;
-        //break;
       case spacehero_exit:
-        return false;
+      case spacehero_emptyEditor:
+        return state;
         //break;
       default:
         std::cerr << "unreachable state" << std::endl;
-        return false;
+        return state;
     }
   }
 }
@@ -96,8 +112,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     levelwrite << universe;
     //state = ?
   }
-
-  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
   
   return state;
 }
@@ -109,7 +124,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
   paruni->tick();
   paruni->move(maxframerate);
 
-  display.handleEvents(SpaceDisplay::SimulationView, bflags, editor);
+  display.handleEvents(view, bflags, editor);
 
   if(bflags.checkFlag(ButtonFlags::breakSimulation))
   {
@@ -121,34 +136,89 @@ Spacehero::SpaceheroState Spacehero::simulate()
     state = spacehero_startsimu;
   }
 
-  display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+  
+  if(view == SpaceDisplay::IntroView)
+  {
+    double menutime;
+    int j;
+
+    (*display.getDisplay()).cleanDisplay();
+    (*display.getDisplay()).OrthoMode();
+
+    if(bflags.viewFlag(ButtonFlags::breakIntro))
+    {
+      menutime = 100;
+    } else {
+      menutime = paruni->elapsed();
+    }
+
+    if(menutime > 5.7*2)
+    {
+      paruni->galaxies.at(0).setexists(false);
+    }
+
+    if(menutime > 6*2)
+    {
+      display.showMenu(menutime-6*2);
+    }
+   
+    if(menutime > 5.1*2)
+    {
+      for(j = 0; j < 3+menutime; j++) paruni->stars[(int)((rand() / (RAND_MAX + 1.0))*paruni->stars.size())].vz = (10e5*(rand() / (RAND_MAX + 1.0)))+2e5;
+    }
+
+    display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
+    SDL_GL_SwapBuffers();
+  } else {
+    display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+  }
 
   // ZEIT verballern
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   if(0 != usleep(sleep)) std::cerr << "usleep failed" << std::endl;
-
-  if(paruni->timeout())
+  
+  if(view == SpaceDisplay::IntroView)
   {
-    display.showEnd(false,bflags);
-    if(bflags.checkFlag(ButtonFlags::replaySimulation))
-    { 
-      return spacehero_startsimu;
-    }
-    return spacehero_edit;
-  }
-
-  if((won = paruni->won()))
-  {
-    display.showEnd(true,bflags);
-    if(bflags.checkFlag(ButtonFlags::replaySimulation))
+    if(bflags.checkFlag(ButtonFlags::startGame))
     {
-      return spacehero_startsimu;
-    }
-    else if(editor.isAllowAll())
-    {
-      return spacehero_edit;
-    } else {
       return spacehero_next;
+    }
+
+    if(bflags.checkFlag(ButtonFlags::exit))
+    {
+      return spacehero_exit;
+    }
+
+    if(bflags.checkFlag(ButtonFlags::startEditor))
+    {
+      return spacehero_emptyEditor;
+    }
+  }
+  else
+  {
+    if(paruni->timeout())
+    {
+      display.showEnd(false,bflags);
+      if(bflags.checkFlag(ButtonFlags::replaySimulation))
+      { 
+	return spacehero_startsimu;
+      }
+      return spacehero_edit;
+    }
+
+    if((won = paruni->won()))
+    {
+      display.showEnd(true,bflags);
+      if(bflags.checkFlag(ButtonFlags::replaySimulation))
+      {
+	return spacehero_startsimu;
+      }
+      else if(editor.isAllowAll())
+      {
+	return spacehero_edit;
+      } else {
+	return spacehero_next;
+      }
     }
   }
 

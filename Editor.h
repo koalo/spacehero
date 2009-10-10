@@ -30,6 +30,10 @@ class Editor
     bool all;
     double massreserve;
 
+    bool setGalaxy;
+    int galaxyX;
+    int galaxyY;
+
     enum {
       small,
       medium,
@@ -46,7 +50,10 @@ class Editor
     Editor(Universe &universe);
     void setAllowAll(bool allowall){all=allowall;}
     bool isAllowAll(){return all;}
-    void check(double mousex, double mousey);
+    bool settingGalaxy(){return setGalaxy;}
+    int getGalaxyX(){return galaxyX;}
+    int getGalaxyY(){return galaxyY;}
+    void check(double mousex, double mousey, int pixelx, int pixely);
     void parseButtons(ButtonFlags &flags);
     double getHoleWeight();
     double getBulgeWeight();

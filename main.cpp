@@ -27,6 +27,7 @@ using namespace boost::filesystem;
 #include "Spacehero.h"
 #include "Universe.h"
 #include "intro.h"
+#include "Illustrator.h"
 
 int main(int argc, char *argv[])
 { 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
 
   SpaceDisplay display(dir+"data/");
   std::string levels = dir+"level/";
-
+  Spacehero::SpaceheroState state;
   std::cerr << "argc: " << argc << std::endl;
 
   if(argc<=1) {
@@ -61,26 +62,142 @@ int main(int argc, char *argv[])
     if (is_directory(levels) ) {
       std::cerr << "level dir found" << std::endl;
 
-      //intro(display);
-      std::cerr << "intro done" << std::endl;
+      while(true)
+      {
+	// Intro und Menu
+	std::string intr = levels+"level1.txt";
+	std::ifstream leveli(intr.c_str());
+	if(!leveli) 
+	{
+	  std::cerr << "Level ungueltig" << std::endl;
+	  exit(0);
+	}
+	
+	try { 
+	  Universe u = Universe();
+/*
+  uni.galaxies[0].x = 0.1;
+  uni.galaxies[0].y = 0.1;
+  uni.galaxies[0].z = VORN;
+  uni.galaxies[0].vx = 100e3;
+  uni.galaxies[0].vy = 100e3;
+  uni.galaxies[0].vz = SPEED;
+  uni.galaxies[0].mass = 4.3e11;
+  uni.galaxies[0].inLevel = 0;
+  uni.galaxies[0].exists = 1;
+  uni.galaxies[0].nograv = 1;
 
-      for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) {
-        std::cerr << "trying to load level: " << itr->path() << std::endl;
-        std::ifstream level(itr->path().string().c_str());
-        std::ofstream levelwrite("/tmp/level.out");
-        if(level) {
+  uni.galaxies[1].x = 1.42;
+  uni.galaxies[1].y = 1.42;
+  uni.galaxies[1].z = VORN;
+  uni.galaxies[1].vx = -200e3;
+  uni.galaxies[1].vy = -200e3;
+  uni.galaxies[1].vz = SPEED;
+  uni.galaxies[1].mass = 20e11;
+  uni.galaxies[1].inLevel = 1;
+  uni.galaxies[1].exists = 1;
+  uni.galaxies[1].nograv = 1;
+*/
+
+	  u.galaxies.push_back(Galaxy(0.1,0.1,4.3e11,false,false));
+	  u.galaxies.back().setZ(0.17);
+	  u.galaxies.back().setVX(100e3*3);
+	  u.galaxies.back().setVY(100e3*3);
+	  u.galaxies.push_back(Galaxy(1.42,1.42,20e11,false,false));
+	  u.galaxies.back().setZ(0.17);
+	  u.galaxies.back().setVX(-200e3*3);
+	  u.galaxies.back().setVY(-200e3*3);
+	  u.calcStars();
+	  u.setStargrav(true);
+	  Spacehero si(display,u);
+	  state = si.play(SpaceDisplay::IntroView);
+	  //state = Spacehero::spacehero_emptyEditor;
+	} catch (Error::ParseLevel e) {
+	  std::cerr << e.msg() << std::endl;
+	}
+
+        // Menu auswerten	
+	if(state == Spacehero::spacehero_exit)
+	{
+	  // Programm beenden
+	  break;
+	} 
+	else if(state == Spacehero::spacehero_emptyEditor)
+	{
+          // Editor starten
           try { 
-            Level l(level); 
-            levelwrite << l;
-            Universe u(l);
-            Spacehero s(display,u);
-            s.play();
-          } catch (Error::ParseLevel e) {
-            std::cerr << e.msg() << std::endl;
-          }
+	    Universe u = Universe();
+	    Spacehero s(display,u);
+	    s.play(SpaceDisplay::EditorView);
+	   } catch (Error::ParseLevel e) {
+	    std::cerr << e.msg() << std::endl;
+	   }
 
-        }
+	}
+	else if(state == Spacehero::spacehero_next)
+        {
+	  // Alle Level durchgehen
+	  for (directory_iterator itr(levels); itr != directory_iterator(); ++itr)
+	  {
+	    std::cerr << "trying to load level: " << itr->path() << std::endl;
+	    std::ifstream level(itr->path().string().c_str());
+	    std::ofstream levelwrite("/tmp/level.out");
+	    if(level) {
+	      try { 
+		Level l(level); 
+		levelwrite << l;
+		Universe u(l);
+		Spacehero s(display,u);
+		if(s.play() == Spacehero::spacehero_exit) break;
+	      } catch (Error::ParseLevel e) {
+		std::cerr << e.msg() << std::endl;
+	      }
+	    }
+	  }
+	}
       }
+#if 0
+      ButtonFlags bflags;
+      ButtonMaster mainmenu(*display.getPictureBook(), *display.getIllustrator());
+      SDL_Event event;
+      int width = (*display.getDisplay()).getWidth();
+      int height = (*display.getDisplay()).getHeight();
+      printf("%i x %i\n", width, height);
+      mainmenu.addButton("button_start", 100, height/2, height*0.1, ButtonFlags::startGame);
+
+      do
+      {
+      printf("%i x %i\n", width, height);
+        while(SDL_PollEvent( &event ))
+	{
+	  (*display.getDisplay()).handleEvents(event);
+          if(event.type == SDL_MOUSEBUTTONDOWN)
+	  {
+  	    mainmenu.checkButtons(bflags,event.motion.x,event.motion.y);
+          }
+	}
+        
+        (*display.getDisplay()).initDisplay();	
+        mainmenu.drawButtons(); 	
+        SDL_GL_SwapBuffers();
+      } while(!bflags.isFlag());
+
+      if(bflags.checkFlag(ButtonFlags::startGame) || bflags.viewFlag(ButtonFlags::startEditor))
+      {
+	  }
+	}
+      }
+      
+      if(bflags.checkFlag(ButtonFlags::chooseLevel))
+      {
+
+      }
+      /*
+      Menu mainmenu(display.getIllustrator(), display.getDisplay());
+      mainmenu.add("START",&start);
+      mainmenu.add("EDITOR",&editor);
+      mainmenu.start();*/
+#endif
     }
   } else {
     std::ifstream level(argv[1]);

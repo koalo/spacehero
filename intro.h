@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
+#define _INTRO_H_
 #ifndef _INTRO_H_
 #define _INTRO_H_
 
-#if 0
 #include "GLdisplay.h"
+#include "Universe.h"
+#include "local.h"
 
 void intro(GLdisplay &display);
 
-
-#endif
 #endif

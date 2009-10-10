@@ -128,3 +128,100 @@ int GLdisplay::getWidth()
 {
   return width;
 }
+
+void GLdisplay::cleanDisplay()
+{
+    /* Bildschirm loeschen */
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+}
+
+void GLdisplay::OrthoMode()
+{
+  /* Auf Projektionsmodus umschalten */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glViewport(0,0,getWidth(),getHeight());
+  glOrtho(0,getWidth(),0,getHeight(),0,128);
+
+  /* Blending aus */
+  glDisable(GL_BLEND);
+  
+  /* Zurueckschalten und Ansicht einstellen */
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  glScalef(1.0f, -1.0f, 1.0f);
+  glTranslatef(0.0f, -getHeight(), 0.0f);
+}
+
+void GLdisplay::PerspectiveMode(int left, int top, int width, int height, float angle)
+{
+/* Auf Projektionsmodus umschalten */
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+  glViewport(left,top,width,height);
+
+  /* Vor Division durch Null schuetzen */
+  if (height == 0)
+  {
+    height = 1;
+  }
+ 
+  float ratio = ( float )width / ( float )height;
+ 
+  /* Perspektive einstellen */
+  gluPerspective(angle, ratio, 0.0000001f, 10000000.0f);
+  
+  /* Zoom einstellen */
+  float viewrad = (angle/360.0)*(2*M_PI);
+  float zoomY = (height*0.5) / tan(viewrad/2.0);
+  float zoomX = (width*0.5) / tan((viewrad*ratio)/2.0);
+  float zoom = (zoomX > zoomY)?zoomX:zoomY;
+
+  /* Zurueckschalten und Ansicht zuruecksetzen */
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  if(height > width)
+  { 
+    glScalef(width, width, 1.0);
+  } else {
+    glScalef(height, height, 1.0);
+  }
+
+  glScalef(1.0f, -1.0f, 1.0f);
+
+  glTranslatef(-0.5f,-0.5f,0.0f);
+  
+  gluLookAt(0, 0, zoom,
+             0,
+             0,
+             0,
+             0,1,0);
+}
+
+void GLdisplay::handleEvents(SDL_Event &event)
+{
+  switch( event.type )
+  {
+    case SDL_VIDEORESIZE:
+      /* Groesse vom Fenster geaendert */
+      resizeWindow( event.resize.w, event.resize.h );
+      break;
+    case SDL_QUIT:
+	exit(0);
+      break;
+    case SDL_KEYDOWN:
+      switch(event.key.keysym.sym)
+      {
+	case SDLK_ESCAPE:
+	  exit(0);
+	  break;
+	default:
+	  break;
+      }
+      break;
+    default:
+      break;
+  }
+}

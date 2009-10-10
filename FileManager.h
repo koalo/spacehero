@@ -35,7 +35,7 @@ class FileManager
   public:
     FileManager(Illustrator *illu, GLdisplay *disp) : name(""), illustrator(illu), display(disp), doinput(true) {}
     std::string getFile();
-    void draw();
+    void draw(int i);
     void handleEvents();
 };
 

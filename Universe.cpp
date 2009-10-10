@@ -56,7 +56,7 @@ Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
 
 std::vector<Star> Galaxy::getStars(int seed) {
   double v;
-  double NStars = mass / 4e8;
+  double NStars = mass / 5e8;
   double NOrbits = mass / 2e10;
   double NStarsPerOrbit = NStars/NOrbits;
   std::vector<Star> accu;
@@ -82,6 +82,7 @@ std::vector<Star> Galaxy::getStars(int seed) {
 Universe::Universe(Level &l) :
   Level(l),
   m_won(false),
+  stargrav(false),
   stars()
 {
   calcStars();
@@ -111,9 +112,14 @@ void Universe::move(double delta)
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
-//    for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
-//      if(i!=l) i->newton(*l,delta);
-//    }
+    if(stargrav)
+    {
+      //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
+       // if(i!=l) i->newton(*l,delta);
+      ////}
+      //for(unsigned int a = 0; a < stars.size(); a++){}
+    }
+    i->move(delta);
   }
   // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
@@ -123,15 +129,9 @@ void Universe::move(double delta)
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
-  }
-
-  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     i->move(delta);
   }
-
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
-    i->move(delta);
-  }
+  
   eventHorizon();
 }
 
@@ -164,11 +164,11 @@ bool Universe::won()
     if( i->getmaster() )
     {
       master++;
-      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->exists )
+      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->exists && goal.getexists() )
       { 
         ingoal++;
       }
     }
   }
-  return (m_won = (ingoal == master));
+  return (m_won = (ingoal == master && master > 0));
 }

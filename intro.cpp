@@ -15,17 +15,12 @@
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
 #if 0
-#include "Universe.h"
 #include "intro.h"
-#include "handleEvents.h"
-#include "displayUniverse.h"
-
-#include "local.h"
 
 void intro(GLdisplay &display)
 {
   Universe uni;
-  Kamera cam;
+  /*Kamera cam;*/
   int simulationTime, j;
   int clocktime;
   float diff, herotime;
@@ -34,7 +29,7 @@ void intro(GLdisplay &display)
 
   /* Zufall starten */
   srand((unsigned int) time(NULL));
-
+/*
   uni.holesSize = 0;
   uni.galaxiesSize = 2;
   uni.starsSize = 0;
@@ -60,9 +55,9 @@ void intro(GLdisplay &display)
   uni.galaxies[1].inLevel = 1;
   uni.galaxies[1].exists = 1;
   uni.galaxies[1].nograv = 1;
-
+*/
   /* Galaxie erzeugen */
-  uni.starsSize = 0;
+/*  uni.starsSize = 0;
   uni.stars = NULL;
   constructGalaxy(&uni.galaxies[0], &uni.stars, &uni.starsSize);  
   constructGalaxy(&uni.galaxies[1], &uni.stars, &uni.starsSize);
@@ -74,7 +69,7 @@ void intro(GLdisplay &display)
   }
 
   cam.rx = cam.ry = cam.rz = 0;
-
+*/
   /* bis die Zeit abgelaufen ist, oder Ziel erreicht */
   display.state.m_breakIntro = 0;
   for(simulationTime = 1; simulationTime < 1200; simulationTime++)
@@ -112,7 +107,7 @@ void intro(GLdisplay &display)
     /* Versteckten Buffer aktivieren */
     SDL_GL_SwapBuffers();
 
-    handleEvents( display, 457645, uni );
+    /*handleEvents( display, 457645, uni );*/
 
     if(display.state.m_breakIntro) break;
 
@@ -122,8 +117,6 @@ void intro(GLdisplay &display)
     usleep(1000000*diff);
   }
 
-  free(uni.stars);
+  /*free(uni.stars);*/
 }
-
-
 #endif

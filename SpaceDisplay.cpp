@@ -50,7 +50,7 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("timesup");
 }
 
-void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight)
+void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight, bool settingGalaxy, int galaxyX, int galaxyY)
 {
   double center, ypos, margin;
   int mrx, mry, y;
@@ -61,31 +61,12 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   /**************************
    * BILDSCHIRM VORBEREITEN *
    **************************/
-
-  /* Bildschirm loeschen */
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
   width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
   height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
 
-  /* Auf Projektionsmodus umschalten */
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glViewport(0,0,display.getWidth(),display.getHeight());
-  glOrtho(0,display.getWidth(),0,display.getHeight(),0,128);
-
-  /* Blending aus */
-  glDisable(GL_BLEND);
+  display.cleanDisplay();
+  display.OrthoMode();
   
-  /* Zurueckschalten und Ansicht einstellen */
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-
-  glScalef(1.0f, -1.0f, 1.0f);
-  glTranslatef(0.0f, -display.getHeight(), 0.0f);
-
-
-
   /**************************
    *        INFOTEXT        *
    **************************/
@@ -193,28 +174,24 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     mrx = - (-display.getHeight()*0.11 * sin(mrangle * M_PI/180));
     mry = (-display.getHeight()*0.11 * cos(mrangle * M_PI/180));
 
-    glLineWidth(4);
-
     glColor3f(0,0,0);
-    glBegin( GL_LINES );
-    glVertex3f( center+mrx, display.getHeight()*0.28+mry, 0.0 );
-    glVertex3f( center, display.getHeight()*0.28, 0.0 );
-    glEnd();
+    illustrator.drawLine(center+mrx, display.getHeight()*0.28+mry, center, display.getHeight()*0.28, 4);
     glColor3f(1,1,1);
   }
 
+  if(settingGalaxy)
+  {
+    int mousex, mousey;
+    SDL_GetMouseState(&mousex, &mousey);
+    glColor3f(1,1,0);
+    illustrator.drawLine(galaxyX,galaxyY,mousex,mousey,2);
+    glColor3f(1,1,1);
+  }
 
-
-  /**************************
+   /**************************
    *       UNIVERSUM        *
    **************************/ 
-   if(false)
-   {
-     displayUniverse(uni, width, height, true, true);
-     displayUniverse(uni, width, height, true, false);
-   } else {
-     displayUniverse(uni, width, height);     
-   }
+  displayUniverse(uni, width, height);     
 
   /* Versteckten Buffer aktivieren */
   SDL_GL_SwapBuffers();
@@ -223,8 +200,13 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
 
 void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool eye, bool pleft )
 {
+  if(eye && pleft)
+  {
+    displayUniverse(uni, width, height, true, false);
+  }
+
   unsigned int i;
-  double eyet = 0;
+  //double eyet = 0;
   GLfloat ratio;
   float zoomX, zoomY, viewrad;
   GLUquadricObj *pObj = gluNewQuadric();
@@ -350,7 +332,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
     gluQuadricTexture(pObj, 1);
     textures.noTexture();
     gluSphere(pObj, uni.goal.radius, 20, 20);
-    /*glTranslatef( -1000000*uni.goal.x, -uni.goal.y, 0.0f );*/
     glColor3f(1,1,1);
   glPopMatrix();
 
@@ -358,10 +339,9 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   gluDeleteQuadric(pObj);
 
   glDisable(GL_LIGHT1);
-  
-  glPopMatrix();
-  drawStars(false,eye,pleft,uni);
 
+  glPopMatrix(); 
+  drawStars(false,eye,pleft,uni);
   glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
   if(eye)
   {
@@ -403,6 +383,7 @@ void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
              0,1,0);
 
   textures.useTexture("star");
+  glPointSize(100.0);
 
   for(i = 0; i < uni.stars.size(); i++)
   {
@@ -426,12 +407,20 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
   {
     textures.useTexture("accomplished");
     width = 629.0;
-  } else {
+  } 
+  else
+  {
     textures.useTexture("timesup");
     width = 265.0;
   }
-
+  
+  gluLookAt(0, 0, zoom,
+             0,
+             0,
+             0,
+             0,1,0);
   illustrator.putImage( 0.5-((width/102)*0.12)*0.5, 0.5-(0.12*0.5), (width/102)*0.12, 0.12 );
+
   SDL_GL_SwapBuffers();
 
   for(i = 0; i < 400; i++)
@@ -445,6 +434,34 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
   }
 }
 
+void SpaceDisplay::showMenu(double time)
+{
+  double scale, herotime, buttontime;
+
+  textures.useTexture("spacehero");
+
+  display.PerspectiveMode(0,0,display.getWidth(),display.getHeight(),VIEWANGLE);
+    
+  scale = 0.9;
+  herotime = 1.0-exp(-(time*100)*0.005);
+  herotime = (herotime > 0)?herotime:0;
+  herotime = (herotime < scale)?herotime:scale;
+  illustrator.putImage( 0.5-scale*herotime/2, 0.5-(scale*(186.0/634.0)*herotime)/2.0, scale*herotime, scale*(186.0/634.0)*herotime );
+
+  buttons.clearButtons();
+
+  display.OrthoMode();
+
+  buttontime = 1.0-exp(-((time-3)*100)*0.009);
+  buttontime = (buttontime > 0)?buttontime:0;
+  buttontime = (buttontime < scale)?buttontime:scale;
+  buttons.addButton("button_start", display.getWidth()*0.2, display.getHeight()*0.2, display.getWidth()*0.08*buttontime, ButtonFlags::startGame);
+  buttons.addButton("button_x", display.getWidth()*0.8, display.getHeight()*0.8, display.getWidth()*0.08*buttontime, ButtonFlags::exit);
+  buttons.addButton("button_green", display.getWidth()*0.7, display.getHeight()*0.25, display.getWidth()*0.08*buttontime, ButtonFlags::startEditor);
+
+  buttons.drawButtons();
+}
+
 void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor)
 {
   GLdouble modelMatrix[16];
@@ -454,6 +471,8 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
 
   while ( SDL_PollEvent( &event ) )
   {
+    display.handleEvents(event);
+
     switch( event.type )
     {
       case SDL_ACTIVEEVENT:
@@ -467,13 +486,27 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
           isActive = 1;
         }  
         break;
+      /*case SDL_MOUSEMOTION:
+	if(editor.settingGalaxy())
+	{
+	  editor.setMouse(event.motion.x,event.motion.y);
+	}
+	break;*/
       case SDL_MOUSEBUTTONDOWN:
         /* Buttons */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
-        {
-          buttons.checkButtons(flags,event.motion.x,event.motion.y);
-        }
-              
+        if(!editor.settingGalaxy())
+	{
+	  if(view == SpaceDisplay::PutView || view == SpaceDisplay::IntroView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
+          {
+            buttons.checkButtons(flags,event.motion.x,event.motion.y);
+          }
+
+          if(view == SpaceDisplay::IntroView)
+	  {
+	    flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+	  }
+	}
+
         /* Nur fuer Setzfenster */
         if(view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView)
         {        
@@ -521,23 +554,13 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
             
             mousey = 1.0-mousey;
 
-            editor.check(mousex,mousey);
+            editor.check(mousex,mousey,event.motion.x,event.motion.y);
           }
         }
-        break;
-      case SDL_VIDEORESIZE:
-        /* Groesse vom Fenster geaendert */
-        display.resizeWindow( event.resize.w, event.resize.h );
-        break;
-      case SDL_QUIT:
-          exit(0);
         break;
       case SDL_KEYDOWN:
         switch(event.key.keysym.sym)
         {
-          case SDLK_ESCAPE:
-            exit(0);
-            break;
           case SDLK_e:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::startEditor);
             break;

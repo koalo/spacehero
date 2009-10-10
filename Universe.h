@@ -58,6 +58,9 @@ class SkyObject {
     void setlevel() { level = true; };
     bool setexists(bool b=true) { return exists = b; };
     bool getexists() { return exists; };
+    void setX(double ix){x = ix;}
+    void setY(double iy){y = iy;}
+    void setZ(double iz){z = iz;}
   public:
     friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
 };
@@ -71,8 +74,11 @@ class SkyMass : public SkyObject {
     SkyMass(): vx(0),vy(0),vz(0),mass(0) {};
     SkyMass(double ix, double iy, double imass, double iradius) : SkyObject(ix,iy,iradius), vx(0), vy(0), vz(0), mass(imass) {};
     
-    inline void newton(SkyMass &m, double delta);
+    inline void newton(SkyMass &m, double &delta);
     inline void move(double delta);
+    void setVX(double ivx){vx = ivx;}
+    void setVY(double ivy){vy = ivy;}
+
   public:
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 };
@@ -81,8 +87,6 @@ class Goal : public SkyObject {
   public:
     Goal() {};
     Goal(std::ifstream &in);
-    void setX(double ix){x = ix;}
-    void setY(double iy){y = iy;}
     void setRadius(double iradius){radius = iradius;}
   public:
     friend std::ostream& operator<< (std::ostream &o, const Goal &g);
@@ -141,7 +145,7 @@ class Level {
     int seed;
   public:
     Level(std::ifstream &in);
-    Level():t0(),maxtime(0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),galaxies(),goal(),seed(0) {};
+    Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),galaxies(),goal(),seed(0) {};
     virtual ~Level() {};
 
   public:
@@ -174,18 +178,19 @@ class Level {
 class Universe: public Level
 {
   bool m_won;
+  bool stargrav;
   public:
   std::vector<Star> stars;  
   public:
   Universe(Level &l);
-  Universe() :m_won(false),stars() {};
+  Universe() :m_won(false),stargrav(false),stars() {};
   void calcStars();
 
   //bool play(GLdisplay &d);
   void move(double delta);
   bool won();
   void eventHorizon();
-
+  void setStargrav(bool igra){stargrav = igra;}
 };
 
 inline void SkyMass::move(double delta) {
@@ -195,7 +200,7 @@ inline void SkyMass::move(double delta) {
   //if(hypot(vx,vy)>1) std::cerr << ".";
 }
 
-inline void SkyMass::newton(SkyMass &m, double delta) {
+inline void SkyMass::newton(SkyMass &m, double &delta) {
   double AX, AY, AZ, a1, a2, r3;
   //std::cerr << *this << m << std::endl;
   if( (!getexists()) || (!m.getexists()) ) return;

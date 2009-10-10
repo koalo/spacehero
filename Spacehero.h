@@ -28,7 +28,7 @@ class Spacehero
   private:
     Spacehero(const Spacehero&);
     Spacehero& operator=(const Spacehero&);
-  private:
+  public:
   // Zustaende des Spielautomaten
   //
   // Endzustaende: next und exit
@@ -40,10 +40,12 @@ class Spacehero
 		spacehero_simulate, 
 		spacehero_stopsimu, 
 		spacehero_next, 
-		spacehero_exit 
+		spacehero_exit,
+	        spacehero_emptyEditor	
 	} state;
-
-	bool won;
+  
+  private:
+  bool won;
 
   ButtonFlags bflags;
   Editor editor;
@@ -51,7 +53,7 @@ class Spacehero
 	SpaceDisplay &display;
 	Universe &universe;
   Universe *paruni;
-
+  SpaceDisplay::BridgeView view;
 
   static const double maxframerate = 1.0/50.0;
 
@@ -59,7 +61,7 @@ public:
 
 	Spacehero(SpaceDisplay &d, Universe &u);
 
-	bool play();
+	Spacehero::SpaceheroState play(SpaceDisplay::BridgeView myview = SpaceDisplay::PutView);
 
 	SpaceheroState edit();
 	SpaceheroState simulate();
