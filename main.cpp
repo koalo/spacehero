@@ -74,10 +74,44 @@ int main(int argc, char *argv[])
 	}
 	
 	try { 
-	  Level li(leveli); 
-	  Universe ui(li);
-	  Spacehero si(display,ui);
+	  Universe u = Universe();
+/*
+  uni.galaxies[0].x = 0.1;
+  uni.galaxies[0].y = 0.1;
+  uni.galaxies[0].z = VORN;
+  uni.galaxies[0].vx = 100e3;
+  uni.galaxies[0].vy = 100e3;
+  uni.galaxies[0].vz = SPEED;
+  uni.galaxies[0].mass = 4.3e11;
+  uni.galaxies[0].inLevel = 0;
+  uni.galaxies[0].exists = 1;
+  uni.galaxies[0].nograv = 1;
+
+  uni.galaxies[1].x = 1.42;
+  uni.galaxies[1].y = 1.42;
+  uni.galaxies[1].z = VORN;
+  uni.galaxies[1].vx = -200e3;
+  uni.galaxies[1].vy = -200e3;
+  uni.galaxies[1].vz = SPEED;
+  uni.galaxies[1].mass = 20e11;
+  uni.galaxies[1].inLevel = 1;
+  uni.galaxies[1].exists = 1;
+  uni.galaxies[1].nograv = 1;
+*/
+
+	  u.galaxies.push_back(Galaxy(0.1,0.1,4.3e11,false,false));
+	  u.galaxies.back().setZ(0.15);
+	  u.galaxies.back().setVX(100e3*1.7);
+	  u.galaxies.back().setVY(100e3*1.7);
+	  u.galaxies.push_back(Galaxy(1.42,1.42,20e11,false,false));
+	  u.galaxies.back().setZ(0.15);
+	  u.galaxies.back().setVX(-200e3*1.7);
+	  u.galaxies.back().setVY(-200e3*1.7);
+	  u.calcStars();
+	  u.setStargrav(true);
+	  Spacehero si(display,u);
 	  state = si.play(SpaceDisplay::IntroView);
+	  //state = Spacehero::spacehero_emptyEditor;
 	} catch (Error::ParseLevel e) {
 	  std::cerr << e.msg() << std::endl;
 	}
@@ -92,9 +126,7 @@ int main(int argc, char *argv[])
 	{
           // Editor starten
           try { 
-	    std::ifstream level(intr.c_str());
-	    Level l(level); 
-	    Universe u(l);
+	    Universe u = Universe();
 	    Spacehero s(display,u);
 	    s.play(SpaceDisplay::EditorView);
 	   } catch (Error::ParseLevel e) {

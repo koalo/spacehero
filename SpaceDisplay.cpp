@@ -383,6 +383,7 @@ void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
              0,1,0);
 
   textures.useTexture("star");
+  glPointSize(100.0);
 
   for(i = 0; i < uni.stars.size(); i++)
   {

@@ -151,9 +151,14 @@ Spacehero::SpaceheroState Spacehero::simulate()
       menutime = paruni->elapsed();
     }
 
-    if(menutime > 6)
+    if(menutime > 5.7*2)
     {
-      display.showMenu(menutime-6);
+      paruni->galaxies.at(0).setexists(false);
+    }
+
+    if(menutime > 6*2)
+    {
+      display.showMenu(menutime-6*2);
     }
    
     SDL_GL_SwapBuffers();
@@ -182,29 +187,31 @@ Spacehero::SpaceheroState Spacehero::simulate()
       return spacehero_emptyEditor;
     }
   }
-
-  if(paruni->timeout())
+  else
   {
-    display.showEnd(false,bflags);
-    if(bflags.checkFlag(ButtonFlags::replaySimulation))
-    { 
-      return spacehero_startsimu;
-    }
-    return spacehero_edit;
-  }
-
-  if((won = paruni->won()))
-  {
-    display.showEnd(true,bflags);
-    if(bflags.checkFlag(ButtonFlags::replaySimulation))
+    if(paruni->timeout())
     {
-      return spacehero_startsimu;
-    }
-    else if(editor.isAllowAll())
-    {
+      display.showEnd(false,bflags);
+      if(bflags.checkFlag(ButtonFlags::replaySimulation))
+      { 
+	return spacehero_startsimu;
+      }
       return spacehero_edit;
-    } else {
-      return spacehero_next;
+    }
+
+    if((won = paruni->won()))
+    {
+      display.showEnd(true,bflags);
+      if(bflags.checkFlag(ButtonFlags::replaySimulation))
+      {
+	return spacehero_startsimu;
+      }
+      else if(editor.isAllowAll())
+      {
+	return spacehero_edit;
+      } else {
+	return spacehero_next;
+      }
     }
   }
 
