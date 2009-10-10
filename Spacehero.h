@@ -40,7 +40,8 @@ class Spacehero
 		spacehero_simulate, 
 		spacehero_stopsimu, 
 		spacehero_next, 
-		spacehero_exit 
+		spacehero_exit,
+	        spacehero_emptyEditor	
 	} state;
 
 	bool won;
@@ -51,7 +52,7 @@ class Spacehero
 	SpaceDisplay &display;
 	Universe &universe;
   Universe *paruni;
-
+  SpaceDisplay::BridgeView view;
 
   static const double maxframerate = 1.0/50.0;
 
@@ -59,7 +60,7 @@ public:
 
 	Spacehero(SpaceDisplay &d, Universe &u);
 
-	bool play(bool starteditor = false);
+	bool play(SpaceDisplay::BridgeView myview = SpaceDisplay::PutView);
 
 	SpaceheroState edit();
 	SpaceheroState simulate();

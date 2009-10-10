@@ -45,7 +45,7 @@ class GLdisplay
     void resizeWindow(int width, int height);
     int getWidth();
     int getHeight();
-    void initDisplay();
+    void initDisplay(bool clear = true);
     void handleEvents(SDL_Event &event);
 };
 

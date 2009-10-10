@@ -20,12 +20,28 @@
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   : state(spacehero_edit), won(false), bflags(), editor(u),
-    display(d), universe(u), paruni(0)
+    display(d), universe(u), paruni(0), view(SpaceDisplay::PutView)
 {
 }
 
-bool Spacehero::play(bool starteditor)
-{  
+bool Spacehero::play(SpaceDisplay::BridgeView myview)
+{ 
+  view = myview; 
+  switch(view)
+  {
+   case SpaceDisplay::EditorView:
+      state = spacehero_starteditor;
+      break;
+    case SpaceDisplay::IntroView:
+    case SpaceDisplay::SimulationView:
+      state = spacehero_startsimu;
+      break;
+    case SpaceDisplay::PutView:
+    default:
+      state = spacehero_edit;
+      break;
+  }
+  
   while (true)
   {
     if(bflags.checkFlag(ButtonFlags::exit))
@@ -35,6 +51,7 @@ bool Spacehero::play(bool starteditor)
 
     switch (state)
     {
+      case spacehero_emptyEditor:
       case spacehero_starteditor:
         editor.setAllowAll(true);
         state = spacehero_edit;
@@ -109,7 +126,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
   paruni->tick();
   paruni->move(maxframerate);
 
-  display.handleEvents(SpaceDisplay::SimulationView, bflags, editor);
+  display.handleEvents(view, bflags, editor);
 
   if(bflags.checkFlag(ButtonFlags::breakSimulation))
   {
@@ -121,11 +138,52 @@ Spacehero::SpaceheroState Spacehero::simulate()
     state = spacehero_startsimu;
   }
 
-  display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+  
+  if(view == SpaceDisplay::IntroView)
+  {
+    double menutime;
+
+    (*display.getDisplay()).initDisplay();
+    display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
+    
+    if(bflags.viewFlag(ButtonFlags::breakIntro))
+    {
+      menutime = 100;
+    } else {
+      menutime = paruni->elapsed();
+    }
+
+    if(menutime > 6)
+    {
+      display.showMenu(menutime-6);
+    }
+   
+    SDL_GL_SwapBuffers();
+  } else {
+    display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+  }
 
   // ZEIT verballern
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   if(0 != usleep(sleep)) std::cerr << "usleep failed" << std::endl;
+  
+  if(view == SpaceDisplay::IntroView)
+  {
+    if(bflags.checkFlag(ButtonFlags::startGame))
+    {
+      return spacehero_next;
+    }
+
+    if(bflags.checkFlag(ButtonFlags::exit))
+    {
+      return spacehero_exit;
+    }
+
+    if(bflags.checkFlag(ButtonFlags::startEditor))
+    {
+      return spacehero_emptyEditor;
+    }
+  }
 
   if(paruni->timeout())
   {

@@ -63,9 +63,39 @@ int main(int argc, char *argv[])
     if (is_directory(levels) ) {
       std::cerr << "level dir found" << std::endl;
 
-      //intro(display);
+      // Intro
+      std::string intr = levels+"level1.txt";
+      std::ifstream leveli(intr.c_str());
+      if(leveli) {
+        try { 
+          Level li(leveli); 
+	  Universe ui(li);
+	  Spacehero si(display,ui);
+	  if(!si.play(SpaceDisplay::IntroView)) return 0; 
+	} catch (Error::ParseLevel e) {
+	  std::cerr << e.msg() << std::endl;
+	}
+      }
       std::cerr << "intro done" << std::endl;
 
+      for (directory_iterator itr(levels); itr != directory_iterator(); ++itr)
+      {
+        std::cerr << "trying to load level: " << itr->path() << std::endl;
+	std::ifstream level(itr->path().string().c_str());
+	std::ofstream levelwrite("/tmp/level.out");
+	if(level) {
+	  try { 
+	    Level l(level); 
+	    levelwrite << l;
+	    Universe u(l);
+	    Spacehero s(display,u);
+	    if(!s.play()) break;
+	  } catch (Error::ParseLevel e) {
+	    std::cerr << e.msg() << std::endl;
+	  }
+        }
+      }
+#if 0
       ButtonFlags bflags;
       ButtonMaster mainmenu(*display.getPictureBook(), *display.getIllustrator());
       SDL_Event event;
@@ -93,21 +123,6 @@ int main(int argc, char *argv[])
 
       if(bflags.checkFlag(ButtonFlags::startGame) || bflags.viewFlag(ButtonFlags::startEditor))
       {
-	for (directory_iterator itr(levels); itr != directory_iterator(); ++itr) {
-	  std::cerr << "trying to load level: " << itr->path() << std::endl;
-	  std::ifstream level(itr->path().string().c_str());
-	  std::ofstream levelwrite("/tmp/level.out");
-	  if(level) {
-	    try { 
-	      Level l(level); 
-	      levelwrite << l;
-	      Universe u(l);
-	      Spacehero s(display,u);
-	      s.play(bflags.checkFlag(ButtonFlags::startEditor));
-	    } catch (Error::ParseLevel e) {
-	      std::cerr << e.msg() << std::endl;
-	    }
-
 	  }
 	}
       }
@@ -121,7 +136,8 @@ int main(int argc, char *argv[])
       mainmenu.add("START",&start);
       mainmenu.add("EDITOR",&editor);
       mainmenu.start();*/
-   }
+#endif
+    }
   } else {
     std::ifstream level(argv[1]);
     Level l(level);

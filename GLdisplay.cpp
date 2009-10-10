@@ -129,14 +129,17 @@ int GLdisplay::getWidth()
   return width;
 }
 
-void GLdisplay::initDisplay()
+void GLdisplay::initDisplay(bool clear)
 {
-  /* Fenstergroesse neu auslesen */
-  videoInfo = SDL_GetVideoInfo( );
-  resizeWindow(videoInfo->current_w,videoInfo->current_h);
-  
-  /* Bildschirm loeschen */
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  if(clear)
+  {
+    /* Fenstergroesse neu auslesen */
+    videoInfo = SDL_GetVideoInfo( );
+    resizeWindow(videoInfo->current_w,videoInfo->current_h);
+    
+    /* Bildschirm loeschen */
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  }
 
   /* Auf Projektionsmodus umschalten */
   glMatrixMode(GL_PROJECTION);
