@@ -82,6 +82,16 @@ Illustrator::~Illustrator()
   glDeleteLists(fontbase, 96);
 }
 
+void Illustrator::drawLine(float sx, float sy, float ex, float ey, float width)
+{
+  glLineWidth(width);
+  glBindTexture( GL_TEXTURE_2D, 0 );
+  glBegin(GL_LINES);
+  glVertex2f (sx, sy);
+  glVertex2f (ex, ey);
+  glEnd();
+}
+
 void Illustrator::putImage(float x, float y, float width, float height)
 {
   /* Objekt zeichnen */

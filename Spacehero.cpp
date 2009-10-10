@@ -24,7 +24,7 @@ Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
 {
 }
 
-bool Spacehero::play(SpaceDisplay::BridgeView myview)
+Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
 { 
   view = myview; 
   switch(view)
@@ -51,8 +51,8 @@ bool Spacehero::play(SpaceDisplay::BridgeView myview)
 
     switch (state)
     {
-      case spacehero_emptyEditor:
       case spacehero_starteditor:
+	view = SpaceDisplay::EditorView;
         editor.setAllowAll(true);
         state = spacehero_edit;
         break;
@@ -76,14 +76,13 @@ bool Spacehero::play(SpaceDisplay::BridgeView myview)
         state = spacehero_edit;
         break;
       case spacehero_next:
-        return true;
-        //break;
       case spacehero_exit:
-        return false;
+      case spacehero_emptyEditor:
+        return state;
         //break;
       default:
         std::cerr << "unreachable state" << std::endl;
-        return false;
+        return state;
     }
   }
 }
@@ -113,8 +112,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     levelwrite << universe;
     //state = ?
   }
-
-  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
   
   return state;
 }

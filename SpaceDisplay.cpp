@@ -50,7 +50,7 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("timesup");
 }
 
-void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight)
+void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight, bool settingGalaxy, int galaxyX, int galaxyY)
 {
   double center, ypos, margin;
   int mrx, mry, y;
@@ -173,19 +173,21 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     mrx = - (-display.getHeight()*0.11 * sin(mrangle * M_PI/180));
     mry = (-display.getHeight()*0.11 * cos(mrangle * M_PI/180));
 
-    glLineWidth(4);
-
     glColor3f(0,0,0);
-    glBegin( GL_LINES );
-    glVertex3f( center+mrx, display.getHeight()*0.28+mry, 0.0 );
-    glVertex3f( center, display.getHeight()*0.28, 0.0 );
-    glEnd();
+    illustrator.drawLine(center+mrx, display.getHeight()*0.28+mry, center, display.getHeight()*0.28, 4);
     glColor3f(1,1,1);
   }
 
+  if(settingGalaxy)
+  {
+    int mousex, mousey;
+    SDL_GetMouseState(&mousex, &mousey);
+    glColor3f(1,1,0);
+    illustrator.drawLine(galaxyX,galaxyY,mousex,mousey,2);
+    glColor3f(1,1,1);
+  }
 
-
-  /**************************
+   /**************************
    *       UNIVERSUM        *
    **************************/ 
   displayUniverse(uni, width, height);     
@@ -488,18 +490,27 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
           isActive = 1;
         }  
         break;
+      /*case SDL_MOUSEMOTION:
+	if(editor.settingGalaxy())
+	{
+	  editor.setMouse(event.motion.x,event.motion.y);
+	}
+	break;*/
       case SDL_MOUSEBUTTONDOWN:
         /* Buttons */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::IntroView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
-        {
-          buttons.checkButtons(flags,event.motion.x,event.motion.y);
-        }
-
-	if(view == SpaceDisplay::IntroView)
+        if(!editor.settingGalaxy())
 	{
-	  flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+	  if(view == SpaceDisplay::PutView || view == SpaceDisplay::IntroView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
+          {
+            buttons.checkButtons(flags,event.motion.x,event.motion.y);
+          }
+
+          if(view == SpaceDisplay::IntroView)
+	  {
+	    flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+	  }
 	}
-              
+
         /* Nur fuer Setzfenster */
         if(view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView)
         {        
@@ -547,7 +558,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
             
             mousey = 1.0-mousey;
 
-            editor.check(mousex,mousey);
+            editor.check(mousex,mousey,event.motion.x,event.motion.y);
           }
         }
         break;

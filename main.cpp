@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
   SpaceDisplay display(dir+"data/");
   std::string levels = dir+"level/";
-
+  Spacehero::SpaceheroState state;
   std::cerr << "argc: " << argc << std::endl;
 
   if(argc<=1) {
@@ -63,37 +63,67 @@ int main(int argc, char *argv[])
     if (is_directory(levels) ) {
       std::cerr << "level dir found" << std::endl;
 
-      // Intro
-      std::string intr = levels+"level1.txt";
-      std::ifstream leveli(intr.c_str());
-      if(leveli) {
-        try { 
-          Level li(leveli); 
+      while(true)
+      {
+	// Intro und Menu
+	std::string intr = levels+"level1.txt";
+	std::ifstream leveli(intr.c_str());
+	if(!leveli) 
+	{
+	  std::cerr << "Level ungueltig" << std::endl;
+	  exit(0);
+	}
+	
+	try { 
+	  Level li(leveli); 
 	  Universe ui(li);
 	  Spacehero si(display,ui);
-	  if(!si.play(SpaceDisplay::IntroView)) return 0; 
+	  state = si.play(SpaceDisplay::IntroView);
 	} catch (Error::ParseLevel e) {
 	  std::cerr << e.msg() << std::endl;
 	}
-      }
-      std::cerr << "intro done" << std::endl;
 
-      for (directory_iterator itr(levels); itr != directory_iterator(); ++itr)
-      {
-        std::cerr << "trying to load level: " << itr->path() << std::endl;
-	std::ifstream level(itr->path().string().c_str());
-	std::ofstream levelwrite("/tmp/level.out");
-	if(level) {
-	  try { 
+        // Menu auswerten	
+	if(state == Spacehero::spacehero_exit)
+	{
+	  // Programm beenden
+	  break;
+	} 
+	else if(state == Spacehero::spacehero_emptyEditor)
+	{
+          // Editor starten
+          try { 
+	    std::ifstream level(intr.c_str());
 	    Level l(level); 
-	    levelwrite << l;
 	    Universe u(l);
 	    Spacehero s(display,u);
-	    if(!s.play()) break;
-	  } catch (Error::ParseLevel e) {
+	    s.play(SpaceDisplay::EditorView);
+	   } catch (Error::ParseLevel e) {
 	    std::cerr << e.msg() << std::endl;
+	   }
+
+	}
+	else if(state == Spacehero::spacehero_next)
+        {
+	  // Alle Level durchgehen
+	  for (directory_iterator itr(levels); itr != directory_iterator(); ++itr)
+	  {
+	    std::cerr << "trying to load level: " << itr->path() << std::endl;
+	    std::ifstream level(itr->path().string().c_str());
+	    std::ofstream levelwrite("/tmp/level.out");
+	    if(level) {
+	      try { 
+		Level l(level); 
+		levelwrite << l;
+		Universe u(l);
+		Spacehero s(display,u);
+		if(s.play() == Spacehero::spacehero_exit) break;
+	      } catch (Error::ParseLevel e) {
+		std::cerr << e.msg() << std::endl;
+	      }
+	    }
 	  }
-        }
+	}
       }
 #if 0
       ButtonFlags bflags;

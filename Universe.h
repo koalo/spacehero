@@ -73,6 +73,9 @@ class SkyMass : public SkyObject {
     
     inline void newton(SkyMass &m, double delta);
     inline void move(double delta);
+    void setVX(double ivx){vx = ivx;}
+    void setVY(double ivy){vy = ivy;}
+
   public:
     friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
 };

@@ -16,73 +16,85 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),size(medium),type(hole)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),size(medium),type(hole)
 {
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
-void Editor::check(double mousex, double mousey)
+void Editor::check(double mousex, double mousey, int pixelx, int pixely)
 {
   unsigned int i, remove = 0;
 
-  for(i = 0; i < uni.holes.size(); i++)
+  if(setGalaxy)
   {
-    if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
+    //SDL_GetMouseState(&mousex, &mousey);
+    uni.galaxies.back().setVX(0);
+    setGalaxy = false;
+  } 
+  else 
+  {
+    for(i = 0; i < uni.holes.size(); i++)
     {
-      remove = 1;
-      
-      /* pruefen ob der ueberhaupt geloescht werden darf */
-      if(!uni.holes[i].level || all)
+      if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
       {
-        if(!all) massreserve += uni.holes[i].mass;
-        uni.holes.erase(uni.holes.begin()+i);
+	remove = 1;
+	
+	/* pruefen ob der ueberhaupt geloescht werden darf */
+	if(!uni.holes[i].level || all)
+	{
+	  if(!all) massreserve += uni.holes[i].mass;
+	  uni.holes.erase(uni.holes.begin()+i);
+	}
       }
     }
-  }
 
-  if(all && !remove)
-  {
-    for(i = 0; i < uni.galaxies.size(); i++)
+    if(all && !remove)
     {
-      if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+      for(i = 0; i < uni.galaxies.size(); i++)
       {
-        remove = 1;
-        uni.galaxies.erase(uni.galaxies.begin()+i);
-        uni.calcStars();
+	if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+	{
+	  remove = 1;
+	  uni.galaxies.erase(uni.galaxies.begin()+i);
+	  uni.calcStars();
+	}
       }
     }
-  }
-  
-  if(!remove)
-  {
-    if(!all)
+    
+    if(!remove)
     {
-      if(massreserve >= getHoleWeight())
+      if(!all)
       {
-        massreserve -= getHoleWeight();
-        uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+	if(massreserve >= getHoleWeight())
+	{
+	  massreserve -= getHoleWeight();
+	  uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+	}
       }
-    }
-    else
-    {
-      switch(type)
+      else
       {
-        case hole:
-          uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
-          break;
-        case bulge:
-          srand(time(NULL));
-          uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
-          uni.calcStars();
-          break;
-        case goal:
-          uni.goal.setX(mousex);
-          uni.goal.setY(mousey);
-          uni.goal.setRadius(getGoalRadius());
-          break;
-        default:
-          // nix setzen
-          break;
+	switch(type)
+	{
+	  case hole:
+	    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
+	    break;
+	  case bulge:
+	    setGalaxy = true;
+	    galaxyX = pixelx;
+	    galaxyY = pixely;
+	    srand(time(NULL));
+	    uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+	    uni.calcStars();
+	    break;
+	  case goal:
+	    uni.goal.setX(mousex);
+	    uni.goal.setY(mousey);
+	    uni.goal.setRadius(getGoalRadius());
+	    break;
+	  default:
+	    // nix setzen
+	    break;
+	}
       }
     }
   }
