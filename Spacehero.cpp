@@ -140,10 +140,11 @@ Spacehero::SpaceheroState Spacehero::simulate()
   if(view == SpaceDisplay::IntroView)
   {
     double menutime;
+    int j;
 
-    (*display.getDisplay()).initDisplay();
-    display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
-    
+    (*display.getDisplay()).cleanDisplay();
+    (*display.getDisplay()).OrthoMode();
+
     if(bflags.viewFlag(ButtonFlags::breakIntro))
     {
       menutime = 100;
@@ -161,6 +162,12 @@ Spacehero::SpaceheroState Spacehero::simulate()
       display.showMenu(menutime-6*2);
     }
    
+    if(menutime > 5.1*2)
+    {
+      for(j = 0; j < 3+menutime; j++) paruni->stars[(int)((rand() / (RAND_MAX + 1.0))*paruni->stars.size())].vz = (10e5*(rand() / (RAND_MAX + 1.0)))+2e5;
+    }
+
+    display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
     SDL_GL_SwapBuffers();
   } else {
     display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
