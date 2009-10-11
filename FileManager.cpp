@@ -22,7 +22,7 @@ std::string FileManager::getFile()
   doinput = true;
   /*std::cout << "Save as: ";
   std::cin >> name;*/
-  int i;
+  int i = 0;
   while(doinput)
   {
     i++;
@@ -34,28 +34,17 @@ std::string FileManager::getFile()
 }
 
 void FileManager::draw(int i)
-{  
-  /* Bildschirm loeschen */
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
-  
-  /* Auf Projektionsmodus umschalten */
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glViewport(0,0,display->getWidth(),display->getHeight());
-  glOrtho(0,display->getWidth(),0,display->getHeight(),0,128);
+{ 
+  display.getDisplay()->cleanDisplay();
+  display.drawBridge(universe, SpaceDisplay::EditorView, 100);
+  display.getDisplay()->OrthoMode(); 
 
-  /* Zurueckschalten und Ansicht einstellen */
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-  
-/*  illustrator.drawRect(0.0,1.0,0.0,0.0,0.0,display.getWidth(),display.getHeight());*/
-  std::string sname = name;
-  if(i % 2)
+  std::string sname = "Save this Level as " + name;
+  if((i/2) % 2)
   {
     sname = sname + "_";
   }
-  illustrator->glPrint(60.0, 0.0, 1.0, 1.0, 10.0, display->getHeight()-120.0, sname.c_str());
-  illustrator->glPrint(60.0, 0.0, 1.0, 1.0, 10.0, display->getHeight()-70.0, "Save this Level as");
+  display.getIllustrator()->glPrint(30.0, 0.0, 1.0, 1.0, 10.0, 120.0, sname.c_str());
   SDL_GL_SwapBuffers();
 }
 
@@ -65,6 +54,7 @@ void FileManager::handleEvents()
   
   while ( SDL_PollEvent( &event ) )
   {
+    display.getDisplay()->handleEvents(event);
     switch( event.type )
     {
 #if 0
@@ -102,29 +92,14 @@ void FileManager::handleEvents()
         }
         break;
 #endif
-      case SDL_VIDEORESIZE:
-        /* Groesse vom Fenster geaendert */
-        display->resizeWindow( event.resize.w, event.resize.h );
-        break;
-      case SDL_QUIT:
-        exit(0);
-        break;
       case SDL_KEYDOWN:
         if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
         {
           name += toupper(event.key.keysym.sym);
-        } else {
-          switch(event.key.keysym.sym)
-          {
-            case SDLK_RETURN:
-              doinput = false;
-              break;
-            case SDLK_ESCAPE:
-              exit(0);
-              break;
-            default:
-              break;
-          }
+        } 
+	else if (event.key.keysym.sym == SDLK_RETURN)
+        {
+          doinput = false;
         }
         break;
       default:

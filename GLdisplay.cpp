@@ -96,6 +96,8 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   /* Fenstergroesse neu auslesen */
   videoInfo = SDL_GetVideoInfo( );
   resizeWindow(videoInfo->current_w,videoInfo->current_h);
+
+  //  if(fullscreen) SDL_WarpMouse(this->width,this->height);
 }
 
 GLdisplay::~GLdisplay()
@@ -209,14 +211,16 @@ void GLdisplay::handleEvents(SDL_Event &event)
       resizeWindow( event.resize.w, event.resize.h );
       break;
     case SDL_QUIT:
-	exit(0);
+      exit(0);
       break;
     case SDL_KEYDOWN:
       switch(event.key.keysym.sym)
       {
-	case SDLK_ESCAPE:
-	  exit(0);
+	case SDLK_F4:
+	  if(event.key.keysym.mod == KMOD_LALT || event.key.keysym.mod == KMOD_RALT) exit(0);
 	  break;
+	case SDLK_c:
+	  if(event.key.keysym.mod == KMOD_LCTRL || event.key.keysym.mod == KMOD_RCTRL) exit(0);
 	default:
 	  break;
       }

@@ -4,7 +4,7 @@ Website
 
 http://spacehero.koalo.de/
 
-Authoren
+Autoren
 --------
 
 Florian Meier
@@ -25,6 +25,8 @@ libsdl1.2-dev
 libboost-dev
 libboost-filesystem-dev
 libsdl-image1.2-dev
+libglu1-mesa-dev
+libgl1-mesa-dev
 
 Debian-Pakete
 -------------

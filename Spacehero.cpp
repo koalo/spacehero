@@ -105,7 +105,7 @@ Spacehero::SpaceheroState Spacehero::edit()
   
   if(bflags.checkFlag(ButtonFlags::saveLevel))
   {
-    FileManager saveas(display.getIllustrator(), display.getDisplay());
+    FileManager saveas(display, universe);
     std::string savefile = "/tmp/"+saveas.getFile()+".txt";
     std::cout << "Wird jetzt gespeichert in: " << savefile << std::endl;
     std::ofstream levelwrite(savefile.c_str());
@@ -113,6 +113,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     //state = ?
   }
   display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
+  SDL_GL_SwapBuffers();
   
   return state;
 }
@@ -142,24 +143,24 @@ Spacehero::SpaceheroState Spacehero::simulate()
     double menutime;
     int j;
 
-    (*display.getDisplay()).cleanDisplay();
-    (*display.getDisplay()).OrthoMode();
+    display.getDisplay()->cleanDisplay();
+    display.getDisplay()->OrthoMode();
 
-    if(bflags.viewFlag(ButtonFlags::breakIntro))
-    {
-      menutime = 100;
-    } else {
-      menutime = paruni->elapsed();
-    }
+    menutime = paruni->elapsed();
 
     if(menutime > 5.7*2)
     {
       paruni->galaxies.at(0).setexists(false);
     }
 
-    if(menutime > 6*2)
+    if(bflags.viewFlag(ButtonFlags::breakIntro))
     {
-      display.showMenu(menutime-6*2);
+      display.showMenu(100);
+    } else {
+      if(menutime > 6*2)
+      {
+	display.showMenu(menutime-6*2);
+      }
     }
    
     if(menutime > 5.1*2)
@@ -171,11 +172,12 @@ Spacehero::SpaceheroState Spacehero::simulate()
     SDL_GL_SwapBuffers();
   } else {
     display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+    SDL_GL_SwapBuffers();
   }
 
   // ZEIT verballern
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
-  if(0 != usleep(sleep)) std::cerr << "usleep failed" << std::endl;
+  if(0 != usleep(sleep)) std::cerr << "usleep failed with " << sleep << " ns and " << maxframerate << " maxframerate and ldelta " << paruni->ldelta() << " and max " << 1.0e6*max(0.0,maxframerate - paruni->ldelta()) << std::endl;
   
   if(view == SpaceDisplay::IntroView)
   {

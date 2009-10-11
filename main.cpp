@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
   SpaceDisplay display(dir+"data/");
   std::string levels = dir+"level/";
-  Spacehero::SpaceheroState state;
+  Spacehero::SpaceheroState state = Spacehero::spacehero_next;
   std::cerr << "argc: " << argc << std::endl;
 
   if(argc<=1) {
@@ -99,17 +99,21 @@ int main(int argc, char *argv[])
   uni.galaxies[1].nograv = 1;
 */
 
+#define SPEEDUP 1.259
 	  u.galaxies.push_back(Galaxy(0.1,0.1,4.3e11,false,false));
 	  u.galaxies.back().setZ(0.17);
-	  u.galaxies.back().setVX(100e3*3);
-	  u.galaxies.back().setVY(100e3*3);
+	  u.galaxies.back().setVX(100e3*SPEEDUP);
+	  u.galaxies.back().setVY(100e3*SPEEDUP);
 	  u.galaxies.push_back(Galaxy(1.42,1.42,20e11,false,false));
 	  u.galaxies.back().setZ(0.17);
-	  u.galaxies.back().setVX(-200e3*3);
-	  u.galaxies.back().setVY(-200e3*3);
+	  u.galaxies.back().setVX(-200e3*SPEEDUP);
+	  u.galaxies.back().setVY(-200e3*SPEEDUP);
 	  u.calcStars();
 	  u.setStargrav(true);
 	  Spacehero si(display,u);
+	  SDL_Event event;
+	  while(SDL_PollEvent(&event)) display.getDisplay()->handleEvents(event);
+	  SDL_ShowCursor(SDL_DISABLE);
 	  state = si.play(SpaceDisplay::IntroView);
 	  //state = Spacehero::spacehero_emptyEditor;
 	} catch (Error::ParseLevel e) {
