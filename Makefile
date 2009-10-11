@@ -8,6 +8,8 @@ CPPFLAGS+=`sdl-config --cflags`
 CXXFLAGS+=-Wall -Wextra -Wparentheses
 CXXFLAGS+=-Weffc++
 
+CXXFLAGS+=-O2
+
 LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
 
 # Profiler stuff
@@ -57,14 +59,40 @@ install:
 	$(INSTALL_FILE) level/* $(DIR_SHARED)/level
 	$(INSTALL_FILE) data/* $(DIR_SHARED)/data
 
-dist:
-	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > spacehero.tgz
+LATEST_VERSION=$$(git tag | grep release | sort | tail -1 | cut -d/ -f2)
 
-GBPFLAGS+= --git-pristine-tar --git-export-dir=/tmp/gbp
-	
-debs:
-	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage $(GBPFLAGS)
-	git-buildpackage $(GBPFLAGS) 
+dist:
+	 git archive --format=tar --prefix=spacehero/ HEAD | gzip > ../spacehero.tgz
+
+deb-git-import:
+	git checkout debian
+	git merge master
+	#git checkout master
+	#git-import-orig --filter='.git/*' --filter='tags' -u $(LATEST_VERSION) ../spacehero.tgz
+
+deb-git-release:
+	git checkout debian
+	git-dch --release
+	git commit debian/changelog --amend
+
+deb-git-snapshot:
+	git checkout debian
+	git-dch --snapshot
+	git commit debian/changelog --amend
+
+deb-git-tag:
+	git checkout debian
+	git-buildpackage --git-tag --git-tag-only --git-ignore-new
+
+
+deb-snapshot: dist deb-git-import deb-git-snapshot deb-git-tag deb-buildpackage
+
+deb-release: dist deb-git-import deb-git-release deb-git-tag deb-buildpackage
+
+deb-buildpackage:
+	git checkout debian
+	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage -B --git-ignore-new
+	git-buildpackage --git-ignore-new
 
 .depend: $(SRC)
 	$(CXX) $(CXXFLAGS) -E -MM $(SRC) > .depend
