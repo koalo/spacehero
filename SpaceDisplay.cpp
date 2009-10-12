@@ -194,7 +194,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   displayUniverse(uni, width, height);     
 
   /* Versteckten Buffer aktivieren */
-  SDL_GL_SwapBuffers();
+//  SDL_GL_SwapBuffers();
 }
 
 
@@ -486,12 +486,9 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
           isActive = 1;
         }  
         break;
-      /*case SDL_MOUSEMOTION:
-	if(editor.settingGalaxy())
-	{
-	  editor.setMouse(event.motion.x,event.motion.y);
-	}
-	break;*/
+      case SDL_MOUSEMOTION:
+        if(view == SpaceDisplay::IntroView) SDL_ShowCursor(SDL_ENABLE);
+	break;
       case SDL_MOUSEBUTTONDOWN:
         /* Buttons */
         if(!editor.settingGalaxy())
@@ -569,6 +566,16 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
             break;
           case SDLK_SPACE:
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+            if(view == SpaceDisplay::IntroView)
+	    {
+	      flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+	    }
+	    break;
+	  case SDLK_ESCAPE:
+            if(view == SpaceDisplay::IntroView)
+	    {
+	      flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
+	    }
             break;
           default:
             break;
