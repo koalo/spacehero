@@ -53,7 +53,8 @@ DIR_SHARED=$(DESTDIR)/usr/share/games/spacehero
 
 install:
 	$(INSTALL_DIR) $(DIR_BIN) $(DIR_SHARED)/level $(DIR_SHARED)/data
-	$(INSTALL_PROGRAM) spacehero $(DIR_BIN)
+	$(INSTALL_PROGRAM) spacehero $(DIR_BIN)/spacehero.bin
+	$(INSTALL_PROGRAM) start.sh $(DIR_BIN)/spacehero
 	$(INSTALL_FILE) level/* $(DIR_SHARED)/level
 	$(INSTALL_FILE) data/* $(DIR_SHARED)/data
 
