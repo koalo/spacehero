@@ -163,9 +163,9 @@ Spacehero::SpaceheroState Spacehero::simulate()
       }
     }
    
-    if(menutime > 5.1*2)
+    for(j = 1; j < exp(-1.1*pow((menutime-12),2))*40; j++) 
     {
-      for(j = 0; j < 3+menutime; j++) paruni->stars[(int)((rand() / (RAND_MAX + 1.0))*paruni->stars.size())].vz = (10e5*(rand() / (RAND_MAX + 1.0)))+2e5;
+      paruni->stars[(int)((rand() / (RAND_MAX + 1.0))*paruni->stars.size())].vz = (10e5*(rand() / (RAND_MAX + 1.0)))+2e5;
     }
 
     display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
@@ -176,8 +176,9 @@ Spacehero::SpaceheroState Spacehero::simulate()
   }
 
   // ZEIT verballern
+  float sle = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
-  if(0 != usleep(sleep)) std::cerr << "usleep failed with " << sleep << " ns and " << maxframerate << " maxframerate and ldelta " << paruni->ldelta() << " and max " << 1.0e6*max(0.0,maxframerate - paruni->ldelta()) << std::endl;
+  if(0 != usleep(sleep)) std::cerr << "usleep failed with " << sleep << " ns and " << maxframerate << " maxframerate and ldelta " << paruni->ldelta() << " and sle " << sle << std::endl;
   
   if(view == SpaceDisplay::IntroView)
   {
