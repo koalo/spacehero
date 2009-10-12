@@ -50,8 +50,8 @@ class Spacehero
   ButtonFlags bflags;
   Editor editor;
 
-	SpaceDisplay &display;
-	Universe &universe;
+  SpaceDisplay &display;
+  Universe &universe;
   Universe *paruni;
   SpaceDisplay::BridgeView view;
 

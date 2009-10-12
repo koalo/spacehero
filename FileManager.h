@@ -18,8 +18,7 @@
 #define _FILEMANAGER_H_
 
 #include <iostream>
-#include "GLdisplay.h"
-#include "Illustrator.h"
+#include "SpaceDisplay.h"
 #include <ctype.h>
 
 class FileManager
@@ -29,11 +28,11 @@ class FileManager
     FileManager& operator=(const FileManager&);
   private:
     std::string name;
-    Illustrator *illustrator;
-    GLdisplay *display;
+    SpaceDisplay &display;
+    Universe &universe;
     bool doinput;
   public:
-    FileManager(Illustrator *illu, GLdisplay *disp) : name(""), illustrator(illu), display(disp), doinput(true) {}
+    FileManager(SpaceDisplay &disp, Universe &uni) : name(""), display(disp), universe(uni), doinput(true) {}
     std::string getFile();
     void draw(int i);
     void handleEvents();
