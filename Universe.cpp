@@ -117,8 +117,9 @@ void Universe::move(double delta)
       //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
        // if(i!=l) i->newton(*l,delta);
       ////}
-      //for(int a = 0; a < stars.size(); a++){}
+      //for(unsigned int a = 0; a < stars.size(); a++){}
     }
+    i->move(delta);
   }
   // galaxy: hole, galaxy
   for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
@@ -128,15 +129,9 @@ void Universe::move(double delta)
     for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
-  }
-
-  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     i->move(delta);
   }
-
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
-    i->move(delta);
-  }
+  
   eventHorizon();
 }
 

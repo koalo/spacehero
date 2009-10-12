@@ -21,6 +21,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <SDL.h>
+#include <math.h>
 
 class GLdisplay
 {
@@ -45,7 +46,9 @@ class GLdisplay
     void resizeWindow(int width, int height);
     int getWidth();
     int getHeight();
-    void initDisplay(bool clear = true);
+    void cleanDisplay();
+    void OrthoMode();
+    void PerspectiveMode(int left, int top, int width, int height, float angle);
     void handleEvents(SDL_Event &event);
 };
 
