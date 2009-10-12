@@ -90,7 +90,8 @@ deb-release: dist deb-git-import deb-git-release deb-git-tag deb-buildpackage
 deb-buildpackage:
 	git checkout debian
 	PBUILDER_OPTS=" --basetgz /var/cache/pbuilder/base-i386.tgz " git-buildpackage -B --git-ignore-new
-	git-buildpackage --git-ignore-new
+	git-buildpackage -B --git-ignore-new 
+	git-buildpackage -S --git-ignore-new 
 
 .depend: $(SRC)
 	$(CXX) $(CXXFLAGS) -E -MM $(SRC) > .depend
