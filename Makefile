@@ -84,7 +84,7 @@ deb-git-tag:
 	git-buildpackage --git-tag --git-tag-only --git-ignore-new
 
 
-deb-snapshot: dist deb-git-import deb-git-snapshot deb-git-tag deb-buildpackage
+deb-snapshot: dist deb-git-import deb-git-snapshot deb-buildpackage
 
 deb-release: dist deb-git-import deb-git-release deb-git-tag deb-buildpackage
 
