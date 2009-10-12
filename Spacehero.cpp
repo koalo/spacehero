@@ -89,8 +89,6 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
 
 Spacehero::SpaceheroState Spacehero::edit()
 {
-  display.handleEvents(editor.getView(), bflags, editor);
-
   editor.parseButtons(bflags);
 
   if(bflags.checkFlag(ButtonFlags::startSimulation))
@@ -112,36 +110,40 @@ Spacehero::SpaceheroState Spacehero::edit()
     levelwrite << universe;
     //state = ?
   }
-  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
-  
-	int mousex, mousey;
-	SDL_GetMouseState(&mousex, &mousey);
-	
-	if(editor.getPutting())
-	{
-					display.getDisplay()->OrthoMode();
-					glEnable(GL_BLEND);
-		switch(editor.getType())
-		{
-						case Editor::hole:
-										display.getPictureBook()->useTexture("hole");
-										break;
-						case Editor::bulge:
-										display.getPictureBook()->useTexture("galaxy");
-										break;
-						case Editor::goal:
-										display.getPictureBook()->useTexture("goal");
-										break;
-		}
-		display.getIllustrator()->putImage(mousex-editor.getSize(),mousey-editor.getSize(),editor.getSize()*2,editor.getSize()*2);
-	}
 
-	if(editor.settingGalaxy())
-	{
-		glColor3f(1,1,0);
-		display.getIllustrator()->drawLine(editor.getGalaxyX(),editor.getGalaxyY(),mousex,mousey,2);
-		glColor3f(1,1,1);
-	}
+  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
+  display.handleEvents(editor.getView(), bflags, editor);
+  
+  int mousex, mousey;
+  SDL_GetMouseState(&mousex, &mousey);
+
+  if(editor.getPutting())
+  {
+    display.getDisplay()->OrthoMode();
+    glEnable(GL_BLEND);
+    switch(editor.getType())
+    {
+      case Editor::hole:
+	display.getPictureBook()->useTexture("hole");
+	break;
+      case Editor::bulge:
+	display.getPictureBook()->useTexture("galaxy");
+	break;
+      case Editor::goal:
+	display.getPictureBook()->useTexture("goal");
+	break;
+    }
+    display.getIllustrator()->putImage(mousex-editor.getSize(),mousey-editor.getSize(),editor.getSize()*2,editor.getSize()*2);
+    //display.getDisplay()->PerspectiveMode();
+  }
+
+  if(editor.settingGalaxy())
+  {
+    display.getDisplay()->OrthoMode();
+    glColor3f(1,1,0);
+    display.getIllustrator()->drawLine(editor.getGalaxyX(),editor.getGalaxyY(),mousex,mousey,2);
+    glColor3f(1,1,1);
+  }
 
   SDL_GL_SwapBuffers();
   

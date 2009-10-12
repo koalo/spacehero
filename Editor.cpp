@@ -16,7 +16,7 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(false),size(medium),type(hole)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(true),size(medium),type(hole)
 {
 }
 
@@ -43,7 +43,10 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely)
 	/* pruefen ob der ueberhaupt geloescht werden darf */
 	if(!uni.holes[i].level || all)
 	{
-	  if(!all) massreserve += uni.holes[i].mass;
+	  if(!all)
+	  {
+	    massreserve += uni.holes[i].mass;
+          }
 	  uni.holes.erase(uni.holes.begin()+i);
 	}
       }
@@ -81,6 +84,7 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely)
 	    break;
 	  case bulge:
 	    setGalaxy = true;
+	    putting = false;
 	    galaxyX = pixelx;
 	    galaxyY = pixely;
 	    srand(time(NULL));
@@ -167,21 +171,21 @@ double Editor::getGoalRadius()
 
 double Editor::getSize()
 {
-	switch(type)
-	{
-		case hole:
-			return getHoleWeight()*0.00000000002;
-			// break;
-		case bulge:
-			return getBulgeWeight()*0.000000000165;
-			// break;
-		case goal:
-			return getGoalRadius()*1300;
-			// break;
-		default:
-	 		break;
-	}
-	return 0.0;
+  switch(type)
+  {
+    case hole:
+      return getHoleWeight()*0.00000000002;
+      // break;
+    case bulge:
+      return getBulgeWeight()*0.000000000165;
+      // break;
+    case goal:
+      return getGoalRadius()*1300;
+      // break;
+    default:
+      break;
+  }
+  return 0.0;
 }
 
 void Editor::parseButtons(ButtonFlags &flags)
