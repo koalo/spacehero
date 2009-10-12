@@ -16,7 +16,7 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),size(medium),type(hole)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(false),size(medium),type(hole)
 {
 }
 
@@ -165,6 +165,25 @@ double Editor::getGoalRadius()
   }
 }
 
+double Editor::getSize()
+{
+	switch(type)
+	{
+		case hole:
+			return getHoleWeight()*0.00000000002;
+			// break;
+		case bulge:
+			return getBulgeWeight()*0.000000000165;
+			// break;
+		case goal:
+			return getGoalRadius()*1300;
+			// break;
+		default:
+	 		break;
+	}
+	return 0.0;
+}
+
 void Editor::parseButtons(ButtonFlags &flags)
 {
   if(flags.checkFlag(ButtonFlags::small))
@@ -185,16 +204,19 @@ void Editor::parseButtons(ButtonFlags &flags)
   if(flags.checkFlag(ButtonFlags::putHole))
   {
     type = hole;
+    putting = true;
   }
 
   if(flags.checkFlag(ButtonFlags::putBulge))
   {
     type = bulge;
+    putting = true;
   }
 
   if(flags.checkFlag(ButtonFlags::putGoal))
   {
     type = goal;
+    putting = true;
   }
 }
 

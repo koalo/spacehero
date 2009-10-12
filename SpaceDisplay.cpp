@@ -179,14 +179,6 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     glColor3f(1,1,1);
   }
 
-  if(settingGalaxy)
-  {
-    int mousex, mousey;
-    SDL_GetMouseState(&mousex, &mousey);
-    glColor3f(1,1,0);
-    illustrator.drawLine(galaxyX,galaxyY,mousex,mousey,2);
-    glColor3f(1,1,1);
-  }
 
    /**************************
    *       UNIVERSUM        *

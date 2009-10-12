@@ -113,6 +113,36 @@ Spacehero::SpaceheroState Spacehero::edit()
     //state = ?
   }
   display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
+  
+	int mousex, mousey;
+	SDL_GetMouseState(&mousex, &mousey);
+	
+	if(editor.getPutting())
+	{
+					display.getDisplay()->OrthoMode();
+					glEnable(GL_BLEND);
+		switch(editor.getType())
+		{
+						case Editor::hole:
+										display.getPictureBook()->useTexture("hole");
+										break;
+						case Editor::bulge:
+										display.getPictureBook()->useTexture("galaxy");
+										break;
+						case Editor::goal:
+										display.getPictureBook()->useTexture("goal");
+										break;
+		}
+		display.getIllustrator()->putImage(mousex-editor.getSize(),mousey-editor.getSize(),editor.getSize()*2,editor.getSize()*2);
+	}
+
+	if(editor.settingGalaxy())
+	{
+		glColor3f(1,1,0);
+		display.getIllustrator()->drawLine(editor.getGalaxyX(),editor.getGalaxyY(),mousex,mousey,2);
+		glColor3f(1,1,1);
+	}
+
   SDL_GL_SwapBuffers();
   
   return state;
@@ -148,7 +178,9 @@ Spacehero::SpaceheroState Spacehero::simulate()
 
     menutime = paruni->elapsed();
 
-    if(menutime > 5.7*2)
+  //  if(menutime > 5.7*2)
+    std::cerr << menutime << std::endl;
+    if(menutime > 3)
     {
       paruni->galaxies.at(0).setexists(false);
     }
@@ -156,7 +188,6 @@ Spacehero::SpaceheroState Spacehero::simulate()
     if(bflags.viewFlag(ButtonFlags::breakIntro))
     {
       display.showMenu(100);
-    } else {
       if(menutime > 6*2)
       {
 	display.showMenu(menutime-6*2);

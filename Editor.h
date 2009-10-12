@@ -24,8 +24,20 @@
 
 class Editor
 {
+	public:
+    enum Size {
+      small,
+      medium,
+      large
+    };
+
+    enum Type {
+      hole,
+      bulge,
+      goal
+    };
   private:
-    Universe &uni;
+		Universe &uni;
     double maxreserve;
     bool all;
     double massreserve;
@@ -33,19 +45,10 @@ class Editor
     bool setGalaxy;
     int galaxyX;
     int galaxyY;
+		bool putting;
 
-    enum {
-      small,
-      medium,
-      large
-    } size;
-
-    enum {
-      hole,
-      bulge,
-      goal
-    } type;
-
+    Size size;
+		Type type;
   public:
     Editor(Universe &universe);
     void setAllowAll(bool allowall){all=allowall;}
@@ -58,7 +61,10 @@ class Editor
     double getHoleWeight();
     double getBulgeWeight();
     double getGoalRadius();
+		double getSize();
     double getQuotient();
+		bool getPutting(){return putting;}
+		Editor::Type getType(){return type;}
     SpaceDisplay::BridgeView getView();
 };
 
