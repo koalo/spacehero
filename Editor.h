@@ -56,15 +56,15 @@ class Editor
     bool settingGalaxy(){return setGalaxy;}
     int getGalaxyX(){return galaxyX;}
     int getGalaxyY(){return galaxyY;}
-    void check(double mousex, double mousey, int pixelx, int pixely);
+    void check(double mousex, double mousey, int pixelx, int pixely, bool click);
     void parseButtons(ButtonFlags &flags);
     double getHoleWeight();
     double getBulgeWeight();
     double getGoalRadius();
-		double getSize();
+    double getSize();
     double getQuotient();
-		bool getPutting(){return putting;}
-		Editor::Type getType(){return type;}
+    bool getPutting(){return putting;}
+    Editor::Type getType(){return type;}
     SpaceDisplay::BridgeView getView();
 };
 

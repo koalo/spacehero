@@ -21,10 +21,10 @@ Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),a
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
-void Editor::check(double mousex, double mousey, int pixelx, int pixely)
+void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click)
 {
   unsigned int i, remove = 0;
-
+  click = 100;
   if(setGalaxy)
   {
     uni.galaxies.back().setVX(-(uni.galaxies.back().x-mousex)*2e6);

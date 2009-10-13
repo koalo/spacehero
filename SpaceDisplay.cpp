@@ -50,7 +50,7 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("timesup");
 }
 
-void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight, bool settingGalaxy, int galaxyX, int galaxyY)
+void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight)
 {
   double center, ypos, margin;
   int mrx, mry, y;
@@ -465,6 +465,57 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
   {
     display.handleEvents(event);
 
+    /* Nur fuer Setzfenster */
+    if((view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView) && (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN))
+    {        
+      /* Objekt setzen? */
+      if(event.motion.x > UNIVERSE_LEFT && 
+	 event.motion.x < display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
+	 event.motion.y > UNIVERSE_TOP && 
+	 event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
+	)
+      {                        
+	/* Mausposition umrechnen - dazu Orthogonale Ansicht vorgaukeln */ 
+	double width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
+	double height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	gluOrtho2D(0,width,0,height);
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+
+	if(height > width)
+	{ 
+	  glScalef(width, width, 1.0);
+	} else {
+	  glScalef(height, height, 1.0);
+	}
+
+	glScalef(1.0f, -1.0f, 1.0f);
+	glTranslatef(0.0f, -1.0f, 0.0f);
+
+	if(height > width)
+	{ 
+	  glTranslatef(0.0f, -0.5f*(height/(float)width)+0.5f, 0.0f);
+	} else {
+	  glTranslatef(0.5f*(width/(float)height)-0.5f, 0.0f, 0.0f);
+	}
+
+	glGetIntegerv(GL_VIEWPORT,viewport);
+	glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
+	glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+	glReadPixels(event.motion.x, event.motion.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zpos );
+	gluUnProject(event.motion.x, event.motion.y, zpos,
+	    modelMatrix, projMatrix, viewport,
+	    &mousex, &mousey, &mousez
+	);
+	
+	mousey = 1.0-mousey;
+
+	editor.check(mousex,mousey,event.motion.x,event.motion.y,event.type == SDL_MOUSEBUTTONDOWN);
+      }
+    }
+
     switch( event.type )
     {
       case SDL_ACTIVEEVENT:
@@ -496,55 +547,6 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
 	  }
 	}
 
-        /* Nur fuer Setzfenster */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView)
-        {        
-          /* Objekt setzen? */
-          if(event.motion.x > UNIVERSE_LEFT && 
-             event.motion.x < display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
-             event.motion.y > UNIVERSE_TOP && 
-             event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
-            )
-          {                        
-            /* Mausposition umrechnen - dazu Orthogonale Ansicht vorgaukeln */ 
-            double width = display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT);
-            double height = display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM);
-            glMatrixMode( GL_PROJECTION );
-            glLoadIdentity();
-            gluOrtho2D(0,width,0,height);
-            glMatrixMode( GL_MODELVIEW );
-            glLoadIdentity();
-
-            if(height > width)
-            { 
-              glScalef(width, width, 1.0);
-            } else {
-              glScalef(height, height, 1.0);
-            }
-
-            glScalef(1.0f, -1.0f, 1.0f);
-            glTranslatef(0.0f, -1.0f, 0.0f);
-
-            if(height > width)
-            { 
-              glTranslatef(0.0f, -0.5f*(height/(float)width)+0.5f, 0.0f);
-            } else {
-              glTranslatef(0.5f*(width/(float)height)-0.5f, 0.0f, 0.0f);
-            }
-
-            glGetIntegerv(GL_VIEWPORT,viewport);
-            glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
-            glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-            glReadPixels(event.motion.x, event.motion.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zpos );
-            gluUnProject(event.motion.x, event.motion.y, zpos,
-                modelMatrix, projMatrix, viewport,
-                &mousex, &mousey, &mousez
-            );
-            
-            mousey = 1.0-mousey;
-
-            editor.check(mousex,mousey,event.motion.x,event.motion.y);
-          }
         }
         break;
       case SDL_KEYDOWN:

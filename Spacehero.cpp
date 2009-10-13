@@ -111,7 +111,7 @@ Spacehero::SpaceheroState Spacehero::edit()
     //state = ?
   }
 
-  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight(),editor.settingGalaxy(),editor.getGalaxyX(),editor.getGalaxyY());
+  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
   display.handleEvents(editor.getView(), bflags, editor);
   
   int mousex, mousey;
