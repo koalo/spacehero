@@ -82,14 +82,13 @@ std::vector<Star> Galaxy::getStars(int seed) {
 Universe::Universe(Level &l) :
   Level(l),
   m_won(false),
-  stargrav(false),
-  stars()
+  stargrav(false)
 {
   calcStars();
 }
 
 
-void Universe::calcStars()
+void Sky::calcStars()
 {
   stars.clear();
 

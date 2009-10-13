@@ -129,7 +129,20 @@ class Star : public SkyMass {
     friend std::ostream& operator<< (std::ostream &o, const Star &g);
 };
 
-class Level {
+class Sky 
+{
+  protected:
+    int seed;
+  public:
+    std::vector<Star> stars;
+    std::vector<Galaxy> galaxies;
+    Sky() :seed(0),stars(),galaxies() {};
+    virtual ~Sky() {};
+    void calcStars();
+};
+
+class Level : public Sky
+{
     timer t0;
     double maxtime;
     double lastt;
@@ -139,13 +152,10 @@ class Level {
     double m_fps;
   public:
     std::vector<Blackhole> holes;
-    std::vector<Galaxy> galaxies;
     Goal goal;
-  protected:
-    int seed;
   public:
     Level(std::ifstream &in);
-    Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),galaxies(),goal(),seed(0) {};
+    Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),goal() {};
     virtual ~Level() {};
 
   public:
@@ -180,11 +190,8 @@ class Universe: public Level
   bool m_won;
   bool stargrav;
   public:
-  std::vector<Star> stars;  
-  public:
   Universe(Level &l);
-  Universe() :m_won(false),stargrav(false),stars() {};
-  void calcStars();
+  Universe() :m_won(false),stargrav(false) {};
 
   //bool play(GLdisplay &d);
   void move(double delta);
