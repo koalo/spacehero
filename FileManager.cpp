@@ -44,7 +44,7 @@ void FileManager::draw(int i)
   {
     sname = sname + "_";
   }
-  display.getIllustrator()->glPrint(30.0, 0.0, 1.0, 1.0, 10.0, 120.0, sname.c_str());
+  display.getIllustrator()->glPrint(30.0, 0.0, 1.0, 1.0, 10.0, 10.0, sname.c_str());
   SDL_GL_SwapBuffers();
 }
 

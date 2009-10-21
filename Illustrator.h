@@ -23,6 +23,7 @@
 #include <SDL.h>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 class Illustrator
 {
@@ -36,7 +37,7 @@ class Illustrator
     ~Illustrator();
 
     void putImage(float x, float y, float width, float height);
-    void drawLine(float sx, float sy, float ex, float ey, float width);
+    void drawLine(float sx, float sy, float ex, float ey, float width, bool arrow = false);
     void drawRect(float red, float green, float blue, float x, float y, float width, float height);
     void drawSphere(float x, float y, float r);
     void drawDisk(float x, float y, float r);

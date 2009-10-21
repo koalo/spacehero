@@ -24,7 +24,7 @@
 
 class Editor
 {
-	public:
+  public:
     enum Size {
       small,
       medium,
@@ -37,7 +37,7 @@ class Editor
       goal
     };
   private:
-		Universe &uni;
+    Universe &uni;
     double maxreserve;
     bool all;
     double massreserve;
@@ -45,25 +45,24 @@ class Editor
     bool setGalaxy;
     int galaxyX;
     int galaxyY;
-		bool putting;
+    bool putting;
 
     Size size;
-		Type type;
+    Type type;
+    double zoom;
   public:
     Editor(Universe &universe);
     void setAllowAll(bool allowall){all=allowall;}
     bool isAllowAll(){return all;}
     bool settingGalaxy(){return setGalaxy;}
-    int getGalaxyX(){return galaxyX;}
-    int getGalaxyY(){return galaxyY;}
-    void check(double mousex, double mousey, int pixelx, int pixely, bool click);
+    void check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace);
+    void drawMouse(SpaceDisplay* display);
     void parseButtons(ButtonFlags &flags);
     double getHoleWeight();
     double getBulgeWeight();
     double getGoalRadius();
     double getSize();
     double getQuotient();
-    bool getPutting(){return putting;}
     Editor::Type getType(){return type;}
     SpaceDisplay::BridgeView getView();
 };

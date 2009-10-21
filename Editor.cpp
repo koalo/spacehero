@@ -16,92 +16,155 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(true),size(medium),type(hole)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(true),size(medium),type(hole),zoom(0)
 {
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
-void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click)
+void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace)
 {
   unsigned int i, remove = 0;
-  click = 100;
+
   if(setGalaxy)
   {
-    uni.galaxies.back().setVX(-(uni.galaxies.back().x-mousex)*2e6);
-    uni.galaxies.back().setVY(-(uni.galaxies.back().y-mousey)*2e6);
-    uni.calcStars();
-    setGalaxy = false;
+    if(click)
+    {
+      uni.galaxies.back().setVX(-(uni.galaxies.back().x-mousex)*2e6);
+      uni.galaxies.back().setVY(-(uni.galaxies.back().y-mousey)*2e6);
+      uni.calcStars();
+      setGalaxy = false;
+      putting = true;
+    }
   } 
   else 
   {
-    for(i = 0; i < uni.holes.size(); i++)
+    if(!onSpace)
     {
-      if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
-      {
-	remove = 1;
-	
-	/* pruefen ob der ueberhaupt geloescht werden darf */
-	if(!uni.holes[i].level || all)
-	{
-	  if(!all)
-	  {
-	    massreserve += uni.holes[i].mass;
-          }
-	  uni.holes.erase(uni.holes.begin()+i);
-	}
-      }
+      putting = false;
+    } else {
+      putting = true;
     }
 
-    if(all && !remove)
+    if(click && onSpace)
     {
-      for(i = 0; i < uni.galaxies.size(); i++)
+      for(i = 0; i < uni.holes.size(); i++)
       {
-	if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+	if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
 	{
 	  remove = 1;
-	  uni.galaxies.erase(uni.galaxies.begin()+i);
-	  uni.calcStars();
+	  
+	  /* pruefen ob der ueberhaupt geloescht werden darf */
+	  if(!uni.holes[i].level || all)
+	  {
+	    if(!all)
+	    {
+	      massreserve += uni.holes[i].mass;
+	    }
+	    uni.holes.erase(uni.holes.begin()+i);
+	  }
 	}
       }
-    }
-    
-    if(!remove)
-    {
-      if(!all)
+
+      if(all && !remove)
       {
-	if(massreserve >= getHoleWeight())
+	for(i = 0; i < uni.galaxies.size(); i++)
 	{
-	  massreserve -= getHoleWeight();
-	  uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
-	}
-      }
-      else
-      {
-	switch(type)
-	{
-	  case hole:
-	    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
-	    break;
-	  case bulge:
-	    setGalaxy = true;
-	    putting = false;
-	    galaxyX = pixelx;
-	    galaxyY = pixely;
-	    srand(time(NULL));
-	    uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+	  if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+	  {
+	    remove = 1;
+	    uni.galaxies.erase(uni.galaxies.begin()+i);
 	    uni.calcStars();
-	    break;
-	  case goal:
-	    uni.goal.setX(mousex);
-	    uni.goal.setY(mousey);
-	    uni.goal.setRadius(getGoalRadius());
-	    break;
-	  default:
-	    // nix setzen
-	    break;
+	  }
+	}
+      }
+      
+      if(!remove)
+      {
+	if(!all)
+	{
+	  if(massreserve >= getHoleWeight())
+	  {
+	    massreserve -= getHoleWeight();
+	    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+	  }
+	}
+	else
+	{
+	  switch(type)
+	  {
+	    case hole:
+	      uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
+	      break;
+	    case bulge:
+	      setGalaxy = true;
+	      putting = false;
+	      galaxyX = pixelx;
+	      galaxyY = pixely;
+	      srand(time(NULL));
+	      uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+	      uni.calcStars();
+	      break;
+	    case goal:
+	      uni.goal.setX(mousex);
+	      uni.goal.setY(mousey);
+	      uni.goal.setRadius(getGoalRadius());
+	      break;
+	    default:
+	      // nix setzen
+	      break;
+	  }
 	}
       }
     }
+  }
+}
+
+void Editor::drawMouse(SpaceDisplay* display)
+{
+  display->getDisplay()->OrthoMode();
+
+  int mousex, mousey;
+  SDL_GetMouseState(&mousex, &mousey);
+
+  if(setGalaxy)
+  {
+    glColor3f(1,1,0);
+    display->getIllustrator()->drawLine(galaxyX,galaxyY,mousex,mousey,2,true);
+    glColor3f(1,1,1);
+  }
+
+  if(putting && (all || (massreserve >= getHoleWeight())))
+  {
+    //display->getDisplay()->PerspectiveMode();
+    glEnable(GL_BLEND);
+    if(!all && massreserve < 2*getHoleWeight())
+    {
+      glColor3f(1,0,0.5);
+    }
+
+    switch(getType())
+    {
+      case Editor::hole:
+	display->getPictureBook()->useTexture("hole");
+	break;
+      case Editor::bulge:
+	display->getPictureBook()->useTexture("galaxy");
+	break;
+      case Editor::goal:
+	display->getPictureBook()->useTexture("goal");
+	break;
+    }
+
+    double size = getSize();
+    if(display->getDisplay()->getHeight() > display->getDisplay()->getWidth())
+    {
+      size *= display->getDisplay()->getWidth();
+    } else {
+      size *= display->getDisplay()->getHeight();
+    }
+    display->getIllustrator()->putImage(mousex-size,mousey-size,size*2,size*2);
+
+    glColor3f(1,1,1);
   }
 }
 
@@ -174,13 +237,13 @@ double Editor::getSize()
   switch(type)
   {
     case hole:
-      return getHoleWeight()*0.00000000002;
+      return HOLESIZE*sqrt(getHoleWeight()/HOLEMEDIUMMASS);//*0.00000000002;
       // break;
     case bulge:
-      return getBulgeWeight()*0.000000000165;
+      return BULGESIZE*sqrt(getBulgeWeight()/1.7e10); //getBulgeWeight()*0.000000000165;
       // break;
     case goal:
-      return getGoalRadius()*1300;
+      return getGoalRadius()*1.38;
       // break;
     default:
       break;
@@ -208,19 +271,16 @@ void Editor::parseButtons(ButtonFlags &flags)
   if(flags.checkFlag(ButtonFlags::putHole))
   {
     type = hole;
-    putting = true;
   }
 
   if(flags.checkFlag(ButtonFlags::putBulge))
   {
     type = bulge;
-    putting = true;
   }
 
   if(flags.checkFlag(ButtonFlags::putGoal))
   {
     type = goal;
-    putting = true;
   }
 }
 

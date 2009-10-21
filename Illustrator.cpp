@@ -82,14 +82,26 @@ Illustrator::~Illustrator()
   glDeleteLists(fontbase, 96);
 }
 
-void Illustrator::drawLine(float sx, float sy, float ex, float ey, float width)
+void Illustrator::drawLine(float sx, float sy, float ex, float ey, float width, bool arrow)
 {
+  #define HYPO 30
+  #define ANGLE 0.35
+  #define SQUARE(x) ((x)*(x))
   glLineWidth(width);
   glBindTexture( GL_TEXTURE_2D, 0 );
   glBegin(GL_LINES);
   glVertex2f (sx, sy);
   glVertex2f (ex, ey);
   glEnd();
+  if(arrow && SQUARE(cos(ANGLE)*HYPO*1.3) < SQUARE(sy-ey)+SQUARE(sx-ex))
+  {
+    float a = atan2(sy-ey, sx-ex);
+    glBegin(GL_TRIANGLES);
+    glVertex2f (ex, ey);
+    glVertex2f (ex+cos(a+ANGLE)*HYPO, ey+sin(a+ANGLE)*HYPO);
+    glVertex2f (ex+cos(a-ANGLE)*HYPO, ey+sin(a-ANGLE)*HYPO);
+    glEnd();
+  }
 }
 
 void Illustrator::putImage(float x, float y, float width, float height)

@@ -30,7 +30,7 @@
 #include <iostream>
 #include <climits>
 
-
+#include "SDL/SDL.h" 
 
 using boost::timer;
 using boost::progress_timer;
@@ -143,7 +143,7 @@ class Sky
 
 class Level : public Sky
 {
-    timer t0;
+    unsigned int t0;
     double maxtime;
     double lastt;
     double m_delta;
@@ -159,8 +159,8 @@ class Level : public Sky
     virtual ~Level() {};
 
   public:
-    void tinit() { t0 = timer(); }; // start time measure
-    double elapsed() { return t0.elapsed(); }; // get elapsed time
+    void tinit() { t0 = SDL_GetTicks(); }; // start time measure
+    double elapsed() { return (SDL_GetTicks()-t0)/1000.0; }; // get elapsed time
 
     void tick() { lastt=elapsed(); };
     void tack(double weight=0.9) {
