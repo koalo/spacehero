@@ -35,7 +35,8 @@ class ButtonFlags : public AbstractButtonFlags
     startEditor = 2048,
     saveLevel = 4096,
     startGame = 8192,
-    chooseLevel = 16384
+    chooseLevel = 16384,
+    skipLevel = 32768
   };
 };
 

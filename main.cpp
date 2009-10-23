@@ -29,165 +29,129 @@ using namespace boost::filesystem;
 #include "intro.h"
 #include "Illustrator.h"
 
-int main(int argc, char *argv[])
+//int main(int argc, char *argv[])
+int main()
 { 
+  // Find data Dir
   std::vector<std::string> path;
 
-  path.push_back( "./" );
-  path.push_back( "~/.spacehero/" );
-  path.push_back( "/usr/share/games/spacehero/" );
+  path.push_back( "./data/" );
+  path.push_back( "~/.spacehero/data/" );
+  path.push_back( "/usr/share/games/spacehero/data/" );
 
   std::string dir;
   for(std::vector<std::string>::iterator l = path.begin(); l!=path.end(); l++) {
     std::cerr << "trying: " << *l << std::endl;
-    if ( is_directory(*l+"level/") && is_directory(*l+"data/") ) {
+    if ( is_directory(*l) ) {
       dir=*l;
       std::cerr << "found: " << dir << std::endl;
       break;
     }
   }
+
   if(dir == "") {
-    std::cerr << "could not find data/level dir" << std::endl;
+    std::cerr << "could not find data dir" << std::endl;
     return 1;
   }
 
+  SpaceDisplay display(dir);
 
-  SpaceDisplay display(dir+"data/");
-  std::string levels = dir+"level/";
+  // Load FileManager
+  FileManager fileman;
+  fileman.addLevelDir( "./level/" );
+  fileman.addLevelDir( "~/.spacehero/level/" );
+  fileman.addLevelDir( "/usr/share/games/spacehero/level/" );
+    
   Spacehero::SpaceheroState state = Spacehero::spacehero_next;
-  std::cerr << "argc: " << argc << std::endl;
 
-  if(argc<=1) {
-    std::cerr << "leveldir: "<< levels << std::endl;
-    if (is_directory(levels) ) {
-      std::cerr << "level dir found" << std::endl;
+  bool start = true;
 
-      while(true)
+  if(true)
+  {
+    while(true)
+    {
+      // Intro und Menu
+      /*std::string intr = levels+"level1.txt";
+      std::ifstream leveli(intr.c_str());
+      if(!leveli) 
       {
-	// Intro und Menu
-	std::string intr = levels+"level1.txt";
-	std::ifstream leveli(intr.c_str());
-	if(!leveli) 
-	{
-	  std::cerr << "Level ungueltig" << std::endl;
-	  exit(0);
-	}
-	
+	std::cerr << "Level ungueltig" << std::endl;
+	exit(0);
+      }*/
+     
+      if(start)
+      {	
+      try { 
+	Universe u = Universe();
+	u.galaxies.push_back(Galaxy(0.145,0.145,4.3e11,false,false));
+	u.galaxies.back().setZ(0.17);
+	u.galaxies.back().setVX(110e3);
+	u.galaxies.back().setVY(110e3);
+	u.galaxies.push_back(Galaxy(1.17,1.17,20e11,false,false));
+	u.galaxies.back().setZ(0.17);
+	u.galaxies.back().setVX(-176e3);
+	u.galaxies.back().setVY(-176e3);
+	u.calcStars();
+	u.setStargrav(true);
+	u.tinit();
+	Spacehero sintro(display,u);
+	SDL_Event event;
+	while(SDL_PollEvent(&event)) display.getDisplay()->handleEvents(event);
+	SDL_ShowCursor(SDL_DISABLE);
+	state = sintro.play(SpaceDisplay::IntroView);
+	//state = Spacehero::spacehero_emptyEditor;
+      } catch (Error::ParseLevel e) {
+	std::cerr << e.msg() << std::endl;
+      }
+      start = false;
+      } else {
+	Universe u;
+	Spacehero smenu(display,u);
+        state = smenu.play(SpaceDisplay::MenuView);
+      }
+
+      // Menu auswerten	
+      if(state == Spacehero::spacehero_exit)
+      {
+	// Programm beenden
+	break;
+      } 
+      else if(state == Spacehero::spacehero_emptyEditor)
+      {
+	// Editor starten
 	try { 
-	  Universe u = Universe();
-	  u.galaxies.push_back(Galaxy(0.145,0.145,4.3e11,false,false));
-	  u.galaxies.back().setZ(0.17);
-	  u.galaxies.back().setVX(110e3);
-	  u.galaxies.back().setVY(110e3);
-	  u.galaxies.push_back(Galaxy(1.17,1.17,20e11,false,false));
-	  u.galaxies.back().setZ(0.17);
-	  u.galaxies.back().setVX(-176e3);
-	  u.galaxies.back().setVY(-176e3);
-	  u.calcStars();
-	  u.setStargrav(true);
-	  Spacehero si(display,u);
-	  SDL_Event event;
-	  while(SDL_PollEvent(&event)) display.getDisplay()->handleEvents(event);
-	  SDL_ShowCursor(SDL_DISABLE);
-	  state = si.play(SpaceDisplay::IntroView);
-	  //state = Spacehero::spacehero_emptyEditor;
+	  Universe uni = Universe();
+	  Spacehero space(display,uni);
+	  space.play(SpaceDisplay::EditorView);
 	} catch (Error::ParseLevel e) {
 	  std::cerr << e.msg() << std::endl;
 	}
 
-        // Menu auswerten	
-	if(state == Spacehero::spacehero_exit)
+      }
+      else if(state == Spacehero::spacehero_next)
+      {
+	bool exit = false;
+	fileman.loadLevels();
+ 
+	Level l;
+
+	while(!exit && fileman.hasLevel())
 	{
-	  // Programm beenden
-	  break;
+	  l = fileman.nextLevel();
+          Universe uni(l);
+          Spacehero space(display,uni);
+	  exit = (space.play() == Spacehero::spacehero_exit);
 	} 
-	else if(state == Spacehero::spacehero_emptyEditor)
-	{
-          // Editor starten
-          try { 
-	    Universe u = Universe();
-	    Spacehero s(display,u);
-	    s.play(SpaceDisplay::EditorView);
-	   } catch (Error::ParseLevel e) {
-	    std::cerr << e.msg() << std::endl;
-	   }
-
-	}
-	else if(state == Spacehero::spacehero_next)
-        {
-	  // Alle Level durchgehen
-	  for (directory_iterator itr(levels); itr != directory_iterator(); ++itr)
-	  {
-	    std::cerr << "trying to load level: " << itr->path() << std::endl;
-	    std::ifstream level(itr->path().string().c_str());
-	    std::ofstream levelwrite("/tmp/level.out");
-	    if(level) {
-	      try { 
-		Level l(level); 
-		levelwrite << l;
-		Universe u(l);
-		Spacehero s(display,u);
-		if(s.play() == Spacehero::spacehero_exit) break;
-	      } catch (Error::ParseLevel e) {
-		std::cerr << e.msg() << std::endl;
-	      }
-	    }
-	  }
-	}
       }
-#if 0
-      ButtonFlags bflags;
-      ButtonMaster mainmenu(*display.getPictureBook(), *display.getIllustrator());
-      SDL_Event event;
-      int width = (*display.getDisplay()).getWidth();
-      int height = (*display.getDisplay()).getHeight();
-      printf("%i x %i\n", width, height);
-      mainmenu.addButton("button_start", 100, height/2, height*0.1, ButtonFlags::startGame);
-
-      do
-      {
-      printf("%i x %i\n", width, height);
-        while(SDL_PollEvent( &event ))
-	{
-	  (*display.getDisplay()).handleEvents(event);
-          if(event.type == SDL_MOUSEBUTTONDOWN)
-	  {
-  	    mainmenu.checkButtons(bflags,event.motion.x,event.motion.y);
-          }
-	}
-        
-        (*display.getDisplay()).initDisplay();	
-        mainmenu.drawButtons(); 	
-        SDL_GL_SwapBuffers();
-      } while(!bflags.isFlag());
-
-      if(bflags.checkFlag(ButtonFlags::startGame) || bflags.viewFlag(ButtonFlags::startEditor))
-      {
-	  }
-	}
-      }
-      
-      if(bflags.checkFlag(ButtonFlags::chooseLevel))
-      {
-
-      }
-      /*
-      Menu mainmenu(display.getIllustrator(), display.getDisplay());
-      mainmenu.add("START",&start);
-      mainmenu.add("EDITOR",&editor);
-      mainmenu.start();*/
-#endif
     }
   } else {
-    std::ifstream level(argv[1]);
+  /*  std::ifstream level(argv[1]);
     Level l(level);
     std::cerr << l << std::endl;
     Universe u(l);
     Spacehero s(display,u);
-    s.play();
+    s.play();*/
   }
-
-
 
   return 0;
 }

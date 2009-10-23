@@ -16,7 +16,7 @@
  */
 #include "FileManager.h"
 
-std::string FileManager::getFile()
+std::string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
 {
   name = "";
   doinput = true;
@@ -26,14 +26,14 @@ std::string FileManager::getFile()
   while(doinput)
   {
     i++;
-    draw(i);
-    handleEvents();
+    draw(i,disp,uni);
+    handleEvents(disp);
     usleep(100000);
   }
   return name;
 }
 
-void FileManager::draw(int i)
+void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
 { 
   display.getDisplay()->cleanDisplay();
   display.drawBridge(universe, SpaceDisplay::EditorView, 100);
@@ -48,7 +48,7 @@ void FileManager::draw(int i)
   SDL_GL_SwapBuffers();
 }
 
-void FileManager::handleEvents()
+void FileManager::handleEvents(SpaceDisplay &display)
 {
   SDL_Event event;
   
@@ -57,41 +57,6 @@ void FileManager::handleEvents()
     display.getDisplay()->handleEvents(event);
     switch( event.type )
     {
-#if 0
-      case SDL_MOUSEBUTTONDOWN:
-        /* Buttons */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
-        {
-          buttons.checkButtons(flags,event.motion.x,event.motion.y);
-        }
-              
-        /* Nur fuer Setzfenster */
-        if(view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView)
-        {        
-          /* Objekt setzen? */
-          if(event.motion.x > UNIVERSE_LEFT && 
-             event.motion.x < display.getWidth()-(UNIVERSE_RIGHT+UNIVERSE_LEFT) && 
-             event.motion.y > UNIVERSE_TOP && 
-             event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
-            )
-          {                        
-            /* Mausposition umrechnen */
-            glGetIntegerv(GL_VIEWPORT,viewport);
-            glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
-            glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-            glReadPixels(event.motion.x, event.motion.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zpos );
-            gluUnProject(event.motion.x, event.motion.y, zpos,
-                modelMatrix, projMatrix, viewport,
-                &mousex, &mousey, &mousez
-            );
-            
-            mousey = 1.0-mousey;
-
-            editor.check(mousex,mousey);
-          }
-        }
-        break;
-#endif
       case SDL_KEYDOWN:
         if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
         {
@@ -106,4 +71,32 @@ void FileManager::handleEvents()
         break;
     }
   }
+}
+
+void FileManager::loadLevels()
+{
+  for(std::vector<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
+  {
+    if (is_directory(*dir))
+    {
+      for (directory_iterator level(*dir); level != directory_iterator(); ++level)
+      {
+	std::ifstream levelstream(level->path().string().c_str());
+	levels.push_back(Level(levelstream));
+      }
+    }
+  }
+}
+
+Level FileManager::nextLevel()
+{
+  int nr = rand() % levels.size();
+  Level ret = levels.at(nr);
+  levels.erase(levels.begin()+nr);
+  return ret;
+}
+
+bool FileManager::hasLevel()
+{
+  return (levels.size() > 0);
 }

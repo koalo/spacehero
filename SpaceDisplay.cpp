@@ -70,11 +70,27 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   /**************************
    *        INFOTEXT        *
    **************************/
-  float fontsize = 18;
+  float fontsize = 20;
   float fmargin = 3;
   y = 1;
   #define Y display.getHeight()-(fontsize*(y++)+fmargin)
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "Task: Navigate the green galaxy into the green target area.");
+  std::string help = "Task: Navigate the green galaxy";
+  bool foundone = false;
+  for(unsigned int i = 0; i < uni.galaxies.size(); i++)
+  {
+    if(uni.galaxies.at(i).getmaster())
+    {
+      if(!foundone)
+      {
+	foundone = true;
+      } else {
+        help += "s";
+	break;
+      }
+    }
+  }
+  help += " into the green target area.";
+  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, help.c_str());
   for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].exists)
@@ -86,9 +102,12 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     }
   }
 
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "fps: %07.2f",uni.fps());
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
+  if(view == SimulationView)
+  { 
+    illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "fps: %02.2f",uni.fps());
+  }
+ // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
+ // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
   #undef Y
 
 
@@ -134,6 +153,9 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
       ypos = display.getHeight()*0.75;
     } else {
       ypos = display.getHeight()*0.35;
+
+      /* Skip */
+      buttons.addButton("button_green", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::skipLevel);
     }
 
     /* Simulation starten */
@@ -294,6 +316,10 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
         glColor3f(1.0f,1.0f,1.0f);
       }
       drawSkymass(uni.galaxies[i]);
+
+      glColor4f(1,1,0,0.5);
+      //getIllustrator()->drawLine(uni.galaxies.at(i).getX(),uni.galaxies.at(i).getY(),uni.galaxies.at(i).getX()+0.5,uni.galaxies.at(i).getY()+0.5,2,true);
+      glColor4f(1,1,1,1);
     }
   }
 
@@ -534,7 +560,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
         /* Buttons */
         if(!editor.settingGalaxy())
 	{
-	  if(view == SpaceDisplay::PutView || view == SpaceDisplay::IntroView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
+	  if(view == SpaceDisplay::PutView || view == SpaceDisplay::IntroView || view == SpaceDisplay::MenuView || view == SpaceDisplay::SimulationView || view == SpaceDisplay::EditorView)
           {
             buttons.checkButtons(flags,event.motion.x,event.motion.y);
           }

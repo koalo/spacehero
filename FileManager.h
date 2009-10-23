@@ -20,6 +20,10 @@
 #include <iostream>
 #include "SpaceDisplay.h"
 #include <ctype.h>
+#include <vector>
+
+#include "boost/filesystem.hpp"
+using namespace boost::filesystem;
 
 class FileManager
 {
@@ -27,15 +31,23 @@ class FileManager
     FileManager(const FileManager&);
     FileManager& operator=(const FileManager&);
   private:
+    std::vector<std::string> dirs;
+    std::string savedir;
+  private:
     std::string name;
-    SpaceDisplay &display;
-    Universe &universe;
     bool doinput;
+    std::vector<Level> levels;
   public:
-    FileManager(SpaceDisplay &disp, Universe &uni) : name(""), display(disp), universe(uni), doinput(true) {}
-    std::string getFile();
-    void draw(int i);
-    void handleEvents();
+    FileManager() : dirs(), savedir(""), name(""), doinput(true), levels() {}
+    void addLevelDir(std::string dir){dirs.push_back(dir);}
+    void setSaveDir(std::string dir){savedir = dir;}
+    void loadLevels();
+    Level nextLevel();
+    bool hasLevel();
+    std::string getFile(SpaceDisplay &disp, Universe &uni);
+    void handleEvents(SpaceDisplay &display);
+  private:
+    void draw(int i, SpaceDisplay &display, Universe &universe);
 };
 
 #endif

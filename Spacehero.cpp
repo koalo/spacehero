@@ -33,6 +33,10 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
       state = spacehero_starteditor;
       break;
     case SpaceDisplay::IntroView:
+    case SpaceDisplay::MenuView:
+      paruni = &universe;
+      state = spacehero_simulate;
+      break;
     case SpaceDisplay::SimulationView:
       state = spacehero_startsimu;
       break;
@@ -103,12 +107,17 @@ Spacehero::SpaceheroState Spacehero::edit()
   
   if(bflags.checkFlag(ButtonFlags::saveLevel))
   {
-    FileManager saveas(display, universe);
-    std::string savefile = "/tmp/"+saveas.getFile()+".txt";
+    FileManager saveas;
+    std::string savefile = "/tmp/"+saveas.getFile(display,universe)+".txt";
     std::cout << "Wird jetzt gespeichert in: " << savefile << std::endl;
     std::ofstream levelwrite(savefile.c_str());
     levelwrite << universe;
     //state = ?
+  }
+
+  if(bflags.checkFlag(ButtonFlags::skipLevel))
+  {
+    return spacehero_next;
   }
 
   display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
@@ -138,7 +147,6 @@ Spacehero::SpaceheroState Spacehero::simulate()
     state = spacehero_startsimu;
   }
 
-  
   if(view == SpaceDisplay::IntroView)
   {
     double menutime;
@@ -168,18 +176,25 @@ Spacehero::SpaceheroState Spacehero::simulate()
     }
 
     display.displayUniverse(*paruni, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight());     
-    SDL_GL_SwapBuffers();
-  } else {
-    display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
-    SDL_GL_SwapBuffers();
+  } 
+  else if(view == SpaceDisplay::MenuView)
+  {
+    display.getDisplay()->cleanDisplay();
+    display.showMenu(100);
   }
+  else
+  {
+    display.drawBridge(*paruni,SpaceDisplay::SimulationView,(paruni->getmaxtime()-paruni->elapsed())/paruni->getmaxtime());
+  }
+
+  SDL_GL_SwapBuffers();
 
   // ZEIT verballern
   float sle = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   useconds_t sleep = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   if(0 != usleep(sleep)) std::cerr << "usleep failed with " << sleep << " ns and " << maxframerate << " maxframerate and ldelta " << paruni->ldelta() << " and sle " << sle << std::endl;
   
-  if(view == SpaceDisplay::IntroView)
+  if(view == SpaceDisplay::IntroView || view == SpaceDisplay::MenuView)
   {
     if(bflags.checkFlag(ButtonFlags::startGame))
     {

@@ -61,6 +61,9 @@ class SkyObject {
     void setX(double ix){x = ix;}
     void setY(double iy){y = iy;}
     void setZ(double iz){z = iz;}
+    double getX(){return x;}
+    double getY(){return y;}
+    double getZ(){return z;}
   public:
     friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
 };

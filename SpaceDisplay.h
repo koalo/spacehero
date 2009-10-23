@@ -58,7 +58,8 @@ class SpaceDisplay
       SimulationView,
       PutView,
       EditorView,
-      IntroView
+      IntroView,
+      MenuView
     };
 
     void displayUniverse( Universe &uni, int width, int height, bool eye = false, bool pleft = true );
