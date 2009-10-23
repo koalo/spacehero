@@ -8,7 +8,7 @@ CXXFLAGS+=-Weffc++
 
 CXXFLAGS+=-O2
 
-LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt
+LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt -lboost_regex-mt
 
 # Profiler stuff
 #CFLAGS+=-pg

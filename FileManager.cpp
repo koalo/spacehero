@@ -67,6 +67,13 @@ void FileManager::handleEvents(SpaceDisplay &display)
           doinput = false;
         }
         break;
+      case SDL_MOUSEBUTTONDOWN:
+        /*nr = (unsigned int)(event.motion.y / size);
+        if(nr < entrys.size())
+        {
+          entrys.at(nr).action(); 
+        }*/
+        break;
       default:
         break;
     }
@@ -75,6 +82,8 @@ void FileManager::handleEvents(SpaceDisplay &display)
 
 void FileManager::loadLevels()
 {
+  std::string name;
+  const boost::regex levelname("^(.*)\\.[A-Za-z0-9]*$");
   for(std::vector<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
   {
     if (is_directory(*dir))
@@ -83,6 +92,9 @@ void FileManager::loadLevels()
       {
 	std::ifstream levelstream(level->path().string().c_str());
 	levels.push_back(Level(levelstream));
+	name = level->path().leaf();  
+        name = boost::regex_replace(name, levelname, "\\1", boost::match_default | boost::format_sed);
+	levels.back().setName(name);
       }
     }
   }
@@ -100,3 +112,28 @@ bool FileManager::hasLevel()
 {
   return (levels.size() > 0);
 }
+
+void FileManager::drawList(SpaceDisplay &display)
+{  
+  /* Bildschirm loeschen */
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
+  
+  /* Auf Projektionsmodus umschalten */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glViewport(0,0,display.getDisplay()->getWidth(),display.getDisplay()->getHeight());
+  glOrtho(0,display.getDisplay()->getWidth(),0,display.getDisplay()->getHeight(),0,128);
+
+  /* Zurueckschalten und Ansicht einstellen */
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+  
+/*  illustrator.drawRect(0.0,1.0,0.0,0.0,0.0,display.getWidth(),display.getHeight());*/
+  float size = 15.0;
+  for(unsigned int i = 0; i < levels.size(); i++)
+  {
+    display.getIllustrator()->glPrint(size, 0.0, 1.0, 1.0, 10.0, display.getDisplay()->getHeight()-((i+1)*size), levels.at(i).getName().c_str());
+  }
+  SDL_GL_SwapBuffers();
+}
+

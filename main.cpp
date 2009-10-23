@@ -99,7 +99,6 @@ int main()
 	while(SDL_PollEvent(&event)) display.getDisplay()->handleEvents(event);
 	SDL_ShowCursor(SDL_DISABLE);
 	state = sintro.play(SpaceDisplay::IntroView);
-	//state = Spacehero::spacehero_emptyEditor;
       } catch (Error::ParseLevel e) {
 	std::cerr << e.msg() << std::endl;
       }

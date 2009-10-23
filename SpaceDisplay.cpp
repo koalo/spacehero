@@ -108,6 +108,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   }
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
+  illustrator.glPrint( fontsize*2, TEXTR, TEXTG, TEXTB, fmargin, 0.0, uni.getName().c_str());
   #undef Y
 
 
@@ -477,8 +478,9 @@ void SpaceDisplay::showMenu(double time)
   buttontime = 1.0-exp(-((time-3)*100)*0.009);
   buttontime = (buttontime > 0)?buttontime:0;
   buttontime = (buttontime < scale)?buttontime:scale;
-  buttons.addButton("button_start", display.getWidth()*0.2, display.getHeight()*0.2, display.getWidth()*0.08*buttontime, ButtonFlags::startGame);
   buttons.addButton("button_x", display.getWidth()*0.8, display.getHeight()*0.8, display.getWidth()*0.08*buttontime, ButtonFlags::exit);
+  buttons.addButton("button_start", display.getWidth()*0.2, display.getHeight()*0.2, display.getWidth()*0.08*buttontime, ButtonFlags::startGame);
+  buttons.addButton("button_green", display.getWidth()*0.15, display.getHeight()*0.75, display.getWidth()*0.08*buttontime, ButtonFlags::chooseLevel);
   buttons.addButton("button_green", display.getWidth()*0.7, display.getHeight()*0.25, display.getWidth()*0.08*buttontime, ButtonFlags::startEditor);
 
   buttons.drawButtons();

@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
+#include "boost/regex.hpp"
 using namespace boost::filesystem;
 
 class FileManager
@@ -48,6 +49,7 @@ class FileManager
     void handleEvents(SpaceDisplay &display);
   private:
     void draw(int i, SpaceDisplay &display, Universe &universe);
+    void drawList(SpaceDisplay &display);
 };
-
 #endif
+

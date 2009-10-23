@@ -155,13 +155,16 @@ class Level : public Sky
 
     double m_fpst;
     double m_fps;
+    std::string name;
   public:
     std::vector<Blackhole> holes;
     Goal goal;
   public:
     Level(std::ifstream &in);
-    Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),holes(),goal() {};
+    Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),name(""),holes(),goal() {};
     virtual ~Level() {};
+    void setName(std::string iname){name = iname;}
+    std::string getName(){return name;}
 
   public:
     void tinit() { t0 = SDL_GetTicks(); }; // start time measure
