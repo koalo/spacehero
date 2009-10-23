@@ -205,14 +205,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    /**************************
    *       UNIVERSUM        *
    **************************/ 
-  displayUniverse(uni, width, height);     
+  displayUniverse(uni, width, height, false, true, (view == EditorView || view == PutView));     
 
   /* Versteckten Buffer aktivieren */
 //  SDL_GL_SwapBuffers();
 }
 
 
-void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool eye, bool pleft )
+void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool eye, bool pleft, bool arrows )
 {
   if(eye && pleft)
   {
@@ -303,8 +303,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
 /*  glDisable(GL_BLEND);*/
 
   /* Galaxienmittelpunkte */
-  textures.useTexture("bulge");
-
   for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].exists)
@@ -315,11 +313,17 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
       } else {
         glColor3f(1.0f,1.0f,1.0f);
       }
+
+      textures.useTexture("bulge");
       drawSkymass(uni.galaxies[i]);
 
-      glColor4f(1,1,0,0.5);
-      //getIllustrator()->drawLine(uni.galaxies.at(i).getX(),uni.galaxies.at(i).getY(),uni.galaxies.at(i).getX()+0.5,uni.galaxies.at(i).getY()+0.5,2,true);
-      glColor4f(1,1,1,1);
+      if(arrows)
+      {
+	glColor4f(0.4,0.4,0,1);
+#define ARROWFAC 0.5e-6
+	getIllustrator()->drawLine(uni.galaxies.at(i).getX(),uni.galaxies.at(i).getY(),uni.galaxies.at(i).getX()+uni.galaxies.at(i).getVX()*ARROWFAC,uni.galaxies.at(i).getY()+uni.galaxies.at(i).getVY()*ARROWFAC,2,true,0.06);
+        glColor4f(1,1,1,1);
+      }
     }
   }
 

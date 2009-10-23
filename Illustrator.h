@@ -37,7 +37,7 @@ class Illustrator
     ~Illustrator();
 
     void putImage(float x, float y, float width, float height);
-    void drawLine(float sx, float sy, float ex, float ey, float width, bool arrow = false);
+    void drawLine(float sx, float sy, float ex, float ey, float width, bool arrow = false, float hypo = 30.0);
     void drawRect(float red, float green, float blue, float x, float y, float width, float height);
     void drawSphere(float x, float y, float r);
     void drawDisk(float x, float y, float r);
