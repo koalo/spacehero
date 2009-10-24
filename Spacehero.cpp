@@ -82,6 +82,7 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
       case spacehero_next:
       case spacehero_exit:
       case spacehero_emptyEditor:
+      case spacehero_chooseLevel:
         return state;
         //break;
       default:
@@ -209,6 +210,11 @@ Spacehero::SpaceheroState Spacehero::simulate()
     if(bflags.checkFlag(ButtonFlags::startEditor))
     {
       return spacehero_emptyEditor;
+    }
+  
+    if(bflags.checkFlag(ButtonFlags::chooseLevel))
+    {
+      return spacehero_chooseLevel;
     }
   }
   else

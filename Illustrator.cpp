@@ -33,7 +33,7 @@ Illustrator::Illustrator(std::string path) :
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     /* Textur erstellen */
-    glTexImage2D( GL_TEXTURE_2D, 0, 3, fontImage->w, fontImage->h, 0, GL_RGB, GL_UNSIGNED_BYTE, fontImage->pixels );
+    glTexImage2D( GL_TEXTURE_2D, 0, 4, fontImage->w, fontImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontImage->pixels );
     fontsize = fontImage->w/(float)16;
 
     SDL_FreeSurface(fontImage);
@@ -56,19 +56,19 @@ Illustrator::Illustrator(std::string path) :
       glBegin( GL_QUADS );
         /* unten links */
         glTexCoord2f( fx - 1/fontsize, fy );
-        glVertex2i( 0, 0 );
+        glVertex2f( 0, fontsize );
 
         /* unten rechts */
         glTexCoord2f( fx, fy );
-        glVertex2f( fontsize, 0 );
+        glVertex2f( fontsize, fontsize );
 
         /* oben rechts */
         glTexCoord2f( fx, fy - 1/fontsize );
-        glVertex2f( fontsize, fontsize );
+        glVertex2f( fontsize, 0 );
 
         /* oben links */
         glTexCoord2f( fx - 1/fontsize, fy - 1/fontsize);
-        glVertex2f( 0, fontsize );
+        glVertex2i( 0, 0 );
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
@@ -172,8 +172,10 @@ void Illustrator::glPrint(float size, float red, float green, float blue, float 
   /* Aussehen und Textur shiften einstellen */
   glBindTexture( GL_TEXTURE_2D, font );
   glPushMatrix();
-  glLoadIdentity();
-  glEnable(GL_BLEND);
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  //  glEnable(GL_ALPHA_TEST);
+//  glAlphaFunc(GL_GREATER, 0.1);
   glPushAttrib( GL_LIST_BIT );
   glListBase( fontbase - 32 );
 

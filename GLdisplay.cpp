@@ -94,8 +94,11 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST ); /* Perspektivenberechnung */
 
   /* Fenstergroesse neu auslesen */
-  videoInfo = SDL_GetVideoInfo( );
-  resizeWindow(videoInfo->current_w,videoInfo->current_h);
+  if(!fullscreen)
+  {
+    videoInfo = SDL_GetVideoInfo( );
+    resizeWindow(videoInfo->current_w,videoInfo->current_h);
+  }
 
   //  if(fullscreen) SDL_WarpMouse(this->width,this->height);
 }

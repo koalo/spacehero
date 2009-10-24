@@ -24,6 +24,7 @@ Level::Level(std::ifstream &in) :
   m_delta(0),
   m_fpst(0),
   m_fps(0),
+  name(""),
   holes(),
   goal()
 {

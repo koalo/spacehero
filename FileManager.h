@@ -47,9 +47,10 @@ class FileManager
     bool hasLevel();
     std::string getFile(SpaceDisplay &disp, Universe &uni);
     void handleEvents(SpaceDisplay &display);
+    void LevelMan(SpaceDisplay& display);
   private:
     void draw(int i, SpaceDisplay &display, Universe &universe);
-    void drawList(SpaceDisplay &display);
+    void drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons);
 };
 #endif
 

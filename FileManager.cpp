@@ -27,7 +27,24 @@ std::string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
   {
     i++;
     draw(i,disp,uni);
-    handleEvents(disp);
+
+    SDL_Event event;
+    while ( SDL_PollEvent( &event ) )
+    {
+      disp.getDisplay()->handleEvents(event);
+      if(event.type == SDL_KEYDOWN)
+      {
+       	if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
+        {
+	  name += toupper(event.key.keysym.sym);
+	} 
+	else if (event.key.keysym.sym == SDLK_RETURN)
+	{
+	  doinput = false;
+	}
+      }
+    }
+
     usleep(100000);
   }
   return name;
@@ -48,42 +65,11 @@ void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
   SDL_GL_SwapBuffers();
 }
 
-void FileManager::handleEvents(SpaceDisplay &display)
-{
-  SDL_Event event;
-  
-  while ( SDL_PollEvent( &event ) )
-  {
-    display.getDisplay()->handleEvents(event);
-    switch( event.type )
-    {
-      case SDL_KEYDOWN:
-        if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
-        {
-          name += toupper(event.key.keysym.sym);
-        } 
-	else if (event.key.keysym.sym == SDLK_RETURN)
-        {
-          doinput = false;
-        }
-        break;
-      case SDL_MOUSEBUTTONDOWN:
-        /*nr = (unsigned int)(event.motion.y / size);
-        if(nr < entrys.size())
-        {
-          entrys.at(nr).action(); 
-        }*/
-        break;
-      default:
-        break;
-    }
-  }
-}
-
 void FileManager::loadLevels()
 {
   std::string name;
   const boost::regex levelname("^(.*)\\.[A-Za-z0-9]*$");
+  levels.clear();
   for(std::vector<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
   {
     if (is_directory(*dir))
@@ -98,6 +84,7 @@ void FileManager::loadLevels()
       }
     }
   }
+  srand(time(NULL));
 }
 
 Level FileManager::nextLevel()
@@ -113,27 +100,65 @@ bool FileManager::hasLevel()
   return (levels.size() > 0);
 }
 
-void FileManager::drawList(SpaceDisplay &display)
+void FileManager::LevelMan(SpaceDisplay& display)
+{
+  unsigned int nr;
+  int active = -1;
+  float fontsize = 40.0;
+  ButtonMaster buttons(*display.getPictureBook(), *display.getIllustrator());
+  ButtonFlags flags = *(new ButtonFlags());
+
+  while(true)
+  {
+    drawList(display,fontsize,active,buttons);
+    SDL_Event event;
+    while ( SDL_PollEvent( &event ) )
+    {
+      display.getDisplay()->handleEvents(event);
+      if(event.type == SDL_MOUSEBUTTONDOWN)
+      {
+	buttons.checkButtons(flags,event.motion.x,event.motion.y);
+	nr = (unsigned int)(event.motion.y / fontsize);
+	if(event.motion.x < display.getDisplay()->getWidth()*0.8 && nr > 0 && nr < levels.size()+1)
+	{
+	  active = nr - 1;
+	  std::cerr << levels.at(nr-1).getName() << std::endl;
+	}
+      }
+    }
+
+    if(flags.checkFlag(ButtonFlags::exit))
+    {
+      break;
+    }
+
+    usleep(100000);
+  }
+}
+
+void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons)
 {  
+  float y;
+
   /* Bildschirm loeschen */
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
+  display.getDisplay()->OrthoMode();
   
-  /* Auf Projektionsmodus umschalten */
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glViewport(0,0,display.getDisplay()->getWidth(),display.getDisplay()->getHeight());
-  glOrtho(0,display.getDisplay()->getWidth(),0,display.getDisplay()->getHeight(),0,128);
-
-  /* Zurueckschalten und Ansicht einstellen */
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-  
-/*  illustrator.drawRect(0.0,1.0,0.0,0.0,0.0,display.getWidth(),display.getHeight());*/
-  float size = 15.0;
+  //display.getPictureBook()->noTexture();
+    
+  glDisable(GL_BLEND);
+  glColor4f(1,1,1,1);
   for(unsigned int i = 0; i < levels.size(); i++)
   {
-    display.getIllustrator()->glPrint(size, 0.0, 1.0, 1.0, 10.0, display.getDisplay()->getHeight()-((i+1)*size), levels.at(i).getName().c_str());
+    y = (i+1)*fontsize;
+    if((int)i == active) display.getIllustrator()->drawRect(0, 0, 1, display.getDisplay()->getWidth()*0.03, y, display.getDisplay()->getWidth()*0.7,fontsize);
+    display.getIllustrator()->glPrint(fontsize*0.8, 0.7, 0.7, 0, display.getDisplay()->getWidth()*0.05, y+fontsize*0.1, levels.at(i).getName().c_str());
   }
+
+  buttons.clearButtons();
+  buttons.addButton("button_x", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*0.1, display.getDisplay()->getWidth()*0.07, ButtonFlags::exit);
+  buttons.drawButtons();  
+
   SDL_GL_SwapBuffers();
 }
 

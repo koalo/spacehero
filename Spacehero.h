@@ -41,7 +41,8 @@ class Spacehero
 		spacehero_stopsimu, 
 		spacehero_next, 
 		spacehero_exit,
-	        spacehero_emptyEditor
+	        spacehero_emptyEditor,
+		spacehero_chooseLevel
 	} state;
   
   private:

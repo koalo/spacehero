@@ -10,3 +10,4 @@ gmon.out
 *.o
 
 .*.swp
+*~

@@ -72,8 +72,8 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    **************************/
   float fontsize = 20;
   float fmargin = 3;
-  y = 1;
-  #define Y display.getHeight()-(fontsize*(y++)+fmargin)
+  y = 0;
+  #define Y (fontsize*(y++)+fmargin)
   std::string help = "Task: Navigate the green galaxy";
   bool foundone = false;
   for(unsigned int i = 0; i < uni.galaxies.size(); i++)
@@ -108,7 +108,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   }
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
-  illustrator.glPrint( fontsize*2, TEXTR, TEXTG, TEXTB, fmargin, 0.0, uni.getName().c_str());
+  illustrator.glPrint( fontsize*2, TEXTR, TEXTG, TEXTB, fmargin, display.getHeight()-fontsize*2.3, uni.getName().c_str());
   #undef Y
 
 

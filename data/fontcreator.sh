@@ -4,7 +4,8 @@
 # HIER EINSTELLEN
 SIZE=20                        # Breite und Hoehe eines Zeichens
 POINT=30                       # Groesse eines Zeichen im Ausgangsbild (hoeher=>schaerfer aber langsamer)
-FONT=Penguin-Attack-Regular    # Schriftart - Achtung: Es muessen alle noetigen Zeichen vorhanden sein (z.B. °)
+FONT=-*-freesans-bold-r-*-*-*-*-*-*-*-*-*-*
+#FONT=Penguin-Attack-Regular    # Schriftart - Achtung: Es muessen alle noetigen Zeichen vorhanden sein (z.B. °)
 
 # HIER NUR EINSTELLEN WENN LUSTIG
 row=0
@@ -50,3 +51,9 @@ row=`expr $row + 1`
 col=0
 
 done
+
+   convert  font.png +matte \
+           \( +clone -fill white -colorize 100% \) \
+           +swap -compose CopyOpacity -composite \
+           font.png
+

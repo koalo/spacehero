@@ -115,6 +115,11 @@ int main()
 	// Programm beenden
 	break;
       } 
+      else if(state == Spacehero::spacehero_chooseLevel)
+      {
+        fileman.loadLevels();
+	fileman.LevelMan(display);
+      }
       else if(state == Spacehero::spacehero_emptyEditor)
       {
 	// Editor starten
