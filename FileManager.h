@@ -21,6 +21,7 @@
 #include "SpaceDisplay.h"
 #include <ctype.h>
 #include <vector>
+#include "Spacehero.h"
 
 #include "boost/filesystem.hpp"
 #include "boost/regex.hpp"

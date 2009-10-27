@@ -36,6 +36,7 @@ Illustrator::Illustrator(std::string path) :
     glTexImage2D( GL_TEXTURE_2D, 0, 4, fontImage->w, fontImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontImage->pixels );
     fontsize = fontImage->w/(float)16;
 
+    std::cout << fontsize << std::endl;
     SDL_FreeSurface(fontImage);
   } else {
     std::cerr << "Font nicht vorhanden: " << (path + "font.png") << std::endl;
@@ -72,7 +73,7 @@ Illustrator::Illustrator(std::string path) :
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
-      glTranslatef( fontsize*0.5, 0, 0 );
+      glTranslatef( fontsize*0.45, 0, 0 );
     glEndList( );
   }
 }

@@ -104,6 +104,7 @@ void FileManager::LevelMan(SpaceDisplay& display)
 {
   unsigned int nr;
   int active = -1;
+  Level l;
   float fontsize = 40.0;
   ButtonMaster buttons(*display.getPictureBook(), *display.getIllustrator());
   ButtonFlags flags = *(new ButtonFlags());
@@ -132,6 +133,26 @@ void FileManager::LevelMan(SpaceDisplay& display)
       break;
     }
 
+    if(flags.checkFlag(ButtonFlags::startGame) && active >= 0 && active < (int)levels.size())
+    {
+      l = levels.at(active);
+      Universe uni(l);
+      Spacehero space(display,uni);
+      space.play();
+    }
+
+    if(flags.checkFlag(ButtonFlags::startEditor) && active >= 0 && active < (int)levels.size())
+    {
+      l = levels.at(active);
+      Universe uni(l);
+      Spacehero space(display,uni);
+      space.play(SpaceDisplay::EditorView);
+    }
+
+    if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
+    {
+    }
+
     usleep(100000);
   }
 }
@@ -156,7 +177,10 @@ void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, Bu
   }
 
   buttons.clearButtons();
-  buttons.addButton("button_x", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*0.1, display.getDisplay()->getWidth()*0.07, ButtonFlags::exit);
+  buttons.addButton("button_red", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(1/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::startGame);
+  buttons.addButton("button_green", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(3/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::startEditor);
+  buttons.addButton("button_green", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(5/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::transfer);
+  buttons.addButton("button_x", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(7/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::exit);
   buttons.drawButtons();  
 
   SDL_GL_SwapBuffers();
