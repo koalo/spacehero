@@ -45,11 +45,14 @@ class Editor
     bool setGalaxy;
     int galaxyX;
     int galaxyY;
-    bool putting;
+    bool canPut;
+    bool removing;
 
     Size size;
     Type type;
     double zoom;
+    SDL_Cursor* scissors;
+    SDL_Cursor* pointer;
   public:
     Editor(Universe &universe);
     void setAllowAll(bool allowall){all=allowall;}

@@ -16,14 +16,91 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),putting(false),size(medium),type(hole),zoom(0)
+Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),canPut(false),removing(false),size(medium),type(hole),zoom(0),scissors(),pointer()
 {
+static const char *image[] = {
+  /* width height num_colors chars_per_pixel */
+  "    32    32        3            1",
+  /* colors */
+  "X c #000000",
+  ". c #ffffff",
+  "  c None",
+  /* pixels */
+"                                ",
+"                                ",
+"                                ",
+"                                ",
+"   .....               ....     ",
+" ..XXXXX.             .XXXX.    ",
+".XXXXXXXX.           .XXXXX.    ",
+".XXXX..XXX.         .XXXXX.     ",
+".XXX.  .XX.        .XXXXX.      ",
+".XXX.  .XX.       .XXXXX.       ",
+" .XXX..XXX.      .XXXXX.        ",
+"  ..XXXXXXX.    .XXXXX.         ",
+"    ..XXXXXX.  .XXXXX.          ",
+"      ..XXXXX..XXXXX.           ",
+"        .XXXXXXXXXX.            ",
+"         .XXXXXXXX.             ",
+"        .XXXXXXXXXX.            ",
+"       .XXXXX..XXXXX.           ", 
+"     ..XXXXX.  .XXXXX.          ", 
+"    .XXXXXX.    .XXXXX.         ",
+"   .XX..XXX.     .XXXXX.        ",
+"  .XX.  .XX.      .XXXXX.       ",
+" .XX.  .XXX.       .XXXXX.      ",
+" .XX...XXX.         .XXXXX.     ",
+" .XXXXXXX.           .XXXXX.    ",
+" .XXXXXX.             .XXXX.    ",
+"  ......               ....     ",
+"                                ",
+"                                ",
+"                                ",
+"                                ",
+"                                ",
+  "13,15"
+};
+
+  int i, row, col;
+  Uint8 data[4*32];
+  Uint8 mask[4*32];
+  int hot_x, hot_y;
+
+  i = -1;
+  for ( row=0; row<32; ++row ) {
+    for ( col=0; col<32; ++col ) {
+      if ( col % 8 ) {
+        data[i] <<= 1;
+        mask[i] <<= 1;
+      } else {
+        ++i;
+        data[i] = mask[i] = 0;
+      }
+      switch (image[4+row][31-col]) {
+        case 'X':
+          data[i] |= 0x01;
+          mask[i] |= 0x01;
+          break;
+        case '.':
+          mask[i] |= 0x01;
+          break;
+        case ' ':
+          break;
+      }
+    }
+  }
+  sscanf(image[4+row], "%d,%d", &hot_x, &hot_y);
+  pointer = SDL_GetCursor();
+  scissors = SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
+  SDL_SetCursor(pointer);
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
 void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace)
 {
-  unsigned int i, remove = 0;
+  unsigned int i;
+  bool canRemove = false;
+  bool wasRemoving = false; 
 
   if(setGalaxy)
   {
@@ -33,85 +110,130 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
       uni.galaxies.back().setVY(-(uni.galaxies.back().y-mousey)*2e6);
       uni.calcStars();
       setGalaxy = false;
-      putting = true;
+      canPut = true;
     }
   } 
   else 
   {
     if(!onSpace)
     {
-      putting = false;
-    } else {
-      putting = true;
+      canPut = false;
     }
-
-    if(click && onSpace)
+    else
     {
+      canPut = true;
       for(i = 0; i < uni.holes.size(); i++)
       {
 	if( MPYTH(uni.holes[i].x, uni.holes[i].y, uni.holes[i].radius) )
 	{
-	  remove = 1;
-	  
+	  canPut = false;
+
 	  /* pruefen ob der ueberhaupt geloescht werden darf */
 	  if(!uni.holes[i].level || all)
 	  {
-	    if(!all)
+	    canRemove = true;
+
+	    if(click)
 	    {
-	      massreserve += uni.holes[i].mass;
+	      if(!all)
+	      {
+	        massreserve += uni.holes[i].mass;
+	      }
+	      uni.holes.erase(uni.holes.begin()+i);
+	      wasRemoving = true;
 	    }
-	    uni.holes.erase(uni.holes.begin()+i);
 	  }
 	}
       }
 
-      if(all && !remove)
+      if(!wasRemoving)
       {
 	for(i = 0; i < uni.galaxies.size(); i++)
 	{
-	  if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius) )
+	  if( MPYTH(uni.galaxies[i].x, uni.galaxies[i].y, uni.galaxies[i].radius*4) )
 	  {
-	    remove = 1;
-	    uni.galaxies.erase(uni.galaxies.begin()+i);
-	    uni.calcStars();
+	    canPut = false;
+
+	    if(all)
+	    {
+	      canRemove = true;
+	      if(click)
+	      {
+		uni.galaxies.erase(uni.galaxies.begin()+i);
+		uni.calcStars();
+		wasRemoving = true;
+	      }
+	    }
 	  }
 	}
       }
-      
-      if(!remove)
+
+      if(!wasRemoving)
       {
-	if(!all)
+	if( MPYTH(uni.goal.x, uni.goal.y, uni.goal.radius) )
 	{
-	  if(massreserve >= getHoleWeight())
+	  canPut = false;
+
+	  if(all)
 	  {
-	    massreserve -= getHoleWeight();
-	    uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+	    canRemove = true;
+	    if(click)
+	    {
+	      uni.goal = Goal();
+	      wasRemoving = true;
+	    }
 	  }
 	}
-	else
+      }
+    
+      if(canRemove && !wasRemoving)
+      {
+        SDL_SetCursor(scissors);
+      } else {
+	SDL_SetCursor(pointer);
+      }
+
+      if(canPut)
+      {
+	if(click)
 	{
-	  switch(type)
+	  if(!all)
 	  {
-	    case hole:
-	      uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
-	      break;
-	    case bulge:
-	      setGalaxy = true;
-	      putting = false;
-	      galaxyX = pixelx;
-	      galaxyY = pixely;
-	      srand(time(NULL));
-	      uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
-	      uni.calcStars();
-	      break;
-	    case goal:
-	      uni.goal.setX(mousex);
-	      uni.goal.setY(mousey);
-	      uni.goal.setRadius(getGoalRadius());
-	      break;
-	    default:
-	      // nix setzen
-	      break;
+	    if(massreserve >= getHoleWeight())
+	    {
+	      massreserve -= getHoleWeight();
+	      uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));        
+	      canPut = false;
+	      canRemove = true;
+              SDL_SetCursor(scissors);
+	    }
+	  }
+	  else
+	  {
+	    switch(type)
+	    {
+	      case hole:
+		uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
+		break;
+	      case bulge:
+		setGalaxy = true;
+		canPut = false;
+		galaxyX = pixelx;
+		galaxyY = pixely;
+		srand(time(NULL));
+		uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+		uni.calcStars();
+		break;
+	      case goal:
+		uni.goal.setX(mousex);
+		uni.goal.setY(mousey);
+		uni.goal.setRadius(getGoalRadius());
+		SDL_SetCursor(scissors);
+		break;
+	      default:
+		// nix setzen
+		break;
+	    }
 	  }
 	}
       }
@@ -133,7 +255,7 @@ void Editor::drawMouse(SpaceDisplay* display)
     glColor3f(1,1,1);
   }
 
-  if(putting && (all || (massreserve >= getHoleWeight())))
+  if(canPut && (all || (massreserve >= getHoleWeight())))
   {
     //display->getDisplay()->PerspectiveMode();
     glEnable(GL_BLEND);

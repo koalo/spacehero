@@ -36,7 +36,7 @@ Illustrator::Illustrator(std::string path) :
     glTexImage2D( GL_TEXTURE_2D, 0, 4, fontImage->w, fontImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontImage->pixels );
     fontsize = fontImage->w/(float)16;
 
-    std::cout << fontsize << std::endl;
+    //std::cout << "Bildbreite" << fontImage->w << "Fontsize: " << fontsize << std::endl;
     SDL_FreeSurface(fontImage);
   } else {
     std::cerr << "Font nicht vorhanden: " << (path + "font.png") << std::endl;
@@ -46,7 +46,7 @@ Illustrator::Illustrator(std::string path) :
   /* Fontliste erzeugen einladen */
   fontbase  = glGenLists( 256 );
   glBindTexture( GL_TEXTURE_2D, font );
-
+  
   for(i = 0; i < 256; i++)
   {
     /* Berechnung der aktuellen Koordinaten */
@@ -56,7 +56,7 @@ Illustrator::Illustrator(std::string path) :
     glNewList( fontbase + (255-i), GL_COMPILE );
       glBegin( GL_QUADS );
         /* unten links */
-        glTexCoord2f( fx - 1/fontsize, fy );
+        glTexCoord2f( fx - 1/16.0, fy );
         glVertex2f( 0, fontsize );
 
         /* unten rechts */
@@ -64,16 +64,16 @@ Illustrator::Illustrator(std::string path) :
         glVertex2f( fontsize, fontsize );
 
         /* oben rechts */
-        glTexCoord2f( fx, fy - 1/fontsize );
+        glTexCoord2f( fx, fy - 1/16.0 );
         glVertex2f( fontsize, 0 );
 
         /* oben links */
-        glTexCoord2f( fx - 1/fontsize, fy - 1/fontsize);
+        glTexCoord2f( fx - 1/16.0, fy - 1/16.0);
         glVertex2i( 0, 0 );
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
-      glTranslatef( fontsize*0.45, 0, 0 );
+      glTranslatef( fontsize*0.5, 0, 0 );
     glEndList( );
   }
 }

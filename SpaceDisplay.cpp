@@ -71,7 +71,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    *        INFOTEXT        *
    **************************/
   float fontsize = 20;
-  float fmargin = 3;
+  float fmargin = 2.5;
   y = 0;
   #define Y (fontsize*(y++)+fmargin)
   std::string help = "Task: Navigate the green galaxy";
