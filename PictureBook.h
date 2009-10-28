@@ -32,6 +32,7 @@ class PictureBook
   public:
     PictureBook(std::string texturepath);
     int addTexture(std::string texture);
+    bool isTexture(std::string texture);
     int useTexture(std::string texture);
     void noTexture();
 };

@@ -68,6 +68,7 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
         state = edit();
         break;
       case spacehero_startsimu:
+	view = SpaceDisplay::SimulationView;
         paruni = new Universe(universe);
         paruni->tinit();
         state = spacehero_simulate;

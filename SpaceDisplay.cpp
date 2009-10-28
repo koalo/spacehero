@@ -38,6 +38,7 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("panel_MASS");
   textures.addTexture("panel_TIME");
   textures.addTexture("panel_EMPTY");
+  textures.addTexture("button");
   textures.addTexture("button_green");
   textures.addTexture("button_start");
   textures.addTexture("button_stop");
@@ -156,11 +157,11 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
       ypos = display.getHeight()*0.35;
 
       /* Skip */
-      buttons.addButton("button_green", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::skipLevel);
+      buttons.addButton("SKIP", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::skipLevel);
     }
 
     /* Simulation starten */
-    buttons.addButton("button_start", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
+    buttons.addButton("START", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::startSimulation);
 
     margin = UNIVERSE_RIGHT*0.3;
 
@@ -177,7 +178,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     buttons.addButton("button_stop", center, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*1.2), START_BUTTON, ButtonFlags::breakSimulation);
 
     /* Replay */
-    buttons.addButton("button_replay", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
+    buttons.addButton("REPLAY", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::replaySimulation);
   }
 
   buttons.drawButtons();
@@ -479,9 +480,9 @@ void SpaceDisplay::showMenu(double time)
   buttontime = (buttontime > 0)?buttontime:0;
   buttontime = (buttontime < scale)?buttontime:scale;
   buttons.addButton("button_x", display.getWidth()*0.8, display.getHeight()*0.8, display.getWidth()*0.08*buttontime, ButtonFlags::exit);
-  buttons.addButton("button_start", display.getWidth()*0.2, display.getHeight()*0.2, display.getWidth()*0.08*buttontime, ButtonFlags::startGame);
-  buttons.addButton("button_green", display.getWidth()*0.15, display.getHeight()*0.75, display.getWidth()*0.08*buttontime, ButtonFlags::chooseLevel);
-  buttons.addButton("button_green", display.getWidth()*0.7, display.getHeight()*0.25, display.getWidth()*0.08*buttontime, ButtonFlags::startEditor);
+  buttons.addButton("START", display.getWidth()*0.2, display.getHeight()*0.2, display.getWidth()*0.08*buttontime, ButtonFlags::startGame);
+  buttons.addButton("LEVELS", display.getWidth()*0.15, display.getHeight()*0.75, display.getWidth()*0.08*buttontime, ButtonFlags::chooseLevel);
+  buttons.addButton("EDITOR", display.getWidth()*0.7, display.getHeight()*0.25, display.getWidth()*0.08*buttontime, ButtonFlags::startEditor);
 
   buttons.drawButtons();
 }

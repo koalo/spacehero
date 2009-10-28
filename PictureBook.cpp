@@ -70,6 +70,17 @@ int PictureBook::useTexture(std::string texture)
   }
 }
 
+bool PictureBook::isTexture(std::string texture)
+{
+  std::map<std::string, GLuint>::iterator iter = textureMap.find(texture);
+  if( iter != textureMap.end() )
+  {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void PictureBook::noTexture()
 {
   glBindTexture( GL_TEXTURE_2D, 0 );

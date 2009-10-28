@@ -50,8 +50,17 @@ void ButtonMaster::drawButtons()
           glBlendFunc(GL_SRC_ALPHA,GL_ONE);
           drawDisk(IMG_BULGE,display->buttons[i].x,display->buttons[i].y,display->buttons[i].r*3,display);
           glDisable( GL_BLEND );*/
-    textures.useTexture(buttons[i].texture);
-    illustrator.drawDisk(buttons[i].x,buttons[i].y,buttons[i].r);
+    if(textures.isTexture(buttons[i].texture))
+    {
+      textures.useTexture(buttons[i].texture);
+      illustrator.drawDisk(buttons[i].x,buttons[i].y,buttons[i].r);
+    } else {
+      textures.useTexture("button");
+      illustrator.drawDisk(buttons[i].x,buttons[i].y,buttons[i].r);
+      float fontsize = buttonSize*10;
+      float length = buttons[i].texture.length()*fontsize*0.5;
+      illustrator.glPrint(fontsize, 0.0, 0.0, 0.0, buttons[i].x-length*0.5-fontsize*0.175, buttons[i].y-fontsize*0.5, buttons[i].texture.c_str());
+    }
   }
 }
 
