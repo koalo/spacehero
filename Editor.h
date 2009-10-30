@@ -58,7 +58,7 @@ class Editor
     void setAllowAll(bool allowall){all=allowall;}
     bool isAllowAll(){return all;}
     bool settingGalaxy(){return setGalaxy;}
-    void check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace);
+    void check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace, bool leftMouse);
     void drawMouse(SpaceDisplay* display);
     void parseButtons(ButtonFlags &flags);
     double getHoleWeight();

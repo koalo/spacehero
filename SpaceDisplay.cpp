@@ -544,7 +544,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
        event.motion.y < display.getHeight()-(UNIVERSE_TOP+UNIVERSE_BOTTOM)
       );
 
-      editor.check(mousex,mousey,event.motion.x,event.motion.y,(event.type == SDL_MOUSEBUTTONDOWN),onSpace);
+      editor.check(mousex,mousey,event.motion.x,event.motion.y,(event.type == SDL_MOUSEBUTTONDOWN),onSpace,(event.type == SDL_MOUSEBUTTONDOWN)?(event.button.button == SDL_BUTTON_LEFT):true);
     }
 
     switch( event.type )

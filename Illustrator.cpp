@@ -165,6 +165,8 @@ void Illustrator::glPrint(float size, float red, float green, float blue, float 
 
   if ( format == NULL ) return;
 
+  glPushMatrix();
+
   /* Format parsen */
   va_start( ap, format );
   vsprintf( text, format, ap );
@@ -172,11 +174,8 @@ void Illustrator::glPrint(float size, float red, float green, float blue, float 
 
   /* Aussehen und Textur shiften einstellen */
   glBindTexture( GL_TEXTURE_2D, font );
-  glPushMatrix();
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  //  glEnable(GL_ALPHA_TEST);
-//  glAlphaFunc(GL_GREATER, 0.1);
   glPushAttrib( GL_LIST_BIT );
   glListBase( fontbase - 32 );
 

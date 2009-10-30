@@ -30,29 +30,29 @@ static const char *image[] = {
 "                                ",
 "                                ",
 "                                ",
-"   .....               ....     ",
-" ..XXXXX.             .XXXX.    ",
-".XXXXXXXX.           .XXXXX.    ",
-".XXXX..XXX.         .XXXXX.     ",
-".XXX.  .XX.        .XXXXX.      ",
+"   .....              ....      ",
+" ..XXXXX.            .XXXX.     ",
+".XXXXXXXX.          .XXXXX.     ",
+".XXXX..XXX.        .XXXXX.      ",
 ".XXX.  .XX.       .XXXXX.       ",
-" .XXX..XXX.      .XXXXX.        ",
-"  ..XXXXXXX.    .XXXXX.         ",
-"    ..XXXXXX.  .XXXXX.          ",
-"      ..XXXXX..XXXXX.           ",
-"        .XXXXXXXXXX.            ",
-"         .XXXXXXXX.             ",
-"        .XXXXXXXXXX.            ",
-"      ..XXXXX..XXXXX.           ", 
-"    ..XXXXXX.  .XXXXX.          ", 
-"  ..XXXXXXX.    .XXXXX.         ",
-" .XXX..XXX.      .XXXXX.        ",
+".XXX.  .XX.      .XXXXX.        ",
+" .XXX..XXX.     .XXXXX.         ",
+"  ..XXXXXXX.   .XXXXX.          ",
+"    ..XXXXXX. .XXXXX.           ",
+"      ..XXXXX.XXXXX.            ",
+"        .XXXXXXXXX.             ",
+"         .XXXXXXX.              ",
+"        .XXXXXXXXX.             ",
+"      ..XXXXX.XXXXX.            ", 
+"    ..XXXXXX. .XXXXX.           ", 
+"  ..XXXXXXX.   .XXXXX.          ",
+" .XXX..XXX.     .XXXXX.         ",
+".XXX.  .XX.      .XXXXX.        ",
 ".XXX.  .XX.       .XXXXX.       ",
-".XXX.  .XX.        .XXXXX.      ",
-".XXXX..XXX.         .XXXXX.     ",
-".XXXXXXXX.           .XXXXX.    ",
-" ..XXXXX.             .XXXX.    ",
-"   .....               ....     ",
+".XXXX..XXX.        .XXXXX.      ",
+".XXXXXXXX.          .XXXXX.     ",
+" ..XXXXX.            .XXXX.     ",
+"   .....              ....      ",
 "                                ",
 "                                ",
 "                                ",
@@ -96,7 +96,7 @@ static const char *image[] = {
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
-void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace)
+void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace, bool leftButton)
 {
   unsigned int i;
   bool canRemove = false;
@@ -221,7 +221,7 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
 		galaxyX = pixelx;
 		galaxyY = pixely;
 		srand(time(NULL));
-		uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),(rand()%2),(rand()%2)));
+		uni.galaxies.push_back(Galaxy(mousex,mousey,getBulgeWeight(),!leftButton,(rand()%2)));
 		uni.calcStars();
 		break;
 	      case goal:
@@ -258,11 +258,13 @@ void Editor::drawMouse(SpaceDisplay* display)
   if(canPut && (all || (massreserve >= getHoleWeight())))
   {
     //display->getDisplay()->PerspectiveMode();
-    glEnable(GL_BLEND);
     if(!all && massreserve < 2*getHoleWeight())
     {
       glColor3f(1,0,0.5);
     }
+
+    float x = display->getDisplay()->getWidth()-PANELRATIO*display->getDisplay()->getHeight()-280;
+    float y = display->getDisplay()->getHeight()-50;
 
     switch(getType())
     {
@@ -270,12 +272,17 @@ void Editor::drawMouse(SpaceDisplay* display)
 	display->getPictureBook()->useTexture("hole");
 	break;
       case Editor::bulge:
+	display->getIllustrator()->glPrint(20, 1, 1, 0, x, y, " left mouse -> white galaxy");
+	display->getIllustrator()->glPrint(20, 1, 1, 0, x, y+20, "right mouse -> green galaxy");
 	display->getPictureBook()->useTexture("galaxy");
 	break;
       case Editor::goal:
 	display->getPictureBook()->useTexture("goal");
 	break;
     }
+
+    glEnable(GL_BLEND);
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
     double size = getSize();
     if(display->getDisplay()->getHeight() > display->getDisplay()->getWidth())
