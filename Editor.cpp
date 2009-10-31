@@ -139,8 +139,8 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
   {
     if(click)
     {
-      uni.galaxies.back().setVX(-(uni.galaxies.back().x-mousex)*2e6);
-      uni.galaxies.back().setVY(-(uni.galaxies.back().y-mousey)*2e6);
+      uni.galaxies.back().vx = -(uni.galaxies.back().x-mousex)*2e6;
+      uni.galaxies.back().vy = -(uni.galaxies.back().y-mousey)*2e6;
       uni.calcStars();
       setGalaxy = false;
       canPut = true;
@@ -162,7 +162,7 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
 	  canPut = false;
 
 	  /* pruefen ob der ueberhaupt geloescht werden darf */
-	  if(!uni.holes[i].level || all)
+	  if(!uni.holes[i].inLevel() || all)
 	  {
 	    canRemove = true;
 
@@ -258,9 +258,9 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
 		uni.calcStars();
 		break;
 	      case goal:
-		uni.goal.setX(mousex);
-		uni.goal.setY(mousey);
-		uni.goal.setRadius(getGoalRadius());
+		uni.goal.x = mousex;
+		uni.goal.y = mousey;
+		uni.goal.radius = getGoalRadius();
 		SDL_SetCursor(scissors);
 		break;
 	      default:

@@ -37,7 +37,7 @@ ButtonMaster::ButtonMaster(PictureBook &t, Illustrator &i)
 
 void ButtonMaster::clearButtons()
 {
-  buttons.empty();
+  buttons.clear();
 }
 
 void ButtonMaster::addButton(std::string texture, float x, float y, float r, ButtonFlags::Actions action)

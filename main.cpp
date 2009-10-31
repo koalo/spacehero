@@ -82,13 +82,13 @@ int main()
       try { 
 	Universe u = Universe();
 	u.galaxies.push_back(Galaxy(0.145,0.145,4.3e11,false,false));
-	u.galaxies.back().setZ(0.17);
-	u.galaxies.back().setVX(110e3);
-	u.galaxies.back().setVY(110e3);
+	u.galaxies.back().z =0.17;
+	u.galaxies.back().vx = 110e3;
+	u.galaxies.back().vy = 110e3;
 	u.galaxies.push_back(Galaxy(1.17,1.17,20e11,false,false));
-	u.galaxies.back().setZ(0.17);
-	u.galaxies.back().setVX(-176e3);
-	u.galaxies.back().setVY(-176e3);
+	u.galaxies.back().z = 0.17;
+	u.galaxies.back().vx = -176e3;
+	u.galaxies.back().vy = -176e3;
 	u.calcStars();
 	u.setStargrav(true);
 	u.tinit();

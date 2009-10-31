@@ -21,6 +21,51 @@
 #include "GLdisplay.h"
 #include "Constants.h"
 
+SkyObject::SkyObject()
+  : x(0), y(0), z(0), radius(0), exists(true), level(false)
+{
+}
+
+SkyObject::SkyObject(double ix, double iy, double iradius) 
+  : x(ix), y(iy), z(0), radius(iradius), exists(true), level(false)
+{
+}
+
+void SkyObject::setlevel()
+{
+  level = true;
+}
+
+bool SkyObject::setexists(bool b)
+{
+  return exists = b;
+}
+
+bool SkyObject::getexists()
+{
+  return exists; 
+}
+
+bool SkyObject::inLevel()
+{
+  return level;
+}
+
+SkyMass::SkyMass()
+  : SkyObject(), mass(0), vx(0), vy(0), vz(0)
+{
+}
+
+SkyMass::SkyMass(double ix, double iy, double imass, double iradius)
+  : SkyObject(ix, iy, iradius), mass(imass), vx(0), vy(0), vz(0)
+{
+}
+
+Goal::Goal()
+  : SkyObject()
+{
+}
+
 Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
 {
   double sx,sy,sz,svx,svy,svz;
@@ -83,12 +128,77 @@ vector<Star> Galaxy::getStars(int seed) {
   return accu;
 }
 
+Sky::Sky() 
+  : seed(0), stars(), galaxies()
+{
+}
+
 Universe::Universe(Level &l) :
   Level(l),
   m_won(false),
   stargrav(false)
 {
   calcStars();
+}
+
+Level::Level()
+  : t0(), maxtime(30.0), lastt(0), m_delta(0), m_fpst(0), m_fps(0), name(""), holes(), goal()
+{
+}
+
+void Level::setName(string name)
+{
+  this->name = name;
+}
+
+string Level::getName()
+{
+  return name;
+}
+
+void Level::tick()
+{
+  lastt=elapsed(); 
+}
+
+void Level::tack(double weight)
+{
+  m_delta = weight*m_delta + (1-weight)*(elapsed()-lastt);
+}
+
+double Level::ldelta(double weight)
+{ 
+  return weight*m_delta + (1-weight)*(elapsed()-lastt);
+}
+
+double Level::delta()
+{
+  return m_delta;
+}
+
+double Level::getmaxtime() const 
+{
+  return maxtime; 
+}
+
+bool Level::timeout()
+{
+  return elapsed() > maxtime; 
+}
+
+double Level::fps()
+{
+  return 1/m_delta;
+}
+
+void Level::tinit()
+{
+  t0 = SDL_GetTicks();
+}
+
+double Level::elapsed() 
+{
+  return (SDL_GetTicks()-t0)/1000.0; 
 }
 
 Blackhole::Blackhole(double ix, double iy, double imass) 
@@ -144,6 +254,16 @@ void Sky::calcStars()
     copy(gstars.begin(),gstars.end(),back_inserter(stars));
   }
   cerr << "universe has " << stars.size() << " stars" << endl;
+}
+
+Universe::Universe()
+  : m_won(false),stargrav(false)
+{
+}
+
+void Universe::setStargrav(bool grav)
+{
+  this->stargrav = grav;
 }
 
 void Universe::move(double delta)
@@ -209,7 +329,7 @@ bool Universe::won()
     if( i->getmaster() )
     {
       master++;
-      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->exists && goal.getexists() )
+      if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->getexists() && goal.getexists() )
       { 
         ingoal++;
       }

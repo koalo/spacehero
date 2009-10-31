@@ -21,14 +21,13 @@ SRC+=Illustrator.cpp
 SRC+=ButtonMaster.cpp
 
 # SpaceHero
-SRC+=Level.cpp
+SRC+=LevelIO.cpp
 SRC+=Editor.cpp
 SRC+=FileManager.cpp
 SRC+=HttpManager.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
-SRC+=output.cpp
 SRC+=main.cpp
 
 OBJS=$(SRC:.cpp=.o)

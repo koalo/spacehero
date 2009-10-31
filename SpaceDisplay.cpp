@@ -99,7 +99,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, help.c_str());
   for(i = 0; i < uni.galaxies.size(); i++)
   {
-    if(uni.galaxies[i].exists)
+    if(uni.galaxies[i].getexists())
     {
       curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
       curse = (curse < 0)?curse+2*M_PI:curse;
@@ -312,7 +312,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   /* Galaxienmittelpunkte */
   for(i = 0; i < uni.galaxies.size(); i++)
   {
-    if(uni.galaxies[i].exists)
+    if(uni.galaxies[i].getexists())
     {
       if(uni.galaxies[i].getmaster())
       {
@@ -328,7 +328,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
       {
 	glColor4f(0.4,0.4,0,1);
 #define ARROWFAC 0.5e-6
-	getIllustrator()->drawLine(uni.galaxies.at(i).getX(),uni.galaxies.at(i).getY(),uni.galaxies.at(i).getX()+uni.galaxies.at(i).getVX()*ARROWFAC,uni.galaxies.at(i).getY()+uni.galaxies.at(i).getVY()*ARROWFAC,2,true,0.06);
+	getIllustrator()->drawLine(uni.galaxies.at(i).x,uni.galaxies.at(i).y,uni.galaxies.at(i).x+uni.galaxies.at(i).vx*ARROWFAC,uni.galaxies.at(i).y+uni.galaxies.at(i).vy*ARROWFAC,2,true,0.06);
         glColor4f(1,1,1,1);
       }
     }
@@ -389,7 +389,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
 void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
 {
   unsigned int i;
-  double eyet;
+  double eyet = 0;
   glPushMatrix();
 
   /* Sterne */
@@ -416,7 +416,7 @@ void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
 
   for(i = 0; i < uni.stars.size(); i++)
   {
-    if(uni.stars[i].exists && ((behind && uni.stars[i].z < 0) || (!behind && uni.stars[i].z > 0)))
+    if(uni.stars[i].getexists() && ((behind && uni.stars[i].z < 0) || (!behind && uni.stars[i].z > 0)))
     {
       drawSkymass(uni.stars[i]);
     }
