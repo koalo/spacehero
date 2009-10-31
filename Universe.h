@@ -17,24 +17,9 @@
 #ifndef _UNIVERSE_H_
 #define _UNIVERSE_H_
 
-#include <fstream>
 #include <iostream>
-#include <iterator>
-
 #include <vector>
-#include <math.h>
-
-#include "local.h"
-
-#include <boost/progress.hpp>
-#include <iostream>
-#include <climits>
-
-#include "SDL/SDL.h" 
-
-using boost::timer;
-using boost::progress_timer;
-using boost::progress_display;
+using namespace std;
 
 namespace Error {
   class ParseLevel {
@@ -65,7 +50,7 @@ class SkyObject {
     double getY(){return y;}
     double getZ(){return z;}
   public:
-    friend std::ostream& operator<< (std::ostream &o, const SkyObject &g);
+    friend ostream& operator<< (ostream &o, const SkyObject &g);
 };
 
 class SkyMass : public SkyObject {
@@ -85,24 +70,24 @@ class SkyMass : public SkyObject {
     double getVY(){return vy;}
 
   public:
-    friend std::ostream& operator<< (std::ostream &o, const SkyMass &g);
+    friend ostream& operator<< (ostream &o, const SkyMass &g);
 };
 
 class Goal : public SkyObject {
   public:
     Goal() {};
-    Goal(std::ifstream &in);
+    Goal(ifstream &in);
     void setRadius(double iradius){radius = iradius;}
   public:
-    friend std::ostream& operator<< (std::ostream &o, const Goal &g);
+    friend ostream& operator<< (ostream &o, const Goal &g);
 };
 
 class Blackhole : public SkyMass {
   public:
-    Blackhole(std::ifstream &in);
-    Blackhole(double ix, double iy, double imass) : SkyMass(ix, iy, imass, HOLESIZE*sqrt(imass/HOLEMEDIUMMASS)) {};
+    Blackhole(ifstream &in);
+    Blackhole(double ix, double iy, double imass);
   public:
-    friend std::ostream& operator<< (std::ostream &o, const Blackhole &g);
+    friend ostream& operator<< (ostream &o, const Blackhole &g);
 };
 
 class Star;
@@ -117,21 +102,21 @@ class Galaxy : public SkyMass {
 
     Galaxy();
   public:
-    Galaxy(std::ifstream &in);
-    Galaxy(double ix, double iy, double imass, bool imaster, bool ilr) : SkyMass(ix, iy, imass, BULGESIZE), master(imaster), lr(ilr) {};
+    Galaxy(ifstream &in);
+    Galaxy(double ix, double iy, double imass, bool imaster, bool ilr);
 
-    std::vector<Star> getStars(int seed);
+    vector<Star> getStars(int seed);
     bool getmaster() { return master; };
 
   public:
-    friend std::ostream& operator<< (std::ostream &o, const Galaxy &g);
+    friend ostream& operator<< (ostream &o, const Galaxy &g);
 };
 
 class Star : public SkyMass {
   public:
     Star(Galaxy &g,double R, double phi, double z, double v, double mass=1e3);
   public:
-    friend std::ostream& operator<< (std::ostream &o, const Star &g);
+    friend ostream& operator<< (ostream &o, const Star &g);
 };
 
 class Sky 
@@ -139,8 +124,8 @@ class Sky
   protected:
     int seed;
   public:
-    std::vector<Star> stars;
-    std::vector<Galaxy> galaxies;
+    vector<Star> stars;
+    vector<Galaxy> galaxies;
     Sky() :seed(0),stars(),galaxies() {};
     virtual ~Sky() {};
     void calcStars();
@@ -155,20 +140,20 @@ class Level : public Sky
 
     double m_fpst;
     double m_fps;
-    std::string name;
+    string name;
   public:
-    std::vector<Blackhole> holes;
+    vector<Blackhole> holes;
     Goal goal;
   public:
-    Level(std::ifstream &in);
+    Level(ifstream &in);
     Level():t0(),maxtime(30.0),lastt(0),m_delta(0),m_fpst(0),m_fps(0),name(""),holes(),goal() {};
     virtual ~Level() {};
-    void setName(std::string iname){name = iname;}
-    std::string getName(){return name;}
+    void setName(string iname){name = iname;}
+    string getName(){return name;}
 
   public:
-    void tinit() { t0 = SDL_GetTicks(); }; // start time measure
-    double elapsed() { return (SDL_GetTicks()-t0)/1000.0; }; // get elapsed time
+    void tinit(); // start time measure
+    double elapsed(); // get elapsed time
 
     void tick() { lastt=elapsed(); };
     void tack(double weight=0.9) {
@@ -189,7 +174,7 @@ class Level : public Sky
     }
 
   public:
-    friend std::ostream& operator<< (std::ostream &o, const Level &l);
+    friend ostream& operator<< (ostream &o, const Level &l);
 };
 
 
@@ -208,38 +193,13 @@ class Universe: public Level
   void setStargrav(bool igra){stargrav = igra;}
 };
 
-inline void SkyMass::move(double delta) {
+//inline void SkyMass::move(double delta);
+/*
+{
   x += (vx/WIDTHINMETERS)*TIMESCALE*delta;
   y += (vy/WIDTHINMETERS)*TIMESCALE*delta;
   z += (vz/WIDTHINMETERS)*TIMESCALE*delta;
-  //if(hypot(vx,vy)>1) std::cerr << ".";
-}
-
-inline void SkyMass::newton(SkyMass &m, double &delta) {
-  double AX, AY, AZ, a1, a2, r3;
-  //std::cerr << *this << m << std::endl;
-  if( (!getexists()) || (!m.getexists()) ) return;
-
-  AX = x - m.x;
-  AY = y - m.y;
-  AZ = z - m.z;
-
-  r3 = sqrt(AX*AX+AY*AY+AZ*AZ);
-  r3 = r3*r3*r3;
-
-  AX = AX/r3;
-  AY = AY/r3;
-  AZ = AZ/r3;
-
-  a1 = SUNGRAVTIMEWIDTH*mass*delta;
-  m.vx += a1*AX;
-  m.vy += a1*AY;  
-  m.vz += a1*AZ;  
-
-  a2 = SUNGRAVTIMEWIDTH*m.mass*delta;
-  vx -= a2*AX;
-  vy -= a2*AY;
-  vz -= a2*AZ;
-};
+  //if(hypot(vx,vy)>1) cerr << ".";
+}*/
 
 #endif

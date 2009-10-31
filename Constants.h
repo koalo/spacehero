@@ -14,9 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** @file local.h
- * @brief Globale Konstanten und Strukturen.
- */
 
 #ifndef LOCAL_H
 #define LOCAL_H
@@ -68,4 +65,27 @@
 
 #define VORN 300
 #define SPEED 0
+
+/* Display-Konstanten */
+#define UNIVERSE_LEFT 0
+#define UNIVERSE_TOP 0
+#define UNIVERSE_BOTTOM 0
+
+#define PANELRATIO 0.205962059620
+#define UNIVERSE_RIGHT (PANELRATIO*display.getHeight())
+
+#define START_BUTTON (UNIVERSE_RIGHT*0.4)
+#define REPLAY_BUTTON (UNIVERSE_RIGHT*0.2)
+#define EXIT_BUTTON (UNIVERSE_RIGHT*0.1)
+#define MARGIN 10
+
+#define SMALL_HOLE (UNIVERSE_RIGHT*0.1)
+#define MEDIUM_HOLE (UNIVERSE_RIGHT*0.12)
+#define LARGE_HOLE (UNIVERSE_RIGHT*0.14)
+
+#define VIEWANGLE 60
+
+#define TEXTR 0.0f
+#define TEXTG 1.0f
+#define TEXTB 0.0f
 #endif

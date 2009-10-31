@@ -15,7 +15,12 @@
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "SpaceDisplay.h"
-#include "local.h"
+
+#include <math.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#include "Constants.h"
 #include "Spacehero.h"
 
 SpaceDisplay::SpaceDisplay(std::string path) : 
@@ -418,6 +423,19 @@ void SpaceDisplay::drawStars(bool behind, bool eye, bool pleft, Universe &uni)
   }
 
   glPopMatrix();
+}
+
+inline void SpaceDisplay::drawSkymass(SkyMass body)
+{
+  double z = body.z;
+  z = 8000*z*z;
+  if(body.z < 0) z = -z;
+  glBegin(GL_QUADS);
+  glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, z );
+  glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, z );
+  glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, z );
+  glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, z );
+  glEnd();
 }
 
 void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)

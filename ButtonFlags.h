@@ -20,25 +20,25 @@
 class ButtonFlags : public AbstractButtonFlags
 {
   public:
-  enum Actions {
-    small = 1,
-    medium = 2,
-    large = 4,
-    startSimulation = 8,
-    breakSimulation = 16,
-    replaySimulation = 32,
-    breakIntro = 64,
-    exit = 128,
-    putHole = 256,
-    putBulge = 512,
-    putGoal = 1024,
-    startEditor = 2048,
-    saveLevel = 4096,
-    startGame = 8192,
-    chooseLevel = 16384,
-    skipLevel = 32768,
-    transfer = 65536
-  };
+    enum Actions {
+      small = 1,
+      medium = 2,
+      large = 4,
+      startSimulation = 8,
+      breakSimulation = 16,
+      replaySimulation = 32,
+      breakIntro = 64,
+      exit = 128,
+      putHole = 256,
+      putBulge = 512,
+      putGoal = 1024,
+      startEditor = 2048,
+      saveLevel = 4096,
+      startGame = 8192,
+      chooseLevel = 16384,
+      skipLevel = 32768,
+      transfer = 65536
+    };
 };
 
 #endif

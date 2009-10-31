@@ -17,41 +17,18 @@
 #ifndef _SPACEDISPLAY_H_
 #define _SPACEDISPLAY_H_
 
-#define UNIVERSE_LEFT 0
-#define UNIVERSE_TOP 0
-#define UNIVERSE_BOTTOM 0
-
-#define PANELRATIO 0.205962059620
-#define UNIVERSE_RIGHT (PANELRATIO*display.getHeight())
-
-#define START_BUTTON (UNIVERSE_RIGHT*0.4)
-#define REPLAY_BUTTON (UNIVERSE_RIGHT*0.2)
-#define EXIT_BUTTON (UNIVERSE_RIGHT*0.1)
-#define MARGIN 10
-
-#define SMALL_HOLE (UNIVERSE_RIGHT*0.1)
-#define MEDIUM_HOLE (UNIVERSE_RIGHT*0.12)
-#define LARGE_HOLE (UNIVERSE_RIGHT*0.14)
-
-#define VIEWANGLE 60
-
-#define TEXTR 0.0f
-#define TEXTG 1.0f
-#define TEXTB 0.0f
-
 #include "GLdisplay.h"
-#include "Universe.h"
-#include "ButtonMaster.h"
 #include "PictureBook.h"
 #include "Illustrator.h"
-
+#include "ButtonMaster.h"
+#include "Universe.h"
 
 class Editor;
 
 class SpaceDisplay
 {
   public:
-    SpaceDisplay(std::string path);
+    SpaceDisplay(string path);
 
   public:
     enum BridgeView { 
@@ -81,19 +58,7 @@ class SpaceDisplay
     float zoom;
 
     inline void drawStars(bool behind, bool eye, bool pleft, Universe &uni);
-
-    inline void drawSkymass(SkyMass body)
-    {
-      double z = body.z;
-      z = 8000*z*z;
-      if(body.z < 0) z = -z;
-      glBegin(GL_QUADS);
-      glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -body.radius+body.x, -body.radius+body.y, z );
-      glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  body.radius+body.x, -body.radius+body.y, z );
-      glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  body.radius+body.x,  body.radius+body.y, z );
-      glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -body.radius+body.x,  body.radius+body.y, z );
-      glEnd();
-    };
+    inline void drawSkymass(SkyMass body);
     
   public:
     Illustrator* getIllustrator(){return &illustrator;}

@@ -16,7 +16,16 @@
  */
 #include "Illustrator.h"
 
-Illustrator::Illustrator(std::string path) :
+#include <iostream>
+using namespace std;
+
+#include <SDL.h>
+#include <SDL_image.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <math.h>
+
+Illustrator::Illustrator(string path) :
   fontbase(0), font(0), fontsize(0)
 {
   int i;
@@ -36,10 +45,10 @@ Illustrator::Illustrator(std::string path) :
     glTexImage2D( GL_TEXTURE_2D, 0, 4, fontImage->w, fontImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontImage->pixels );
     fontsize = fontImage->w/(float)16;
 
-    //std::cout << "Bildbreite" << fontImage->w << "Fontsize: " << fontsize << std::endl;
+    //cout << "Bildbreite" << fontImage->w << "Fontsize: " << fontsize << endl;
     SDL_FreeSurface(fontImage);
   } else {
-    std::cerr << "Font nicht vorhanden: " << (path + "font.png") << std::endl;
+    cerr << "Font nicht vorhanden: " << (path + "font.png") << endl;
     exit(1);
   }
 

@@ -17,11 +17,7 @@
 #ifndef _GLDISPLAY_H_
 #define _GLDISPLAY_H_
 
-#include <iostream>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <SDL.h>
-#include <math.h>
 
 class GLdisplay
 {

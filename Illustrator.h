@@ -17,23 +17,18 @@
 #ifndef _ILLUSTRATOR_H_
 #define _ILLUSTRATOR_H_
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <SDL_image.h>
-#include <SDL.h>
-#include <iostream>
 #include <string>
-#include <math.h>
+using namespace std;
 
 class Illustrator
 {
   private:
-    GLuint fontbase;
-    GLuint font;
+    unsigned int fontbase;
+    unsigned int font;
     float fontsize;
 
   public:
-    Illustrator(std::string path);
+    Illustrator(string path);
     ~Illustrator();
 
     void putImage(float x, float y, float width, float height);

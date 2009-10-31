@@ -18,14 +18,12 @@
 #define _HTTPMANAGER_H_
 
 #include <string>
-#include <iostream>
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
-
 using namespace std;
+
+#include <boost/asio.hpp>
 using boost::asio::ip::tcp;
 
-class HttpManager : public ostream
+class HttpManager
 {
   private:
     boost::asio::io_service io_service;

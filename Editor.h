@@ -17,9 +17,6 @@
 #ifndef _EDITOR_H_
 #define _EDITOR_H_
 
-#include "ButtonMaster.h"
-#include "ButtonFlags.h"
-#include "Universe.h"
 #include "SpaceDisplay.h"
 
 class Editor
@@ -36,6 +33,7 @@ class Editor
       bulge,
       goal
     };
+
   private:
     Universe &uni;
     double maxreserve;
@@ -51,13 +49,15 @@ class Editor
     Size size;
     Type type;
     double zoom;
+
     SDL_Cursor* scissors;
     SDL_Cursor* pointer;
+
   public:
     Editor(Universe &universe);
-    void setAllowAll(bool allowall){all=allowall;}
-    bool isAllowAll(){return all;}
-    bool settingGalaxy(){return setGalaxy;}
+    void setAllowAll(bool allowall);
+    bool isAllowAll();
+    bool settingGalaxy();
     void check(double mousex, double mousey, int pixelx, int pixely, bool click, bool onSpace, bool leftMouse);
     void drawMouse(SpaceDisplay* display);
     void parseButtons(ButtonFlags &flags);
@@ -66,7 +66,7 @@ class Editor
     double getGoalRadius();
     double getSize();
     double getQuotient();
-    Editor::Type getType(){return type;}
+    Type getType();
     SpaceDisplay::BridgeView getView();
 };
 

@@ -17,14 +17,27 @@
 
 #include "ButtonMaster.h"
 
+#include <GL/gl.h>
+#include <math.h>
+
+AbstractButtonFlags::AbstractButtonFlags()
+  : flags(0)
+{
+}
+
+Button::Button()
+  : texture(""), x(0), y(0), r(0), active(0), action((ButtonFlags::Actions)4096)
+{
+}
+
 ButtonMaster::ButtonMaster(PictureBook &t, Illustrator &i)
-  : buttonSize(0), textures(t), illustrator(i)
+  : buttons(), textures(t), illustrator(i)
 {
 }
 
 void ButtonMaster::clearButtons()
 {
-  buttonSize = 0;
+  buttons.empty();
 }
 
 void ButtonMaster::addButton(std::string texture, float x, float y, float r, ButtonFlags::Actions action)
@@ -37,41 +50,37 @@ void ButtonMaster::addButton(std::string texture, float x, float y, float r, But
   newButton.texture = texture;
   newButton.active = 1;
   newButton.action = action;
-  buttons[buttonSize++] = newButton;
+  buttons.push_back(newButton);
 }
 
 void ButtonMaster::drawButtons()
 {
-  int i;
-
-  for(i = 0; i < buttonSize; i++)
+  for(unsigned int i = 0; i < buttons.size(); i++)
   {
-    if(textures.isTexture(buttons[i].texture))
+    if(textures.isTexture(buttons.at(i).texture))
     {
-      textures.useTexture(buttons[i].texture);
-      illustrator.drawDisk(buttons[i].x,buttons[i].y,buttons[i].r);
+      textures.useTexture(buttons.at(i).texture);
+      illustrator.drawDisk(buttons.at(i).x,buttons.at(i).y,buttons.at(i).r);
     } else {
       textures.useTexture("button");
       glEnable( GL_BLEND );
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      illustrator.putImage(buttons[i].x-buttons[i].r,buttons[i].y-buttons[i].r,buttons[i].r*2,buttons[i].r*2);
+      illustrator.putImage(buttons.at(i).x-buttons.at(i).r,buttons.at(i).y-buttons.at(i).r,buttons.at(i).r*2,buttons.at(i).r*2);
       glDisable( GL_BLEND );
-      float fontsize = buttons[i].r*0.4;
-      float length = buttons[i].texture.length()*fontsize*0.5;
-      illustrator.glPrint(fontsize, 0.0, 0.0, 0.0, buttons[i].x-length*0.5-fontsize*0.175, buttons[i].y-fontsize*0.5, buttons[i].texture.c_str());
+      float fontsize = buttons.at(i).r*0.4;
+      float length = buttons.at(i).texture.length()*fontsize*0.5;
+      illustrator.glPrint(fontsize, 0.0, 0.0, 0.0, buttons.at(i).x-length*0.5-fontsize*0.175, buttons.at(i).y-fontsize*0.5, buttons.at(i).texture.c_str());
     }
   }
 }
 
 void ButtonMaster::checkButtons(ButtonFlags &flags, int x, int y)
 {
-  int i;
-
-  for(i = 0; i < buttonSize; i++)
+  for(unsigned int i = 0; i < buttons.size(); i++)
   {
-    if( hypot(buttons[i].x-x,buttons[i].y-y) < buttons[i].r)
+    if( hypot(buttons.at(i).x-x,buttons.at(i).y-y) < buttons.at(i).r)
     {
-      flags.activateFlag((AbstractButtonFlags::Actions)buttons[i].action);
+      flags.activateFlag((AbstractButtonFlags::Actions)buttons.at(i).action);
     }
   }
 }

@@ -15,42 +15,40 @@
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "boost/filesystem.hpp"
+#include <vector>
+#include <string>
 #include <iostream>
-#include <fstream>
+using namespace std;
+
+#include <boost/filesystem.hpp>
 using namespace boost::filesystem;
 
-#include <stdlib.h>
-#include <vector>
-
 #include "SpaceDisplay.h"
+#include "FileManager.h"
 #include "Spacehero.h"
-#include "Universe.h"
-#include "intro.h"
-#include "Illustrator.h"
 
 //int main(int argc, char *argv[])
 int main()
 { 
   // Find data Dir
-  std::vector<std::string> path;
+  vector<string> path;
 
   path.push_back( "./data/" );
   path.push_back( "~/.spacehero/data/" );
   path.push_back( "/usr/share/games/spacehero/data/" );
 
-  std::string dir;
-  for(std::vector<std::string>::iterator l = path.begin(); l!=path.end(); l++) {
-    std::cerr << "trying: " << *l << std::endl;
+  string dir;
+  for(vector<string>::iterator l = path.begin(); l!=path.end(); l++) {
+    cerr << "trying: " << *l << endl;
     if ( is_directory(*l) ) {
       dir=*l;
-      std::cerr << "found: " << dir << std::endl;
+      cerr << "found: " << dir << endl;
       break;
     }
   }
 
   if(dir == "") {
-    std::cerr << "could not find data dir" << std::endl;
+    cerr << "could not find data dir" << endl;
     return 1;
   }
 
@@ -71,11 +69,11 @@ int main()
     while(true)
     {
       // Intro und Menu
-      /*std::string intr = levels+"level1.txt";
-      std::ifstream leveli(intr.c_str());
+      /*string intr = levels+"level1.txt";
+      ifstream leveli(intr.c_str());
       if(!leveli) 
       {
-	std::cerr << "Level ungueltig" << std::endl;
+	cerr << "Level ungueltig" << endl;
 	exit(0);
       }*/
      
@@ -100,7 +98,7 @@ int main()
 	SDL_ShowCursor(SDL_DISABLE);
 	state = sintro.play(SpaceDisplay::IntroView);
       } catch (Error::ParseLevel e) {
-	std::cerr << e.msg() << std::endl;
+	cerr << e.msg() << endl;
       }
       start = false;
       } else {
@@ -128,7 +126,7 @@ int main()
 	  Spacehero space(display,uni);
 	  space.play(SpaceDisplay::EditorView);
 	} catch (Error::ParseLevel e) {
-	  std::cerr << e.msg() << std::endl;
+	  cerr << e.msg() << endl;
 	}
 
       }
@@ -149,9 +147,9 @@ int main()
       }
     }
   } else {
-  /*  std::ifstream level(argv[1]);
+  /*  ifstream level(argv[1]);
     Level l(level);
-    std::cerr << l << std::endl;
+    cerr << l << endl;
     Universe u(l);
     Spacehero s(display,u);
     s.play();*/

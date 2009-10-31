@@ -17,42 +17,34 @@
 #ifndef _FILEMANAGER_H_
 #define _FILEMANAGER_H_
 
-#include <iostream>
-#include "SpaceDisplay.h"
-#include <ctype.h>
 #include <vector>
-#include "Spacehero.h"
-#include "HttpManager.h"
+using namespace std;
 
-#include "boost/filesystem.hpp"
-#include "boost/regex.hpp"
-using namespace boost::filesystem;
+#include "SpaceDisplay.h"
+#include "Universe.h"
 
 class FileManager
 {
   private:
     FileManager(const FileManager&);
     FileManager& operator=(const FileManager&);
-  private:
-    std::vector<std::string> dirs;
-    std::string savedir;
-  private:
-    std::string name;
+    vector<string> dirs;
+    string savedir;
+    string name;
     bool doinput;
-    std::vector<Level> levels;
+    vector<Level> levels;
+    void draw(int i, SpaceDisplay &display, Universe &universe);
+    void drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons);
   public:
-    FileManager() : dirs(), savedir(""), name(""), doinput(true), levels() {}
-    void addLevelDir(std::string dir){dirs.push_back(dir);}
-    void setSaveDir(std::string dir){savedir = dir;}
+    FileManager();
+    void addLevelDir(string dir);
+    void setSaveDir(string dir);
     void loadLevels();
     Level nextLevel();
     bool hasLevel();
-    std::string getFile(SpaceDisplay &disp, Universe &uni);
+    string getFile(SpaceDisplay &disp, Universe &uni);
     void handleEvents(SpaceDisplay &display);
     void LevelMan(SpaceDisplay& display);
-  private:
-    void draw(int i, SpaceDisplay &display, Universe &universe);
-    void drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons);
 };
 #endif
 

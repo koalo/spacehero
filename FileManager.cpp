@@ -16,12 +16,37 @@
  */
 #include "FileManager.h"
 
-std::string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
+#include <GL/gl.h>
+
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
+using namespace boost::filesystem;
+
+#include <fstream>
+using namespace std;
+
+#include "Spacehero.h"
+#include "HttpManager.h"
+
+FileManager::FileManager()
+  : dirs(), savedir(""), name(""), doinput(true), levels() 
+{
+}
+    
+void FileManager::addLevelDir(string dir)
+{
+  dirs.push_back(dir);
+}
+
+void FileManager::setSaveDir(string dir)
+{
+  savedir = dir;
+}
+
+string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
 {
   name = "";
   doinput = true;
-  /*std::cout << "Save as: ";
-  std::cin >> name;*/
   int i = 0;
   while(doinput)
   {
@@ -56,7 +81,7 @@ void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
   display.drawBridge(universe, SpaceDisplay::EditorView, 100);
   display.getDisplay()->OrthoMode(); 
 
-  std::string sname = "Save this Level as " + name;
+  string sname = "Save this Level as " + name;
   if((i/2) % 2)
   {
     sname = sname + "_";
@@ -67,16 +92,16 @@ void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
 
 void FileManager::loadLevels()
 {
-  std::string name;
+  string name;
   const boost::regex levelname("^(.*)\\.[A-Za-z0-9]*$");
   levels.clear();
-  for(std::vector<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
+  for(vector<string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
   {
     if (is_directory(*dir))
     {
       for (directory_iterator level(*dir); level != directory_iterator(); ++level)
       {
-	std::ifstream levelstream(level->path().string().c_str());
+	ifstream levelstream(level->path().string().c_str());
 	levels.push_back(Level(levelstream));
 	name = level->path().leaf();  
         name = boost::regex_replace(name, levelname, "\\1", boost::match_default | boost::format_sed);
@@ -123,7 +148,7 @@ void FileManager::LevelMan(SpaceDisplay& display)
 	if(event.motion.x < display.getDisplay()->getWidth()*0.8 && nr > 0 && nr < levels.size()+1)
 	{
 	  active = nr - 1;
-	  std::cerr << levels.at(nr-1).getName() << std::endl;
+	  cerr << levels.at(nr-1).getName() << endl;
 	}
       }
     }
@@ -151,10 +176,9 @@ void FileManager::LevelMan(SpaceDisplay& display)
 
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
-      stringstream mystream;
       HttpManager http("localhost");
       http.sendHeader("/recvLevel.php");
-      mystream << levels.at(active); 
+      //mystream << levels.at(active); 
       //http << mystream; 
     }
 

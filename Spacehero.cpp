@@ -15,8 +15,13 @@
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Spacehero.h"
-#include <sys/time.h>
-#include <unistd.h>
+
+#include <fstream>
+using namespace std;
+
+#include <math.h>
+
+#include "FileManager.h"
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   : state(spacehero_edit), won(false), bflags(), editor(u),
@@ -87,7 +92,7 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
         return state;
         //break;
       default:
-        std::cerr << "unreachable state" << std::endl;
+        cerr << "unreachable state" << endl;
         return state;
     }
   }
@@ -110,9 +115,9 @@ Spacehero::SpaceheroState Spacehero::edit()
   if(bflags.checkFlag(ButtonFlags::saveLevel))
   {
     FileManager saveas;
-    std::string savefile = "/tmp/"+saveas.getFile(display,universe)+".txt";
-    std::cout << "Wird jetzt gespeichert in: " << savefile << std::endl;
-    std::ofstream levelwrite(savefile.c_str());
+    string savefile = "/tmp/"+saveas.getFile(display,universe)+".txt";
+    cout << "Wird jetzt gespeichert in: " << savefile << endl;
+    ofstream levelwrite(savefile.c_str());
     levelwrite << universe;
     //state = ?
   }
@@ -194,7 +199,7 @@ Spacehero::SpaceheroState Spacehero::simulate()
   // ZEIT verballern
   float sle = 1.0e6*max(0.0,maxframerate - paruni->ldelta());
   useconds_t sleep = (sle > 0.0)?(useconds_t)floor(sle):0;
-  if(0 != usleep(sleep)) std::cerr << "usleep failed with " << sleep << " ns in useconds_t and " << sle << " ns in float " << std::endl;
+  if(0 != usleep(sleep)) cerr << "usleep failed with " << sleep << " ns in useconds_t and " << sle << " ns in float " << endl;
   
   if(view == SpaceDisplay::IntroView || view == SpaceDisplay::MenuView)
   {

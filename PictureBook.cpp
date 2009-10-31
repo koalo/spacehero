@@ -16,15 +16,22 @@
  */
 #include "PictureBook.h"
 
-PictureBook::PictureBook(std::string texturepath)
+#include <iostream>
+using namespace std;
+
+#include <SDL.h>
+#include <SDL_image.h>
+#include <GL/gl.h>
+
+PictureBook::PictureBook(string texturepath)
   : path(texturepath), textureMap()
 {
-  std::cerr << "trying to load textures from: " << path << std::endl;
+  cerr << "trying to load textures from: " << path << endl;
 }
 
-int PictureBook::addTexture(std::string texture)
+int PictureBook::addTexture(string texture)
 {
-  GLuint textureName;
+  unsigned int textureName;
   SDL_Surface *textureImage;
   
   glGenTextures( 1, &textureName );
@@ -48,31 +55,31 @@ int PictureBook::addTexture(std::string texture)
  
     SDL_FreeSurface(textureImage);
 
-    textureMap.insert(std::pair<std::string, GLuint>(texture, textureName));
+    textureMap.insert(pair<string, GLuint>(texture, textureName));
 
     return 1;
   } else {
-    std::cerr << "error loading texture " << texture << " from:" << path << std::cerr;
+    cerr << "error loading texture " << texture << " from:" << path << cerr;
     return 0;
   }
 }
 
-int PictureBook::useTexture(std::string texture)
+int PictureBook::useTexture(string texture)
 {
-  std::map<std::string, GLuint>::iterator iter = textureMap.find(texture);
+  map<string, GLuint>::iterator iter = textureMap.find(texture);
   if( iter != textureMap.end() )
   {
     glBindTexture( GL_TEXTURE_2D, iter->second );
     return 1;
   } else {
-    std::cerr << "texture " << texture << " was not load!" << std::cerr;
+    cerr << "texture " << texture << " was not load!" << cerr;
     return 0;
   }
 }
 
-bool PictureBook::isTexture(std::string texture)
+bool PictureBook::isTexture(string texture)
 {
-  std::map<std::string, GLuint>::iterator iter = textureMap.find(texture);
+  map<string, GLuint>::iterator iter = textureMap.find(texture);
   if( iter != textureMap.end() )
   {
     return true;

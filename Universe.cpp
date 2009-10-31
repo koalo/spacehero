@@ -16,8 +16,10 @@
  */
 #include "Universe.h"
 
+#include <math.h>
+
 #include "GLdisplay.h"
-#include "local.h"
+#include "Constants.h"
 
 Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
 {
@@ -54,12 +56,12 @@ Star::Star(Galaxy &g, double R, double phi, double iz, double v, double mass)
   radius = STARSIZE;
 }
 
-std::vector<Star> Galaxy::getStars(int seed) {
+vector<Star> Galaxy::getStars(int seed) {
   double v;
   double NStars = mass / 5e8;
   double NOrbits = mass / 2e10;
   double NStarsPerOrbit = NStars/NOrbits;
-  std::vector<Star> accu;
+  vector<Star> accu;
 
   srand(seed);
 
@@ -89,33 +91,75 @@ Universe::Universe(Level &l) :
   calcStars();
 }
 
+Blackhole::Blackhole(double ix, double iy, double imass) 
+  : SkyMass(ix, iy, imass, HOLESIZE*sqrt(imass/HOLEMEDIUMMASS))
+{
+}
+
+Galaxy::Galaxy(double ix, double iy, double imass, bool imaster, bool ilr) 
+  : SkyMass(ix, iy, imass, BULGESIZE), master(imaster), lr(ilr)
+{
+}
+
+inline void SkyMass::move(double delta) {
+  x += (vx/WIDTHINMETERS)*TIMESCALE*delta;
+  y += (vy/WIDTHINMETERS)*TIMESCALE*delta;
+  z += (vz/WIDTHINMETERS)*TIMESCALE*delta;
+  //if(hypot(vx,vy)>1) cerr << ".";
+}
+
+inline void SkyMass::newton(SkyMass &m, double &delta) {
+  double AX, AY, AZ, a1, a2, r3;
+  if( (!getexists()) || (!m.getexists()) ) return;
+
+  AX = x - m.x;
+  AY = y - m.y;
+  AZ = z - m.z;
+
+  r3 = sqrt(AX*AX+AY*AY+AZ*AZ);
+  r3 = r3*r3*r3;
+
+  AX = AX/r3;
+  AY = AY/r3;
+  AZ = AZ/r3;
+
+  a1 = SUNGRAVTIMEWIDTH*mass*delta;
+  m.vx += a1*AX;
+  m.vy += a1*AY;  
+  m.vz += a1*AZ;  
+
+  a2 = SUNGRAVTIMEWIDTH*m.mass*delta;
+  vx -= a2*AX;
+  vy -= a2*AY;
+  vz -= a2*AZ;
+}
 
 void Sky::calcStars()
 {
   stars.clear();
 
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
-    std::vector<Star> gstars = i->getStars(seed);
-    std::cerr << "got " << gstars.size() << " stars" << std::endl;
+  for(vector<Galaxy>::iterator i = galaxies.begin(); i != galaxies.end(); i++) {
+    vector<Star> gstars = i->getStars(seed);
+    cerr << "got " << gstars.size() << " stars" << endl;
     copy(gstars.begin(),gstars.end(),back_inserter(stars));
   }
-  std::cerr << "universe has " << stars.size() << " stars" << std::endl;
+  cerr << "universe has " << stars.size() << " stars" << endl;
 }
 
 void Universe::move(double delta)
 {
   delta *= 30; // speedup
   // star: hole, galaxy
-  for(std::vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
-    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+  for(vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
+    for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       i->newton(*j,delta);
     }
-    for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
+    for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
     if(stargrav)
     {
-      //for(std::vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
+      //for(vector<Star>::iterator l = stars.begin(); l!= stars.end(); l++) {
        // if(i!=l) i->newton(*l,delta);
       ////}
       //for(unsigned int a = 0; a < stars.size(); a++){}
@@ -123,11 +167,11 @@ void Universe::move(double delta)
     i->move(delta);
   }
   // galaxy: hole, galaxy
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
-    for(std::vector<Galaxy>::iterator j = i+1; j!= galaxies.end(); j++) {
+  for(vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) {
+    for(vector<Galaxy>::iterator j = i+1; j!= galaxies.end(); j++) {
       if(i!=j) i->newton(*j,delta);
     }
-    for(std::vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
+    for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
       i->newton(*k,delta);
     }
     i->move(delta);
@@ -140,14 +184,14 @@ void Universe::eventHorizon()
 {
   // fuer jede Stern wird geprueft ob die sich zu nah zu Black Hole befindet
   // wenn der Abstand kleiner als r ist, dann soll die verschwinden -> stars[j].exist = 0 statt 1 
-  for(std::vector<Blackhole>::iterator i = holes.begin(); i!= holes.end(); i++) {
-    for(std::vector<Star>::iterator j = stars.begin(); j!= stars.end(); j++) {
+  for(vector<Blackhole>::iterator i = holes.begin(); i!= holes.end(); i++) {
+    for(vector<Star>::iterator j = stars.begin(); j!= stars.end(); j++) {
       double r = hypot(i->x - j->x,i->y - j->y);
         if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
           j->setexists(false);
     }
     // fuer MittelPunkten von Galxies auch
-    for(std::vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+    for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       double r = hypot(i->x - j->x,i->y - j->y);
         if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
           j->setexists(false);
@@ -160,7 +204,7 @@ bool Universe::won()
 {
   int master = 0;
   int ingoal = 0;
-  for(std::vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) 
+  for(vector<Galaxy>::iterator i = galaxies.begin(); i!= galaxies.end(); i++) 
   {
     if( i->getmaster() )
     {

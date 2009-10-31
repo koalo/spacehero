@@ -17,23 +17,21 @@
 #ifndef _PICTUREBOOK_H_
 #define _PICTUREBOOK_H_
 
-#include <GL/gl.h>
-#include <SDL.h>
-#include <SDL_image.h>
+#include <string>
 #include <map>
-#include <iostream>
+using namespace std;
 
 class PictureBook
 {
   private:
-    std::string path;
-    std::map<std::string, GLuint> textureMap;
+    string path;
+    map<string, unsigned int> textureMap;
 
   public:
-    PictureBook(std::string texturepath);
-    int addTexture(std::string texture);
-    bool isTexture(std::string texture);
-    int useTexture(std::string texture);
+    PictureBook(string texturepath);
+    int addTexture(string texture);
+    bool isTexture(string texture);
+    int useTexture(string texture);
     void noTexture();
 };
 

@@ -28,7 +28,6 @@ SRC+=HttpManager.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
-SRC+=intro.cpp
 SRC+=output.cpp
 SRC+=main.cpp
 

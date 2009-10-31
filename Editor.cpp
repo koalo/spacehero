@@ -16,50 +16,58 @@
  */
 #include "Editor.h"
 
-Editor::Editor(Universe &universe) : uni(universe),maxreserve(MAXSTARTRESERVE),all(false),massreserve(maxreserve),setGalaxy(false),galaxyX(0),galaxyY(0),canPut(false),removing(false),size(medium),type(hole),zoom(0),scissors(),pointer()
+#include <GL/gl.h>
+#include <math.h>
+
+#include "ButtonMaster.h"
+#include "Constants.h"
+
+Editor::Editor(Universe &universe) 
+  : uni(universe), maxreserve(MAXSTARTRESERVE), all(false), massreserve(maxreserve), setGalaxy(false),
+    galaxyX(0), galaxyY(0), canPut(false), removing(false), size(medium), type(hole), zoom(0), scissors(), pointer()
 {
-static const char *image[] = {
-  /* width height num_colors chars_per_pixel */
-  "    32    32        3            1",
-  /* colors */
-  "X c #000000",
-  ". c #ffffff",
-  "  c None",
-  /* pixels */
-"                                ",
-"                                ",
-"                                ",
-"                                ",
-"   .....              ....      ",
-" ..XXXXX.            .XXXX.     ",
-".XXXXXXXX.          .XXXXX.     ",
-".XXXX..XXX.        .XXXXX.      ",
-".XXX.  .XX.       .XXXXX.       ",
-".XXX.  .XX.      .XXXXX.        ",
-" .XXX..XXX.     .XXXXX.         ",
-"  ..XXXXXXX.   .XXXXX.          ",
-"    ..XXXXXX. .XXXXX.           ",
-"      ..XXXXX.XXXXX.            ",
-"        .XXXXXXXXX.             ",
-"         .XXXXXXX.              ",
-"        .XXXXXXXXX.             ",
-"      ..XXXXX.XXXXX.            ", 
-"    ..XXXXXX. .XXXXX.           ", 
-"  ..XXXXXXX.   .XXXXX.          ",
-" .XXX..XXX.     .XXXXX.         ",
-".XXX.  .XX.      .XXXXX.        ",
-".XXX.  .XX.       .XXXXX.       ",
-".XXXX..XXX.        .XXXXX.      ",
-".XXXXXXXX.          .XXXXX.     ",
-" ..XXXXX.            .XXXX.     ",
-"   .....              ....      ",
-"                                ",
-"                                ",
-"                                ",
-"                                ",
-"                                ",
-  "13,15"
-};
+  static const char *image[] = {
+    /* width height num_colors chars_per_pixel */
+    "    32    32        3            1",
+    /* colors */
+    "X c #000000",
+    ". c #ffffff",
+    "  c None",
+    /* pixels */
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "   .....              ....      ",
+  " ..XXXXX.            .XXXX.     ",
+  ".XXXXXXXX.          .XXXXX.     ",
+  ".XXXX..XXX.        .XXXXX.      ",
+  ".XXX.  .XX.       .XXXXX.       ",
+  ".XXX.  .XX.      .XXXXX.        ",
+  " .XXX..XXX.     .XXXXX.         ",
+  "  ..XXXXXXX.   .XXXXX.          ",
+  "    ..XXXXXX. .XXXXX.           ",
+  "      ..XXXXX.XXXXX.            ",
+  "        .XXXXXXXXX.             ",
+  "         .XXXXXXX.              ",
+  "        .XXXXXXXXX.             ",
+  "      ..XXXXX.XXXXX.            ", 
+  "    ..XXXXXX. .XXXXX.           ", 
+  "  ..XXXXXXX.   .XXXXX.          ",
+  " .XXX..XXX.     .XXXXX.         ",
+  ".XXX.  .XX.      .XXXXX.        ",
+  ".XXX.  .XX.       .XXXXX.       ",
+  ".XXXX..XXX.        .XXXXX.      ",
+  ".XXXXXXXX.          .XXXXX.     ",
+  " ..XXXXX.            .XXXX.     ",
+  "   .....              ....      ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+    "13,15"
+  };
 
   int i, row, col;
   Uint8 data[4*32];
@@ -67,16 +75,20 @@ static const char *image[] = {
   int hot_x, hot_y;
 
   i = -1;
-  for ( row=0; row<32; ++row ) {
-    for ( col=0; col<32; ++col ) {
-      if ( col % 8 ) {
+  for ( row=0; row<32; ++row )
+  {
+    for ( col=0; col<32; ++col )
+    {
+      if ( col % 8 )
+      {
         data[i] <<= 1;
         mask[i] <<= 1;
       } else {
         ++i;
         data[i] = mask[i] = 0;
       }
-      switch (image[4+row][31-col]) {
+      switch (image[4+row][31-col])
+      {
         case 'X':
           data[i] |= 0x01;
           mask[i] |= 0x01;
@@ -89,10 +101,31 @@ static const char *image[] = {
       }
     }
   }
+
   sscanf(image[4+row], "%d,%d", &hot_x, &hot_y);
   pointer = SDL_GetCursor();
   scissors = SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
   SDL_SetCursor(pointer);
+}
+
+void Editor::setAllowAll(bool allowall)
+{
+  all = allowall;
+}
+
+bool Editor::isAllowAll()
+{
+  return all;
+}
+
+bool Editor::settingGalaxy()
+{
+  return setGalaxy;
+}
+
+Editor::Type Editor::getType()
+{
+  return type;
 }
 
 #define MPYTH(a,b,c) ((mousex-a)*(mousex-a) + (mousey-b)*(mousey-b) <= (c)*(c))
@@ -257,7 +290,6 @@ void Editor::drawMouse(SpaceDisplay* display)
 
   if(canPut && (all || (massreserve >= getHoleWeight())))
   {
-    //display->getDisplay()->PerspectiveMode();
     if(!all && massreserve < 2*getHoleWeight())
     {
       glColor3f(1,0,0.5);
@@ -366,10 +398,10 @@ double Editor::getSize()
   switch(type)
   {
     case hole:
-      return HOLESIZE*sqrt(getHoleWeight()/HOLEMEDIUMMASS);//*0.00000000002;
+      return HOLESIZE*sqrt(getHoleWeight()/HOLEMEDIUMMASS);
       // break;
     case bulge:
-      return BULGESIZE*sqrt(getBulgeWeight()/1.7e10); //getBulgeWeight()*0.000000000165;
+      return BULGESIZE*sqrt(getBulgeWeight()/1.7e10);
       // break;
     case goal:
       return getGoalRadius()*1.38;
@@ -377,6 +409,7 @@ double Editor::getSize()
     default:
       break;
   }
+
   return 0.0;
 }
 
@@ -417,3 +450,4 @@ SpaceDisplay::BridgeView Editor::getView()
 {
   return (all)?SpaceDisplay::EditorView:SpaceDisplay::PutView;
 }
+

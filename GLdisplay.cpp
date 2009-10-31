@@ -14,7 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Spacehero.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "GLdisplay.h"
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <math.h>
 
 GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   surface(0)

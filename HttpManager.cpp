@@ -36,7 +36,7 @@ void HttpManager::sendHeader(string page)
 {
   string message = "BLA";
   message += page;
-  cout << message << endl;
+  //cout << message << endl;
   boost::system::error_code ignored_error;
   boost::asio::write(socket, boost::asio::buffer(message),
           boost::asio::transfer_all(), ignored_error);
