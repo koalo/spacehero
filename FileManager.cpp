@@ -151,6 +151,11 @@ void FileManager::LevelMan(SpaceDisplay& display)
 
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
+      stringstream mystream;
+      HttpManager http("localhost");
+      http.sendHeader("/recvLevel.php");
+      mystream << levels.at(active); 
+      //http << mystream; 
     }
 
     usleep(100000);

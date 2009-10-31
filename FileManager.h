@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <vector>
 #include "Spacehero.h"
+#include "HttpManager.h"
 
 #include "boost/filesystem.hpp"
 #include "boost/regex.hpp"

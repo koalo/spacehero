@@ -24,6 +24,7 @@ SRC+=ButtonMaster.cpp
 SRC+=Level.cpp
 SRC+=Editor.cpp
 SRC+=FileManager.cpp
+SRC+=HttpManager.cpp
 SRC+=Universe.cpp 
 SRC+=Spacehero.cpp
 SRC+=SpaceDisplay.cpp
