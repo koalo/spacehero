@@ -26,6 +26,7 @@ class Illustrator
     unsigned int fontbase;
     unsigned int font;
     float fontsize;
+    float fontspace;
 
   public:
     Illustrator(string path);
@@ -40,6 +41,7 @@ class Illustrator
     void buildFont();
     void glPrint(float size, float red, float green, float blue, float x, float y, const char *format, ... );
     float getFontsize(){return fontsize;}
+    float getFontspace(){return fontspace;}
 };
 
 #endif

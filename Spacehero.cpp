@@ -127,9 +127,16 @@ Spacehero::SpaceheroState Spacehero::edit()
     return spacehero_next;
   }
 
-  display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+  if(view == SpaceDisplay::ScreenView)
+  {
+    display.getDisplay()->cleanDisplay();
+    display.displayUniverse(universe, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight(), false, true, true);
+  } else {
+    display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+    editor.drawMouse(&display);
+  }
+
   display.handleEvents(editor.getView(), bflags, editor);
-  editor.drawMouse(&display);
   SDL_GL_SwapBuffers();
   
   return state;

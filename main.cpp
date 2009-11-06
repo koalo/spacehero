@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <boost/filesystem.hpp>
@@ -27,8 +28,7 @@ using namespace boost::filesystem;
 #include "FileManager.h"
 #include "Spacehero.h"
 
-//int main(int argc, char *argv[])
-int main()
+int main(int argc, char *argv[])
 { 
   // Find data Dir
   vector<string> path;
@@ -64,7 +64,7 @@ int main()
 
   bool start = true;
 
-  if(true)
+  if(argc == 1)
   {
     while(true)
     {
@@ -147,12 +147,12 @@ int main()
       }
     }
   } else {
-  /*  ifstream level(argv[1]);
-    Level l(level);
-    cerr << l << endl;
-    Universe u(l);
+    ifstream levelfile(argv[1]);
+    Level lll(levelfile);
+    cerr << lll << endl;
+    Universe u(lll);
     Spacehero s(display,u);
-    s.play();*/
+    s.play(SpaceDisplay::ScreenView);
   }
 
   return 0;

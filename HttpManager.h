@@ -18,19 +18,21 @@
 #define _HTTPMANAGER_H_
 
 #include <string>
+#include <ostream>
 using namespace std;
 
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
 
-class HttpManager
+class HttpManager : public stringstream
 {
   private:
     boost::asio::io_service io_service;
     tcp::socket socket;
+    string server;
   public:
     HttpManager(string server);
-    void sendHeader(string page);
+    bool send(string page);
 };
 
 #endif

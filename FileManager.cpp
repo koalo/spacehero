@@ -177,9 +177,18 @@ void FileManager::LevelMan(SpaceDisplay& display)
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
       HttpManager http("localhost");
-      http.sendHeader("/recvLevel.php");
-      //mystream << levels.at(active); 
-      //http << mystream; 
+      http << levels.at(active); 
+      float fs = 50;
+      string text;
+      if(http.send("/recvLevel.php"))
+      {
+	text = "OK";
+      } else {
+	text = "Failed";
+      }
+      display.getIllustrator()->glPrint(fs, 0.0, 1.0, 1.0, 0.5*(display.getDisplay()->getWidth()-fs*text.length()*display.getIllustrator()->getFontspace()), display.getDisplay()->getHeight()*0.5-fs*0.5, text.c_str());
+      SDL_GL_SwapBuffers();
+      usleep(2e6);
     }
 
     usleep(100000);

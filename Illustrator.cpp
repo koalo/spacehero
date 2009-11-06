@@ -26,7 +26,7 @@ using namespace std;
 #include <math.h>
 
 Illustrator::Illustrator(string path) :
-  fontbase(0), font(0), fontsize(0)
+  fontbase(0), font(0), fontsize(0), fontspace(0.5)
 {
   int i;
   float fx, fy;
@@ -82,7 +82,7 @@ Illustrator::Illustrator(string path) :
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
-      glTranslatef( fontsize*0.5, 0, 0 );
+      glTranslatef( fontsize*fontspace, 0, 0 );
     glEndList( );
   }
 }

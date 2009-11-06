@@ -137,7 +137,6 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   illustrator.putImage(display.getWidth()-UNIVERSE_RIGHT, 0, UNIVERSE_RIGHT, display.getHeight());
 
 
-
   /**************************
    *        BUTTONS         *
    **************************/
