@@ -27,6 +27,12 @@ for($pos = 0; $pos < strlen($fromlevel); $pos++)
 
 echo $tolevel;
 
-$sth->execute(array("Testlevel","Bastler",$tolevel));
+$fromtitle = $_POST['title'];
+$totitle = $fromtitle;
+
+$fromcreator = $_POST['creator'];
+$tocreator = $fromcreator;
+
+$sth->execute(array($totitle,$tocreator,$tolevel));
 ?>
 

@@ -131,12 +131,13 @@ Spacehero::SpaceheroState Spacehero::edit()
   {
     display.getDisplay()->cleanDisplay();
     display.displayUniverse(universe, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight(), false, true, true);
+    display.handleEvents(editor.getView(), bflags, editor);
   } else {
     display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
+    display.handleEvents(editor.getView(), bflags, editor);
     editor.drawMouse(&display);
   }
 
-  display.handleEvents(editor.getView(), bflags, editor);
   SDL_GL_SwapBuffers();
   
   return state;

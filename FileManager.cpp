@@ -177,7 +177,12 @@ void FileManager::LevelMan(SpaceDisplay& display)
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
       HttpManager http("localhost");
+      http << "level=";
       http << levels.at(active); 
+      http << "&creator=";
+      http << "Unknown";
+      http << "&title=";
+      http << levels.at(active).getName();
       float fs = 50;
       string text;
       if(http.send("/recvLevel.php"))

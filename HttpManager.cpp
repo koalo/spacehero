@@ -39,24 +39,24 @@ HttpManager::HttpManager(string server)
 
 bool HttpManager::send(string page)
 {
-  string fromlevel = str();
-  string tolevel = "";
+  string fromcontent = str();
+  string tocontent = "";
 
   unsigned int pos;
-  for(pos = 0; pos < fromlevel.length(); pos++)
+  for(pos = 0; pos < fromcontent.length(); pos++)
   {
-    char ch = fromlevel.at(pos);
+    char ch = fromcontent.at(pos);
     if(ch == ' ')
     {
-      tolevel += "%20";
+      tocontent += "%20";
     }
     else if(ch == '\n')
     {
-      tolevel += "%0A";
+      tocontent += "%0A";
     } 
-    else if((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+    else if((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || (ch == '=') || (ch == '&'))
     {
-      tolevel += ch;
+      tocontent += ch;
     }
   }
 
@@ -68,16 +68,13 @@ bool HttpManager::send(string page)
   message << "Connection: close\r\n";
   message << "Content-Type: application/x-www-form-urlencoded\r\n";
   message << "Content-Length: ";
-  message << tolevel.length()+6; 
-  message << "\r\n";
-  message << "\r\nlevel=";
-  message << tolevel;
+  message << tocontent.length(); 
+  message << "\r\n\r\n";
+  message << tocontent;
   message << "\r\n\r\n";
 
-  //const boost::regex levelname("G");
-  //level = boost::regex_replace(level, levelname, "ALLE", boost::match_default | boost::format_sed);
+  cout << message.str();
 
-  cout << message.str() << endl;
   boost::system::error_code ignored_error;
   boost::asio::write(socket, boost::asio::buffer(message.str()),
     boost::asio::transfer_all(), ignored_error);
@@ -102,9 +99,6 @@ bool HttpManager::send(string page)
   {
     cout << result.substr(pos+4) << endl;
   }  
-  
-  cout << tolevel << endl;
-
   
   /*if(result.substr(pos+4) == tolevel)
   {
