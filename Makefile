@@ -3,8 +3,7 @@
 
 CPPFLAGS+=`sdl-config --cflags`
 
-CXXFLAGS+=-Wall -Wextra -Wparentheses
-CXXFLAGS+=-Weffc++
+CXXFLAGS+=-Wall -Wextra -Weffc++
 
 CXXFLAGS+=-O2
 

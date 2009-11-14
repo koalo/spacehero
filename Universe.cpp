@@ -268,7 +268,7 @@ void Universe::setStargrav(bool grav)
 
 void Universe::move(double delta)
 {
-  delta *= 30; // speedup
+  delta *= 50; // speedup
   // star: hole, galaxy
   for(vector<Star>::iterator i = stars.begin(); i!= stars.end(); i++) {
     for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
@@ -300,6 +300,8 @@ void Universe::move(double delta)
   eventHorizon();
 }
 
+#define XMALL 1e-250
+
 void Universe::eventHorizon()
 {
   // fuer jede Stern wird geprueft ob die sich zu nah zu Black Hole befindet
@@ -311,12 +313,20 @@ void Universe::eventHorizon()
           j->setexists(false);
     }
     // fuer MittelPunkten von Galxies auch
-    for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
+    for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++)
+    {
       double r = hypot(i->x - j->x,i->y - j->y);
-        if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
-          j->setexists(false);
+      if(r < HOLESIZE*0.5*sqrt(i->mass/HOLEMEDIUMMASS))
+      {
+	j->setexists(false);
+	if(abs(j->vx) > XMALL*100 && abs(j->vy) > XMALL*100)
+	{
+	  printf("%e\n",j->vx);
+	  j->vx *= XMALL;
+	  j->vy *= XMALL;
+	}
+      }
     }
-
   }
 }
 
@@ -331,6 +341,8 @@ bool Universe::won()
       master++;
       if( hypot(i->x - goal.x,i->y - goal.y) < goal.radius && i->getexists() && goal.getexists() )
       { 
+	i->vx /= 1e16;
+	i->vy /= 1e16;
         ingoal++;
       }
     }

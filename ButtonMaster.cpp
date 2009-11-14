@@ -31,7 +31,7 @@ Button::Button()
 }
 
 ButtonMaster::ButtonMaster(PictureBook &t, Illustrator &i)
-  : buttons(), textures(t), illustrator(i)
+  : buttons(), textures(t), illustrator(i), pressedButton("") 
 {
 }
 
@@ -62,14 +62,17 @@ void ButtonMaster::drawButtons()
       textures.useTexture(buttons.at(i).texture);
       illustrator.drawDisk(buttons.at(i).x,buttons.at(i).y,buttons.at(i).r);
     } else {
+      //textures.useTexture("button",buttons.at(i).texture == pressedButton);
       textures.useTexture("button");
       glEnable( GL_BLEND );
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       illustrator.putImage(buttons.at(i).x-buttons.at(i).r,buttons.at(i).y-buttons.at(i).r,buttons.at(i).r*2,buttons.at(i).r*2);
       glDisable( GL_BLEND );
-      float fontsize = buttons.at(i).r*0.4;
-      float length = buttons.at(i).texture.length()*fontsize*0.5;
-      illustrator.glPrint(fontsize, 0.0, 0.0, 0.0, buttons.at(i).x-length*0.5-fontsize*0.175, buttons.at(i).y-fontsize*0.5, buttons.at(i).texture.c_str());
+      illustrator.setFontheight(buttons.at(i).r*0.4);
+      float length = buttons.at(i).texture.length()*illustrator.getFontwidth();
+      glColor3f(0.0,0.0,0.0);
+      illustrator.glPrint(buttons.at(i).x-length*0.5-illustrator.getFontwidth()*0.35, buttons.at(i).y-illustrator.getFontwidth(), buttons.at(i).texture.c_str());
+      glColor3f(1.0,1.0,1.0);
     }
   }
 }
@@ -81,6 +84,7 @@ void ButtonMaster::checkButtons(ButtonFlags &flags, int x, int y)
     if( hypot(buttons.at(i).x-x,buttons.at(i).y-y) < buttons.at(i).r)
     {
       flags.activateFlag((AbstractButtonFlags::Actions)buttons.at(i).action);
+      pressedButton = buttons.at(i).texture;
     }
   }
 }

@@ -19,29 +19,61 @@
 
 #include <string>
 using namespace std;
+#include <SDL.h>
 
 class Illustrator
 {
   private:
     unsigned int fontbase;
     unsigned int font;
-    float fontsize;
+    float fontheight;
+    float fontpixels;
     float fontspace;
+    string input;
+    string inputtext;
+    bool doinput;
 
   public:
     Illustrator(string path);
     ~Illustrator();
 
+    enum VAnchor {
+      NORTH,
+      MIDDLE, 
+      SOUTH
+    };
+
+    enum HAnchor {
+      WEST,
+      CENTER,
+      EAST
+    };
+
+  private:
+    VAnchor fontvanchor;
+    HAnchor fonthanchor;
+
+  public:
     void putImage(float x, float y, float width, float height);
     void drawLine(float sx, float sy, float ex, float ey, float width, bool arrow = false, float hypo = 30.0);
     void drawRect(float red, float green, float blue, float x, float y, float width, float height);
     void drawSphere(float x, float y, float r);
     void drawDisk(float x, float y, float r);
 
+    void startInput(string text);
+    void drawInput();
+    void stopInput();
+    bool doingInput();
+    string getInput();
+    bool handleInput(SDL_Event& event); // returns false if ESC
+
     void buildFont();
-    void glPrint(float size, float red, float green, float blue, float x, float y, const char *format, ... );
-    float getFontsize(){return fontsize;}
+    void glPrint(float x, float y, const char *format, ... );
+    float getFontheight(){return fontheight;}
+    float getFontwidth(){return fontheight*fontspace;}
+    void setFontheight(float px);
     float getFontspace(){return fontspace;}
+    void setFontalign(VAnchor vanchor, HAnchor hanchor);
 };
 
 #endif

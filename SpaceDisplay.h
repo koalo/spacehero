@@ -41,6 +41,7 @@ class SpaceDisplay
     };
 
     void displayUniverse( Universe &uni, int width, int height, bool eye = false, bool pleft = true, bool arrows = false );
+    void initBridge(Universe &uni, BridgeView view);
     void drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight = 0);
     void handleEvents(BridgeView view, ButtonFlags &flags, Editor &editor);
     void showEnd(bool win, ButtonFlags &flags);

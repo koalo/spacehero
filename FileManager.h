@@ -32,6 +32,7 @@ class FileManager
     string savedir;
     string name;
     bool doinput;
+    bool nameinput; 
     vector<Level> levels;
     void draw(int i, SpaceDisplay &display, Universe &universe);
     void drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons);

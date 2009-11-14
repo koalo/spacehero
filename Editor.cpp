@@ -295,7 +295,7 @@ void Editor::drawMouse(SpaceDisplay* display)
       glColor3f(1,0,0.5);
     }
 
-    float x = display->getDisplay()->getWidth()-PANELRATIO*display->getDisplay()->getHeight()-280;
+    float x = display->getDisplay()->getWidth()-PANELRATIO*display->getDisplay()->getHeight()-7.0;
     float y = display->getDisplay()->getHeight()-50;
 
     switch(getType())
@@ -304,8 +304,9 @@ void Editor::drawMouse(SpaceDisplay* display)
 	display->getPictureBook()->useTexture("hole");
 	break;
       case Editor::bulge:
-	display->getIllustrator()->glPrint(20, 1, 1, 0, x, y, " left mouse -> white galaxy");
-	display->getIllustrator()->glPrint(20, 1, 1, 0, x, y+20, "right mouse -> green galaxy");
+	display->getIllustrator()->setFontalign(Illustrator::NORTH, Illustrator::EAST);
+	display->getIllustrator()->glPrint(x, y, "left mouse -> white galaxy");
+	display->getIllustrator()->glPrint(x, y+display->getIllustrator()->getFontheight(), "right mouse -> green galaxy");
 	display->getPictureBook()->useTexture("galaxy");
 	break;
       case Editor::goal:

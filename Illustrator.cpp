@@ -19,14 +19,13 @@
 #include <iostream>
 using namespace std;
 
-#include <SDL.h>
 #include <SDL_image.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <math.h>
 
 Illustrator::Illustrator(string path) :
-  fontbase(0), font(0), fontsize(0), fontspace(0.5)
+  fontbase(0), font(0), fontheight(0), fontpixels(0), fontspace(0.5), input(""), inputtext(""), doinput(false), fontvanchor(NORTH), fonthanchor(WEST)
 {
   int i;
   float fx, fy;
@@ -43,7 +42,7 @@ Illustrator::Illustrator(string path) :
 
     /* Textur erstellen */
     glTexImage2D( GL_TEXTURE_2D, 0, 4, fontImage->w, fontImage->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontImage->pixels );
-    fontsize = fontImage->w/(float)16;
+    fontpixels = fontImage->w/(float)16;
 
     //cout << "Bildbreite" << fontImage->w << "Fontsize: " << fontsize << endl;
     SDL_FreeSurface(fontImage);
@@ -66,15 +65,15 @@ Illustrator::Illustrator(string path) :
       glBegin( GL_QUADS );
         /* unten links */
         glTexCoord2f( fx - 1/16.0, fy );
-        glVertex2f( 0, fontsize );
+        glVertex2f( 0, fontpixels );
 
         /* unten rechts */
         glTexCoord2f( fx, fy );
-        glVertex2f( fontsize, fontsize );
+        glVertex2f( fontpixels, fontpixels );
 
         /* oben rechts */
         glTexCoord2f( fx, fy - 1/16.0 );
-        glVertex2f( fontsize, 0 );
+        glVertex2f( fontpixels, 0 );
 
         /* oben links */
         glTexCoord2f( fx - 1/16.0, fy - 1/16.0);
@@ -82,7 +81,7 @@ Illustrator::Illustrator(string path) :
       glEnd( );
 
       /* wieder zurueck, aber nicht ganz, dadurch überlagern sich die Buchstaben und sind enger */
-      glTranslatef( fontsize*fontspace, 0, 0 );
+      glTranslatef( fontpixels*fontspace, 0, 0 );
     glEndList( );
   }
 }
@@ -90,6 +89,70 @@ Illustrator::Illustrator(string path) :
 Illustrator::~Illustrator()
 {
   glDeleteLists(fontbase, 96);
+}
+
+void Illustrator::startInput(string text)
+{
+  input = "";
+  inputtext = text;
+  doinput = true;
+}
+
+void Illustrator::stopInput()
+{
+  doinput = false;
+}
+
+bool Illustrator::doingInput()
+{
+  return doinput;
+}
+
+string Illustrator::getInput()
+{
+  return input;
+}
+
+bool Illustrator::handleInput(SDL_Event& event)
+{
+  if(!doinput) return false;
+
+  if(event.type == SDL_KEYDOWN)
+  {
+    if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
+    {
+      input += toupper(event.key.keysym.sym);
+    } 
+    else if(event.key.keysym.sym == SDLK_BACKSPACE && input.length() > 0)
+    {
+      input.erase(input.end()-1);
+    }
+    else if(event.key.keysym.sym == SDLK_ESCAPE)
+    {
+      input = "";
+      doinput = false;
+      return false;
+    }
+    else if(event.key.keysym.sym == SDLK_RETURN)
+    {
+      doinput = false;
+    }
+  }
+
+  return true;
+}
+
+void Illustrator::drawInput()
+{ 
+  if(doinput)
+  {
+    string text = inputtext + " " + input;
+    if((clock() / 20000)  % 2)
+    {
+      text = text + "_";
+    }
+    glPrint(10.0, 10.0, text.c_str());
+  }
 }
 
 void Illustrator::drawLine(float sx, float sy, float ex, float ey, float width, bool arrow, float hypo)
@@ -167,7 +230,18 @@ void Illustrator::drawDisk(float x, float y, float r)
   gluDeleteQuadric(pObj);
 }
 
-void Illustrator::glPrint(float size, float red, float green, float blue, float x, float y, const char *format, ... )
+void Illustrator::setFontheight(float px)
+{
+  fontheight = px;
+}
+
+void Illustrator::setFontalign(VAnchor vanchor, HAnchor hanchor)
+{
+  fontvanchor = vanchor;
+  fonthanchor = hanchor;
+}
+
+void Illustrator::glPrint(float x, float y, const char *format, ... )
 {
   va_list ap;
   char text[256];
@@ -183,22 +257,48 @@ void Illustrator::glPrint(float size, float red, float green, float blue, float 
 
   /* Aussehen und Textur shiften einstellen */
   glBindTexture( GL_TEXTURE_2D, font );
+  glMatrixMode(GL_TEXTURE);
+  glLoadIdentity();
+  glScalef(1.0, 1.0, 1.0);
+  glMatrixMode(GL_MODELVIEW);
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
   glPushAttrib( GL_LIST_BIT );
   glListBase( fontbase - 32 );
 
   /* Groesse und Position anpassen */
+  switch(fonthanchor)
+  {
+    case WEST:
+      break;
+    case CENTER:
+      x = x - 0.5*getFontwidth()*strlen(text);
+      break;
+    case EAST:
+      x = x - getFontwidth()*strlen(text);
+      break;
+  }
+
+  switch(fontvanchor)
+  {
+    case NORTH:
+      break;
+    case MIDDLE:
+      y = y - 0.5*getFontheight();
+      break;
+    case SOUTH:
+      y = y - getFontheight();
+      break;
+  }
+
   glTranslatef(x,y,0.0);
-  glScalef((size/fontsize),(size/fontsize),1.0);
-  y += size+3.0f;
+  glScalef(fontheight/fontpixels,fontheight/fontpixels,1.0);
+  y += fontheight+3.0f;
 
   /* richtige Schrift */
-  glColor3f(red,green,blue);
   glCallLists( strlen(text), GL_BYTE, text );
 
   /* zurueckstellen */
-  glColor3f(1,1,1);
   glPopAttrib();
   glDisable( GL_BLEND );
   glPopMatrix();

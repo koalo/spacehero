@@ -96,7 +96,10 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
     }
   }
   help += " into the green target area.";
-  illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, help.c_str());
+  glColor3f(TEXTR,TEXTG,TEXTB);
+  illustrator.setFontheight(fontsize);
+  illustrator.setFontalign(Illustrator::NORTH, Illustrator::WEST);
+  illustrator.glPrint( fmargin, Y, help.c_str());
   for(i = 0; i < uni.galaxies.size(); i++)
   {
     if(uni.galaxies[i].getexists())
@@ -104,17 +107,19 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
       curse = atan2(uni.galaxies[i].vx,-uni.galaxies[i].vy); /* Vertauscht und VZ geaendert, dadurch quasi acot2 */
       curse = (curse < 0)?curse+2*M_PI:curse;
       curse = curse*(180/M_PI);
-      illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
+      illustrator.glPrint( fmargin, Y, "%i. Galaxy: Mass: %.0e kg, Curse: %i°",(i+1),uni.galaxies[0].mass,(int)round(curse));
     }
   }
 
   if(view == SimulationView)
   { 
-    illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "fps: %02.2f",uni.fps());
+    illustrator.glPrint( fmargin, Y, "fps: %02.2f",uni.fps());
   }
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
-  illustrator.glPrint( fontsize*2, TEXTR, TEXTG, TEXTB, fmargin, display.getHeight()-fontsize*2.3, uni.getName().c_str());
+  illustrator.setFontheight(fontsize*2);
+  illustrator.glPrint( fmargin, display.getHeight()-fontsize*2.3, uni.getName().c_str());
+  glColor3f(1.0,1.0,1.0);
   #undef Y
 
 
@@ -280,6 +285,16 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
 
   glTranslatef(-0.5f,-0.5f,0.0f);
 
+  /* evtl. fuer Verfolgungsmodus */
+  /*
+  float drehung = (atan2(uni.galaxies[0].vy,uni.galaxies[0].vx)/(2*M_PI))*360;
+  //glTranslatef( 0.5, 0.5, 0.0);
+  glTranslatef( 0.5, 0.8, 0.0 );
+  glRotatef(270-drehung, 0.0f, 0.0f, 1.0f);
+  glTranslatef( -uni.galaxies[0].x, -uni.galaxies[0].y, 0.0f );
+  //glRotatef(0.06, -1.0f, 0.0f, 0.0f);
+  //glTranslatef( uni.galaxies[0].vx/500000, uni.galaxies[0].vy/500000, 0.0f);
+*/
   drawStars(true,eye,pleft,uni);
 
   glPushMatrix();
@@ -289,19 +304,6 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
              0,
              0,
              0,1,0);
-/*    glRotatef(60, 1.0f, 0.0f, 0.0f);*/
-    /* fuer Drehung */
-/*    glRotatef(cam->rx, 1.0f, 0.0f, 0.0f);
-    glRotatef(cam->ry, 0.0f, 1.0f, 0.0f);
-    glRotatef(cam->rz, 0.0f, 0.0f, 1.0f);
-    */
-    /* evtl. fuer Verfolgungsmodus */
-  /*  drehung = (asin(stars[0].vy/stars[0].vx)/(2*M_PI))*360;
-    glRotatef(90, -1.0f, 0.0f, 0.0f);
-    glRotatef(90+drehung, 0.0f, 0.0f, 1.0f);
-    glTranslatef( -(stars[0].x - 0.5), -(0.5 - stars[0].y), 0.0f );
-    glTranslatef( stars[0].vx/500000, stars[0].vy/500000, 0.0f);*/
-
   glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
   glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );

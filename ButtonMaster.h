@@ -67,6 +67,7 @@ class ButtonMaster
     vector<Button> buttons;    
     PictureBook &textures;
     Illustrator &illustrator;
+    string pressedButton;
 
   public:
     void addButton(string texture, float x, float y, float r, ButtonFlags::Actions action);

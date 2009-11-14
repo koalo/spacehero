@@ -115,11 +115,14 @@ Spacehero::SpaceheroState Spacehero::edit()
   if(bflags.checkFlag(ButtonFlags::saveLevel))
   {
     FileManager saveas;
-    string savefile = "/tmp/"+saveas.getFile(display,universe)+".txt";
-    cout << "Wird jetzt gespeichert in: " << savefile << endl;
-    ofstream levelwrite(savefile.c_str());
-    levelwrite << universe;
-    //state = ?
+    string savefile = saveas.getFile(display,universe);
+    if(savefile != "")
+    {
+      savefile = "/tmp/"+savefile+".txt";
+      cout << "Wird jetzt gespeichert in: " << savefile << endl;
+      ofstream levelwrite(savefile.c_str());
+      levelwrite << universe;
+    }
   }
 
   if(bflags.checkFlag(ButtonFlags::skipLevel))

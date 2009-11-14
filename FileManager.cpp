@@ -29,7 +29,7 @@ using namespace std;
 #include "HttpManager.h"
 
 FileManager::FileManager()
-  : dirs(), savedir(""), name(""), doinput(true), levels() 
+  : dirs(), savedir(""), name(""), doinput(true), nameinput(false), levels() 
 {
 }
     
@@ -63,7 +63,16 @@ string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
         {
 	  name += toupper(event.key.keysym.sym);
 	} 
-	else if (event.key.keysym.sym == SDLK_RETURN)
+	else if(event.key.keysym.sym == SDLK_BACKSPACE && name.length() > 0)
+	{
+	  name.erase(name.end()-1);
+	}
+	else if(event.key.keysym.sym == SDLK_BACKSPACE || event.key.keysym.sym == SDLK_ESCAPE)
+	{
+          name = "";
+	  doinput = false;
+	}
+	else if(event.key.keysym.sym == SDLK_RETURN)
 	{
 	  doinput = false;
 	}
@@ -86,7 +95,7 @@ void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
   {
     sname = sname + "_";
   }
-  display.getIllustrator()->glPrint(30.0, 0.0, 1.0, 1.0, 10.0, 10.0, sname.c_str());
+  display.getIllustrator()->glPrint(10.0, 10.0, sname.c_str());
   SDL_GL_SwapBuffers();
 }
 
@@ -141,6 +150,8 @@ void FileManager::LevelMan(SpaceDisplay& display)
     while ( SDL_PollEvent( &event ) )
     {
       display.getDisplay()->handleEvents(event);
+      nameinput = display.getIllustrator()->handleInput(event);
+
       if(event.type == SDL_MOUSEBUTTONDOWN)
       {
 	buttons.checkButtons(flags,event.motion.x,event.motion.y);
@@ -176,11 +187,17 @@ void FileManager::LevelMan(SpaceDisplay& display)
 
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
+      display.getIllustrator()->startInput("Your Name (optional):");
+      nameinput = true;
+    }
+    
+    if(nameinput && !display.getIllustrator()->doingInput())
+    {
       HttpManager http("localhost");
       http << "level=";
       http << levels.at(active); 
       http << "&creator=";
-      http << "Unknown";
+      http << display.getIllustrator()->getInput();
       http << "&title=";
       http << levels.at(active).getName();
       float fs = 50;
@@ -191,7 +208,8 @@ void FileManager::LevelMan(SpaceDisplay& display)
       } else {
 	text = "Failed";
       }
-      display.getIllustrator()->glPrint(fs, 0.0, 1.0, 1.0, 0.5*(display.getDisplay()->getWidth()-fs*text.length()*display.getIllustrator()->getFontspace()), display.getDisplay()->getHeight()*0.5-fs*0.5, text.c_str());
+      display.getIllustrator()->setFontheight(fs);
+      display.getIllustrator()->glPrint(0.5*(display.getDisplay()->getWidth()-fs*text.length()*display.getIllustrator()->getFontspace()), display.getDisplay()->getHeight()*0.5-fs*0.5, text.c_str());
       SDL_GL_SwapBuffers();
       usleep(2e6);
     }
@@ -212,11 +230,14 @@ void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, Bu
     
   glDisable(GL_BLEND);
   glColor4f(1,1,1,1);
+  display.getIllustrator()->setFontheight(fontsize*0.8);
   for(unsigned int i = 0; i < levels.size(); i++)
   {
     y = (i+1)*fontsize;
     if((int)i == active) display.getIllustrator()->drawRect(0, 0, 1, display.getDisplay()->getWidth()*0.03, y, display.getDisplay()->getWidth()*0.7,fontsize);
-    display.getIllustrator()->glPrint(fontsize*0.8, 0.7, 0.7, 0, display.getDisplay()->getWidth()*0.05, y+fontsize*0.1, levels.at(i).getName().c_str());
+    glColor3f(1.0,1.0,0.0);
+    display.getIllustrator()->glPrint(display.getDisplay()->getWidth()*0.05, y+fontsize*0.1, levels.at(i).getName().c_str());
+    glColor3f(1.0,1.0,1.0);
   }
 
   buttons.clearButtons();
@@ -226,6 +247,7 @@ void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, Bu
   buttons.addButton("button_x", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(7/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::exit);
   buttons.drawButtons();  
 
+  display.getIllustrator()->drawInput();
   SDL_GL_SwapBuffers();
 }
 
