@@ -17,6 +17,7 @@
 #include "Spacehero.h"
 
 #include <fstream>
+#include <errno.h>
 using namespace std;
 
 #include <math.h>
@@ -25,7 +26,7 @@ using namespace std;
 
 Spacehero::Spacehero(SpaceDisplay &d, Universe &u)
   : state(spacehero_edit), won(false), bflags(), editor(u),
-    display(d), universe(u), paruni(0), view(SpaceDisplay::PutView)
+    display(d), universe(u), paruni(0), view(SpaceDisplay::PutView), levelinput(false)
 {
 }
 
@@ -112,17 +113,40 @@ Spacehero::SpaceheroState Spacehero::edit()
     state = spacehero_starteditor;
   }
   
-  if(bflags.checkFlag(ButtonFlags::saveLevel))
+  if(bflags.viewFlag(ButtonFlags::saveLevel) && !levelinput)
   {
-    FileManager saveas;
-    string savefile = saveas.getFile(display,universe);
+    display.getIllustrator()->startInput("Saves this level in ~/.spacehero/\n\nName for this level:");
+    levelinput = true;
+  }
+
+  if(bflags.viewFlag(ButtonFlags::saveLevel) && levelinput && !display.getIllustrator()->doingInput())
+  {
+    bflags.checkFlag(ButtonFlags::saveLevel); 
+    string savefile = display.getIllustrator()->getInput();
+    FileManager saver;
     if(savefile != "")
     {
-      savefile = "/tmp/"+savefile+".txt";
-      cout << "Wird jetzt gespeichert in: " << savefile << endl;
-      ofstream levelwrite(savefile.c_str());
-      levelwrite << universe;
+      try
+      {
+	universe.setName(savefile);
+        saver.saveLevel(universe);
+      } 
+      catch(ios_base::failure &e)
+      {
+        display.getIllustrator()->drawMessage(string("FAILED\n") + strerror(errno));
+	cerr << strerror(errno) << endl;
+        SDL_GL_SwapBuffers();
+	display.getDisplay()->waitForUser();
+      }
+      catch(exception &e)
+      {
+        display.getIllustrator()->drawMessage(string("FAILED\n") + e.what());
+	cerr << e.what() << endl;
+        SDL_GL_SwapBuffers();
+	display.getDisplay()->waitForUser();
+      }
     }
+    levelinput = false;
   }
 
   if(bflags.checkFlag(ButtonFlags::skipLevel))

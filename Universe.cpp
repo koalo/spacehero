@@ -142,13 +142,45 @@ Universe::Universe(Level &l) :
 }
 
 Level::Level()
-  : t0(), maxtime(30.0), lastt(0), m_delta(0), m_fpst(0), m_fps(0), name(""), holes(), goal()
+  : t0(), maxtime(30.0), lastt(0), m_delta(0), m_fpst(0), m_fps(0), name(""), filename(""), holes(), goal()
 {
 }
 
 void Level::setName(string name)
 {
   this->name = name;
+
+  unsigned int pos = -1;
+  pos = name.find(" ",pos+1);
+
+  while(pos < name.length()-1)
+  {
+    name = name.replace(pos, 1, "_");
+    pos = name.find(" ",pos+1);
+  }
+  
+  this->filename = name;
+}
+
+void Level::setFilename(string name)
+{
+  this->filename = name;
+
+  unsigned int pos = -1;
+  pos = name.find("_",pos+1);
+
+  while(pos < name.length()-1)
+  {
+    name = name.replace(pos, 1, " ");
+    pos = name.find("_",pos+1);
+  }
+  
+  this->name = name;
+}
+
+string Level::getFilename()
+{
+  return filename;
 }
 
 string Level::getName()

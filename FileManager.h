@@ -30,20 +30,21 @@ class FileManager
     FileManager& operator=(const FileManager&);
     vector<string> dirs;
     string savedir;
-    string name;
-    bool doinput;
+    //string name;
+    //bool doinput;
     bool nameinput; 
     vector<Level> levels;
-    void draw(int i, SpaceDisplay &display, Universe &universe);
+    //void draw(int i, SpaceDisplay &display, Universe &universe);
     void drawList(SpaceDisplay &display, float fontsize, int active, ButtonMaster& buttons);
   public:
     FileManager();
     void addLevelDir(string dir);
-    void setSaveDir(string dir);
+//    void setSaveDir(string dir);
+    void saveLevel(Level level);
     void loadLevels();
     Level nextLevel();
     bool hasLevel();
-    string getFile(SpaceDisplay &disp, Universe &uni);
+    //string getFile(SpaceDisplay &disp, Universe &uni);
     void handleEvents(SpaceDisplay &display);
     void LevelMan(SpaceDisplay& display);
 };

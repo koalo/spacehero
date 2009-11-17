@@ -5,7 +5,7 @@
 SIZE=40                        # Breite und Hoehe eines Zeichens
 POINT=72                       # Groesse eines Zeichen im Ausgangsbild
 DENS=100                       # Aufloesung eines Zeichen im Ausgangsbild
-FONT="./Engadget.ttf"
+FONT="./Font.ttf"
 #FONT=-*-freesans-bold-r-*-*-*-*-*-*-*-*-*-*
 #FONT=Penguin-Attack-Regular    # Schriftart - Achtung: Es muessen alle noetigen Zeichen vorhanden sein (z.B. °)
 

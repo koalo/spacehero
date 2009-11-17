@@ -117,7 +117,7 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   }
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "elapsed: %2.2f",uni.elapsed());
  // illustrator.glPrint( fontsize, TEXTR, TEXTG, TEXTB, fmargin, Y, "won: %d",uni.won());
-  illustrator.setFontheight(fontsize*2);
+  illustrator.setFontheight(fontsize*1.8);
   illustrator.glPrint( fmargin, display.getHeight()-fontsize*2.3, uni.getName().c_str());
   glColor3f(1.0,1.0,1.0);
   #undef Y
@@ -157,11 +157,13 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
   {  
     if(view == EditorView)
     {
-      buttons.addButton("hole", center, display.getHeight()*0.2, START_BUTTON, ButtonFlags::putHole);
-      buttons.addButton("galaxy", center, display.getHeight()*0.4, START_BUTTON, ButtonFlags::putBulge);
-      buttons.addButton("goal", center, display.getHeight()*0.6, START_BUTTON, ButtonFlags::putGoal);
+      buttons.addButton("hole", center, display.getHeight()*0.19, START_BUTTON, ButtonFlags::putHole);
+      buttons.addButton("galaxy", center, display.getHeight()*0.38, START_BUTTON, ButtonFlags::putBulge);
+      buttons.addButton("goal", center, display.getHeight()*0.57, START_BUTTON, ButtonFlags::putGoal);
 
-      ypos = display.getHeight()*0.75;
+      ypos = display.getHeight()*0.7;
+      
+      buttons.addButton("SAVE", center+REPLAY_BUTTON, display.getHeight()-UNIVERSE_BOTTOM-(START_BUTTON*2.1)-REPLAY_BUTTON, REPLAY_BUTTON, ButtonFlags::saveLevel);
     } else {
       ypos = display.getHeight()*0.35;
 
@@ -217,6 +219,14 @@ void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, 
    *       UNIVERSUM        *
    **************************/ 
   displayUniverse(uni, width, height, false, true, (view == EditorView || view == PutView));     
+  
+  if(illustrator.doingInput())
+  {
+    display.OrthoMode();
+    illustrator.setFontheight(22);
+    illustrator.drawInput();
+  }
+  display.PerspectiveMode(UNIVERSE_LEFT, UNIVERSE_TOP, display.getWidth()-UNIVERSE_RIGHT-UNIVERSE_LEFT, display.getHeight()-UNIVERSE_TOP-UNIVERSE_BOTTOM, VIEWANGLE);
 
   /* Versteckten Buffer aktivieren */
 //  SDL_GL_SwapBuffers();
@@ -449,12 +459,12 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
   if(win)
   {
     textures.useTexture("accomplished");
-    width = 629.0;
+    width = 629.0*2.4;
   } 
   else
   {
     textures.useTexture("timesup");
-    width = 265.0;
+    width = 265.0*2.4;
   }
   
   gluLookAt(0, 0, zoom,
@@ -462,7 +472,7 @@ void SpaceDisplay::showEnd(bool win, ButtonFlags &flags)
              0,
              0,
              0,1,0);
-  illustrator.putImage( 0.5-((width/102)*0.12)*0.5, 0.5-(0.12*0.5), (width/102)*0.12, 0.12 );
+  illustrator.putImage( 0.5-((width/102)*0.12)*0.5, 0.5-(2.4*0.12*0.5), (width/102)*0.12, 2.4*0.12 );
 
   SDL_GL_SwapBuffers();
 
@@ -516,6 +526,7 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
   while ( SDL_PollEvent( &event ) )
   {
     display.handleEvents(event);
+    illustrator.handleInput(event);
 
     /* Nur fuer Setzfenster */
     if((view == SpaceDisplay::PutView || view == SpaceDisplay::EditorView) && (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN))
@@ -607,7 +618,6 @@ void SpaceDisplay::handleEvents(BridgeView view, ButtonFlags &flags, Editor &edi
             flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::saveLevel);
             break;
           case SDLK_SPACE:
-            flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);
             if(view == SpaceDisplay::IntroView)
 	    {
 	      flags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::breakIntro);

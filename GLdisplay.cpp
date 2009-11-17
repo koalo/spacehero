@@ -106,6 +106,7 @@ GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   }
 
   //  if(fullscreen) SDL_WarpMouse(this->width,this->height);
+  SDL_EnableUNICODE(1);
 }
 
 GLdisplay::~GLdisplay()
@@ -237,3 +238,30 @@ void GLdisplay::handleEvents(SDL_Event &event)
       break;
   }
 }
+
+void GLdisplay::waitForUser()
+{
+  SDL_Event event;
+
+  // leeren
+  while ( SDL_PollEvent( &event ) );
+  {
+    handleEvents(event);
+  }
+
+  // warten
+  bool wait = true;
+  do
+  {
+    while ( SDL_PollEvent( &event ) )
+    {
+      handleEvents(event);
+
+      if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_KEYDOWN)
+      {
+	wait = false;
+      }
+    }
+  } while(wait);
+}
+

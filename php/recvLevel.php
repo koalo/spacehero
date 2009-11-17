@@ -1,4 +1,5 @@
 <?php
+ini_set("html_errors","false");
 $dbh = new PDO('mysql:host=localhost;dbname=spacehero', "spacehero", "2vYtaZWSvFj9aTAn");
 $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
@@ -25,14 +26,14 @@ for($pos = 0; $pos < strlen($fromlevel); $pos++)
   }
 }
 
-echo $tolevel;
-
 $fromtitle = $_POST['title'];
 $totitle = $fromtitle;
 
 $fromcreator = $_POST['creator'];
 $tocreator = $fromcreator;
 
-$sth->execute(array($totitle,$tocreator,$tolevel));
+if($sth->execute(array($totitle,$tocreator,$tolevel)))
+{
+  echo "OK";
+}
 ?>
-

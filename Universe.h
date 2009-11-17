@@ -132,6 +132,7 @@ class Level : public Sky
     double m_fpst;
     double m_fps;
     string name;
+    string filename;
   public:
     vector<Blackhole> holes;
     Goal goal;
@@ -140,7 +141,9 @@ class Level : public Sky
     Level();
     virtual ~Level() {};
     void setName(string name);
+    void setFilename(string name);
     string getName();
+    string getFilename();
 
   public:
     void tinit(); // start time measure

@@ -62,10 +62,11 @@ class Illustrator
 
     void startInput(string text);
     void drawInput();
+    void drawMessage(string text);
     void stopInput();
     bool doingInput();
     string getInput();
-    bool handleInput(SDL_Event& event); // returns false if ESC
+    void handleInput(SDL_Event& event);
 
     void buildFont();
     void glPrint(float x, float y, const char *format, ... );

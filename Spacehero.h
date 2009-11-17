@@ -55,6 +55,7 @@ class Spacehero
   SpaceDisplay::BridgeView view;
 
   static const double maxframerate = 1.0/50.0;
+  bool levelinput;
 
 public:
 

@@ -19,30 +19,50 @@
 #include <GL/gl.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/regex.hpp>
 using namespace boost::filesystem;
-
-#include <fstream>
-using namespace std;
 
 #include "Spacehero.h"
 #include "HttpManager.h"
 
 FileManager::FileManager()
-  : dirs(), savedir(""), name(""), doinput(true), nameinput(false), levels() 
+  : dirs(), savedir(""), nameinput(false), levels() 
 {
+  savedir = getenv("HOME");
+  savedir += "/.spacehero";
 }
     
 void FileManager::addLevelDir(string dir)
 {
   dirs.push_back(dir);
 }
-
+/*
 void FileManager::setSaveDir(string dir)
 {
   savedir = dir;
 }
+*/
+void FileManager::saveLevel(Level level)
+{
+  if(level.getFilename() != "")
+  {
+    if(!exists( savedir ))
+    {
+      create_directory( savedir );
+    }
 
+    string savefile = savedir+"/"+level.getFilename()+".txt";
+    cout << "Wird jetzt gespeichert in: " << savefile << endl;
+    boost::filesystem::ofstream levelwrite;
+    levelwrite.exceptions ( boost::filesystem::ofstream::eofbit | boost::filesystem::ofstream::failbit | boost::filesystem::ofstream::badbit );
+    levelwrite.open(savefile.c_str());
+    levelwrite << level;
+    levelwrite.close();
+  }
+}
+
+/*
 string FileManager::getFile(SpaceDisplay &disp, Universe &uni)
 {
   name = "";
@@ -98,7 +118,7 @@ void FileManager::draw(int i, SpaceDisplay &display, Universe &universe)
   display.getIllustrator()->glPrint(10.0, 10.0, sname.c_str());
   SDL_GL_SwapBuffers();
 }
-
+*/
 void FileManager::loadLevels()
 {
   string name;
@@ -110,11 +130,11 @@ void FileManager::loadLevels()
     {
       for (directory_iterator level(*dir); level != directory_iterator(); ++level)
       {
-	ifstream levelstream(level->path().string().c_str());
+	boost::filesystem::ifstream levelstream(level->path().string().c_str());
 	levels.push_back(Level(levelstream));
 	name = level->path().leaf();  
         name = boost::regex_replace(name, levelname, "\\1", boost::match_default | boost::format_sed);
-	levels.back().setName(name);
+	levels.back().setFilename(name);
       }
     }
   }
@@ -150,7 +170,12 @@ void FileManager::LevelMan(SpaceDisplay& display)
     while ( SDL_PollEvent( &event ) )
     {
       display.getDisplay()->handleEvents(event);
-      nameinput = display.getIllustrator()->handleInput(event);
+      display.getIllustrator()->handleInput(event);
+
+      if(event.key.keysym.sym == SDLK_ESCAPE)
+      {
+        nameinput = false;
+      }
 
       if(event.type == SDL_MOUSEBUTTONDOWN)
       {
@@ -187,31 +212,40 @@ void FileManager::LevelMan(SpaceDisplay& display)
 
     if(flags.checkFlag(ButtonFlags::transfer) && active >= 0 && active < (int)levels.size())
     {
-      display.getIllustrator()->startInput("Your Name (optional):");
+      display.getIllustrator()->startInput("Transfers this level to spacehero.de\nENTER for transfer, ESC for abort\n\nYour Name (optional):");
       nameinput = true;
     }
     
     if(nameinput && !display.getIllustrator()->doingInput())
     {
-      HttpManager http("localhost");
-      http << "level=";
-      http << levels.at(active); 
-      http << "&creator=";
-      http << display.getIllustrator()->getInput();
-      http << "&title=";
-      http << levels.at(active).getName();
-      float fs = 50;
-      string text;
-      if(http.send("/recvLevel.php"))
+      nameinput = false;
+      cout << "Transfer wurde aufgerufen" << endl;
+      drawList(display,fontsize,active,buttons);
+      try
       {
-	text = "OK";
-      } else {
-	text = "Failed";
+	HttpManager http("localhost");
+	http << "level=";
+	http << levels.at(active); 
+	if(display.getIllustrator()->getInput() != "")
+	{
+	  http << "&creator=";
+	  http << display.getIllustrator()->getInput();
+	}
+	http << "&title=";
+	http << levels.at(active).getFilename();
+	//float fs = 50;
+	//string text;
+	http.send("/recvLevel.php");
+	display.getIllustrator()->drawMessage("OK\nYour Level is transferred to spacehero.de\nIt will appear there in some minutes.");
+      } 
+      catch(exception &e)
+      {
+	display.getIllustrator()->drawMessage(string("FAILED\n")+e.what());
+	cerr << e.what() << endl;
       }
-      display.getIllustrator()->setFontheight(fs);
-      display.getIllustrator()->glPrint(0.5*(display.getDisplay()->getWidth()-fs*text.length()*display.getIllustrator()->getFontspace()), display.getDisplay()->getHeight()*0.5-fs*0.5, text.c_str());
+      //display.getIllustrator()->setFontheight(fs);
       SDL_GL_SwapBuffers();
-      usleep(2e6);
+      display.getDisplay()->waitForUser();
     }
 
     usleep(100000);
@@ -225,7 +259,7 @@ void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, Bu
   /* Bildschirm loeschen */
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
   display.getDisplay()->OrthoMode();
-  
+  display.getIllustrator()->setFontalign(Illustrator::NORTH, Illustrator::WEST);
   //display.getPictureBook()->noTexture();
     
   glDisable(GL_BLEND);

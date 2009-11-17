@@ -35,6 +35,7 @@ Level::Level(ifstream &in) :
   m_fpst(0),
   m_fps(0),
   name(""),
+  filename(""),
   holes(),
   goal()
 {

@@ -46,6 +46,7 @@ class GLdisplay
     void OrthoMode();
     void PerspectiveMode(int left, int top, int width, int height, float angle);
     void handleEvents(SDL_Event &event);
+    void waitForUser();
 };
 
 #endif

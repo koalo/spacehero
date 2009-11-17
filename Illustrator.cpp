@@ -113,15 +113,18 @@ string Illustrator::getInput()
   return input;
 }
 
-bool Illustrator::handleInput(SDL_Event& event)
+void Illustrator::handleInput(SDL_Event& event)
 {
-  if(!doinput) return false;
-
   if(event.type == SDL_KEYDOWN)
   {
-    if((event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
+    if((event.key.keysym.unicode == ' ') || (event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z') || (event.key.keysym.sym >= '0' && event.key.keysym.sym <= '9'))
     {
-      input += toupper(event.key.keysym.sym);
+      if(event.key.keysym.mod & KMOD_SHIFT)
+      {	
+        input += toupper(event.key.keysym.unicode);
+      } else {
+	input += event.key.keysym.unicode;
+      }
     } 
     else if(event.key.keysym.sym == SDLK_BACKSPACE && input.length() > 0)
     {
@@ -131,28 +134,100 @@ bool Illustrator::handleInput(SDL_Event& event)
     {
       input = "";
       doinput = false;
-      return false;
     }
     else if(event.key.keysym.sym == SDLK_RETURN)
     {
       doinput = false;
     }
   }
-
-  return true;
 }
 
 void Illustrator::drawInput()
 { 
   if(doinput)
   {
-    string text = inputtext + " " + input;
-    if((clock() / 20000)  % 2)
+    string text = inputtext + "\n" + input;
+    if((SDL_GetTicks() / 500)  % 2)
     {
-      text = text + "_";
+      text += "_";
+    } else {
+      text += " ";
     }
-    glPrint(10.0, 10.0, text.c_str());
+    drawMessage(text);
   }
+}
+
+void Illustrator::drawMessage(string text)
+{
+  const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo( );
+  int winwidth = videoInfo->current_w;
+  int winheight = videoInfo->current_h;
+
+  unsigned int pos = 0;
+  unsigned int lastpos = 0;
+  unsigned int lines = 0;
+  unsigned int maxlength = 10;
+
+  while(true)
+  {
+    if((((pos < text.length()-1)?pos:(text.length()-1)) - lastpos) > winwidth/getFontwidth())
+    {
+      maxlength = winwidth/getFontwidth();
+      lastpos += winwidth/getFontwidth();
+      text.insert(lastpos,"\n");
+      pos++;
+      lines++;
+      continue;
+    }
+
+    if(pos >= text.length()-1) break;
+
+    if(pos - lastpos > maxlength)
+    {
+      maxlength = pos - lastpos;
+    }
+    lastpos = pos;
+    pos = text.find("\n",pos+1);
+    lines++;
+  }
+
+  if(text.length() - lastpos > maxlength)
+  {
+    maxlength = text.length() - lastpos;
+  }
+
+  glBindTexture( GL_TEXTURE_2D, 0 );
+  glEnable(GL_BLEND);
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glColor4f(0.0,0.0,0.5,0.8);
+  int width = getFontwidth()*(maxlength+7);
+  int height = getFontheight()*(lines+2);
+  int x = winwidth / 2 - width/2;
+  int y = winheight / 2 - height/2;
+
+  /* Objekt zeichnen */
+  glBegin(GL_QUADS);
+  glVertex3f( x, y, 0.0f );
+  glVertex3f( x+width, y, 0.0f );
+  glVertex3f( x+width, y+height, 0.0f );
+  glVertex3f( x, y+height, 0.0f );
+  glEnd();
+  
+  glColor3f(1,1,1);
+  glDisable(GL_BLEND);
+
+  setFontalign(SOUTH, CENTER);
+  pos = -1;
+  lastpos = -1;
+  unsigned int i = 0;
+
+  do
+  {
+    lastpos = pos;
+    pos = text.find("\n",pos+1);
+    glPrint(winwidth/2, winheight/2+getFontheight()*(i-0.5*lines+1), text.substr(lastpos+1,pos-lastpos).c_str());
+    i++;
+  } while(pos < text.length()-1);
 }
 
 void Illustrator::drawLine(float sx, float sy, float ex, float ey, float width, bool arrow, float hypo)

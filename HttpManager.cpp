@@ -28,13 +28,17 @@ HttpManager::HttpManager(string server)
   tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
   tcp::resolver::iterator end;
   boost::system::error_code error = boost::asio::error::host_not_found;
-  while (error && endpoint_iterator != end)
+
+  while(error && endpoint_iterator != end)
   {
-      socket.close();
-        socket.connect(*endpoint_iterator++, error);
+    socket.close();
+    socket.connect(*endpoint_iterator++, error);
   }
-  if (error)
-      throw boost::system::system_error(error);
+
+  if(error)
+  {
+    throw boost::system::system_error(error);
+  }
 }
 
 bool HttpManager::send(string page)
@@ -54,13 +58,14 @@ bool HttpManager::send(string page)
     {
       tocontent += "%0A";
     } 
-    else if((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || (ch == '=') || (ch == '&'))
+    else if((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || (ch == '=') || (ch == '&') || (ch == '_'))
     {
       tocontent += ch;
     }
   }
 
-  stringstream message;
+  boost::asio::streambuf request;
+  ostream message(&request);
   message << "POST ";
   message << page;
   message << " HTTP/1.1\r\n";
@@ -72,39 +77,69 @@ bool HttpManager::send(string page)
   message << "\r\n\r\n";
   message << tocontent;
   message << "\r\n\r\n";
+  cout << tocontent;
 
-  cout << message.str();
-
-  boost::system::error_code ignored_error;
-  boost::asio::write(socket, boost::asio::buffer(message.str()),
-    boost::asio::transfer_all(), ignored_error);
-
-  // TODO COULD LEAD TO DEAD!!!!!!
-  stringstream resultstream;
-  while(true)
+  boost::system::error_code error;
+  boost::asio::write(socket, request, boost::asio::transfer_all(), error);
+  if(error)
   {
-    boost::array<char, 128> buf;
-    boost::system::error_code error;
-    size_t len = socket.read_some(boost::asio::buffer(buf), error);
-    if (error == boost::asio::error::eof)
-      break; // Connection closed cleanly by peer.
-    else if (error)
-      throw boost::system::system_error(error); // Some other error.
-    resultstream.write(buf.data(), len);
+    throw boost::system::system_error(error);
   }
- 
-  string result = resultstream.str();
-  pos = result.find("\r\n\r\n");
-  if(pos != std::string::npos)
+
+  // Read the response status line.
+  boost::asio::streambuf response;
+  boost::asio::read_until(socket, response, "\r\n");
+
+  // Check that response is OK.
+  istream response_stream(&response);
+  string http_version;
+  response_stream >> http_version;
+  unsigned int status_code;
+  response_stream >> status_code;
+  string status_message;
+  std::getline(response_stream, status_message);
+  if (!response_stream || http_version.substr(0, 5) != "HTTP/")
   {
-    cout << result.substr(pos+4) << endl;
-  }  
+    throw boost::system::system_error(boost::asio::error::operation_not_supported, "Invalid response");
+  }
+  if (status_code != 200)
+  {
+    throw logic_error("Response returned with HTTP status code "+status_code);
+  }
+
+  // Read the response headers, which are terminated by a blank line.
+  boost::asio::read_until(socket, response, "\r\n\r\n");
+
+  // Process the response headers.
+  string header;
+  while(std::getline(response_stream, header) && header != "\r")
+  {
+    // will keinen Header
+  }
+
+  // Write whatever content we already have to output.
+  stringstream returnmessage;
+  if (response.size() > 0)
+  {
+    returnmessage << &response;
+  }
+
+  // Read until EOF, writing data to output as we go.
+  while (boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error))
+  {
+    returnmessage << &response;
+  }
+
+  if (error != boost::asio::error::eof)
+  {
+    throw boost::system::system_error(error);
+  }
   
-  /*if(result.substr(pos+4) == tolevel)
+  if(returnmessage.str() != "OK")
   {
-    cout << "OK" << endl;
-  } else {
-    cout << "Failed" << endl;
-  }*/
+    throw logic_error(returnmessage.str());
+  }
+
   return true;
 }
+

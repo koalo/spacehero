@@ -57,7 +57,8 @@ int main(int argc, char *argv[])
   // Load FileManager
   FileManager fileman;
   fileman.addLevelDir( "./level/" );
-  fileman.addLevelDir( "~/.spacehero/level/" );
+  string home = getenv("HOME");
+  fileman.addLevelDir( home + "/.spacehero/" );
   fileman.addLevelDir( "/usr/share/games/spacehero/level/" );
     
   Spacehero::SpaceheroState state = Spacehero::spacehero_next;
