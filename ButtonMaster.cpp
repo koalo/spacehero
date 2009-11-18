@@ -68,7 +68,7 @@ void ButtonMaster::drawButtons()
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       illustrator.putImage(buttons.at(i).x-buttons.at(i).r,buttons.at(i).y-buttons.at(i).r,buttons.at(i).r*2,buttons.at(i).r*2);
       glDisable( GL_BLEND );
-      illustrator.setFontheight(buttons.at(i).r*0.4);
+      illustrator.setFontheight(pow(buttons.at(i).r,0.7)*1.3);
       float length = buttons.at(i).texture.length()*illustrator.getFontwidth();
       glColor3f(0.0,0.0,0.0);
       illustrator.glPrint(buttons.at(i).x-length*0.5-illustrator.getFontwidth()*0.35, buttons.at(i).y-illustrator.getFontwidth(), buttons.at(i).texture.c_str());
