@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
     Universe u(lll);
     Spacehero s(display,u);
     s.play(SpaceDisplay::ScreenView);
+    display.getDisplay()->save();
   }
 
   return 0;

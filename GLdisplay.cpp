@@ -21,6 +21,8 @@
 #include <GL/glu.h>
 #include <math.h>
 
+#include <iostream>
+
 GLdisplay::GLdisplay(bool fullscreen, int width, int height, int bpp):
   surface(0)
   ,videoFlags(0)
@@ -265,3 +267,47 @@ void GLdisplay::waitForUser()
   } while(wait);
 }
 
+int GLdisplay::save()
+{
+  char *filename = "test.bmp";
+
+  SDL_Surface *temp;
+  unsigned char *pixels;
+  int i;
+ // int width = 1024;
+//  int height = 600;
+    int width = 1022;//videoInfo->current_w;
+    int height = videoInfo->current_h;
+                    
+        temp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+        0x000000FF, 0x0000FF00, 0x00FF0000, 0
+#else
+        0x00FF0000, 0x0000FF00, 0x000000FF, 0
+#endif
+        );
+
+        if (temp == NULL) return -1;
+
+        pixels = (unsigned char*)malloc(3 * width * height);
+        if (pixels == NULL)
+        {
+          SDL_FreeSurface(temp);
+          return -1;
+        }
+
+        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+        for (i=0; i < height; i++)
+	{
+	  memcpy(((char *) temp->pixels) + temp->pitch*i, 
+                       pixels + 3* width * (height-i-1), 
+                       width*3);
+	}
+
+	free(pixels);
+
+        SDL_SaveBMP(temp, filename);
+        SDL_FreeSurface(temp);
+    return 0;
+}

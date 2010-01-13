@@ -46,6 +46,7 @@ Spacehero::SpaceheroState Spacehero::play(SpaceDisplay::BridgeView myview)
     case SpaceDisplay::SimulationView:
       state = spacehero_startsimu;
       break;
+    case SpaceDisplay::ScreenView:
     case SpaceDisplay::PutView:
     default:
       state = spacehero_edit;
@@ -159,6 +160,10 @@ Spacehero::SpaceheroState Spacehero::edit()
     display.getDisplay()->cleanDisplay();
     display.displayUniverse(universe, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight(), false, true, true);
     display.handleEvents(editor.getView(), bflags, editor);
+    display.getDisplay()->cleanDisplay();
+    display.displayUniverse(universe, (*display.getDisplay()).getWidth(), (*display.getDisplay()).getHeight(), false, true, true);
+    display.handleEvents(editor.getView(), bflags, editor);
+    bflags.activateFlag((AbstractButtonFlags::Actions)ButtonFlags::exit);
   } else {
     display.drawBridge(universe,editor.getView(),editor.getQuotient(),editor.getHoleWeight());
     display.handleEvents(editor.getView(), bflags, editor);
@@ -166,7 +171,7 @@ Spacehero::SpaceheroState Spacehero::edit()
   }
 
   SDL_GL_SwapBuffers();
-  
+
   return state;
 }
 
@@ -290,7 +295,8 @@ Spacehero::SpaceheroState Spacehero::simulate()
   return state;
 }
 
-Spacehero::SpaceheroState Spacehero::handleEvents() {
+Spacehero::SpaceheroState Spacehero::handleEvents() 
+{
   return state;
 }
 
