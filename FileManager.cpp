@@ -27,7 +27,7 @@ using namespace boost::filesystem;
 #include "HttpManager.h"
 
 FileManager::FileManager()
-  : dirs(), savedir(""), nameinput(false), levels() 
+  : dirs(), savedir(""), position(0), nameinput(false), levels() 
 {
   savedir = getenv("HOME");
   savedir += "/.spacehero";
@@ -181,10 +181,10 @@ void FileManager::LevelMan(SpaceDisplay& display)
       {
 	buttons.checkButtons(flags,event.motion.x,event.motion.y);
 	nr = (unsigned int)(event.motion.y / fontsize);
-	if(event.motion.x < display.getDisplay()->getWidth()*0.8 && nr > 0 && nr < levels.size()+1)
+	if(event.motion.x < display.getDisplay()->getWidth()*0.8 && event.motion.x > display.getDisplay()->getWidth()*0.1 && nr > 0 && nr < levels.size()+1)
 	{
-	  active = nr - 1;
-	  cerr << levels.at(nr-1).getName() << endl;
+	  active = ((nr-1)+position)%levels.size();
+	  cerr << levels.at(active).getName() << endl;
 	}
       }
     }
@@ -214,6 +214,18 @@ void FileManager::LevelMan(SpaceDisplay& display)
     {
       display.getIllustrator()->startInput("Transfers this level to spacehero.de\nENTER for transfer, ESC for abort\n\nYour Name (optional):");
       nameinput = true;
+    }
+    
+    if(flags.checkFlag(ButtonFlags::up))
+    {
+      position--;
+      if(position < 0) position = levels.size();
+    }
+    
+    if(flags.checkFlag(ButtonFlags::down))
+    {
+      position++;
+      if(position > (int)levels.size()) position = 0;
     }
     
     if(nameinput && !display.getIllustrator()->doingInput())
@@ -265,20 +277,24 @@ void FileManager::drawList(SpaceDisplay &display, float fontsize, int active, Bu
   glDisable(GL_BLEND);
   glColor4f(1,1,1,1);
   display.getIllustrator()->setFontheight(fontsize*0.8);
-  for(unsigned int i = 0; i < levels.size(); i++)
+  for(unsigned int i = 0; i < 13 && i < levels.size(); i++)
   {
     y = (i+1)*fontsize;
-    if((int)i == active) display.getIllustrator()->drawRect(0, 0, 1, display.getDisplay()->getWidth()*0.03, y, display.getDisplay()->getWidth()*0.7,fontsize);
+    if((int)(i+position)%levels.size() == active) display.getIllustrator()->drawRect(0, 0, 1, display.getDisplay()->getWidth()*0.09, y, display.getDisplay()->getWidth()*0.7,fontsize);
     glColor3f(1.0,1.0,0.0);
-    display.getIllustrator()->glPrint(display.getDisplay()->getWidth()*0.05, y+fontsize*0.1, levels.at(i).getName().c_str());
+    display.getIllustrator()->glPrint(display.getDisplay()->getWidth()*0.12, y+fontsize*0.1, levels.at((i+position)%levels.size()).getName().c_str());
     glColor3f(1.0,1.0,1.0);
   }
 
   buttons.clearButtons();
   buttons.addButton("START", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(1/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::startGame);
   buttons.addButton("EDIT", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(3/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::startEditor);
+  /*
   buttons.addButton("TRANSFER", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(5/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::transfer);
+  */
   buttons.addButton("button_x", display.getDisplay()->getWidth()*0.9, display.getDisplay()->getHeight()*(7/8.0), display.getDisplay()->getWidth()*0.06, ButtonFlags::exit);
+  buttons.addButton("button_up", display.getDisplay()->getWidth()*0.05, display.getDisplay()->getHeight()*0.11, display.getDisplay()->getWidth()*0.03, ButtonFlags::up);
+  buttons.addButton("button_down", display.getDisplay()->getWidth()*0.05, display.getDisplay()->getHeight()*0.91, display.getDisplay()->getWidth()*0.03, ButtonFlags::down);
   buttons.drawButtons();  
 
   display.getIllustrator()->drawInput();

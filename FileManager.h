@@ -30,6 +30,7 @@ class FileManager
     FileManager& operator=(const FileManager&);
     vector<string> dirs;
     string savedir;
+    int position;
     //string name;
     //bool doinput;
     bool nameinput; 

@@ -54,6 +54,8 @@ SpaceDisplay::SpaceDisplay(std::string path) :
   textures.addTexture("bulge");
   textures.addTexture("accomplished");
   textures.addTexture("timesup");
+  textures.addTexture("button_up");
+  textures.addTexture("button_down");
 }
 
 void SpaceDisplay::drawBridge(Universe &uni, BridgeView view, double indicator, double holeWeight)
