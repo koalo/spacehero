@@ -313,7 +313,7 @@ void Universe::move(double delta)
 #define TO2PI(x) ((x)<0?(x)+M_PI*2:(x))
     for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
     //  i->newton(*k,delta);
-      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->y)));
+      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->x)));
       if(ang > M_PI)
       {
 	ang = 2*M_PI-ang;
@@ -339,7 +339,7 @@ void Universe::move(double delta)
       if(i!=j) i->newton(*j,delta);
     }
     for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
-      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->y)));
+      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->x)));
       if(ang > M_PI)
       {
 	ang = 2*M_PI-ang;
@@ -347,7 +347,12 @@ void Universe::move(double delta)
 
       if(ang < 0.25*M_PI)
       {
+	cout << 1 << endl;
         i->newton(*k,delta*AFUN(ang));
+      }
+      else
+      {
+	cout << 0 << endl;
       }
     }
     i->move(delta);

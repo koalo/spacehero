@@ -356,7 +356,10 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   for(i = 0; i < uni.holes.size(); i++)
   {
     drawSkymass(uni.holes[i]);
+  }
 
+  for(i = 0; i < uni.holes.size(); i++)
+  {
     if(true)
     {
       glColor4f(0.4,0.4,0,1);
