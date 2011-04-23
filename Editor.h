@@ -41,6 +41,7 @@ class Editor
     double massreserve;
 
     bool setGalaxy;
+    bool setHole;
     int galaxyX;
     int galaxyY;
     bool canPut;

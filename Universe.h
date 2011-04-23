@@ -52,7 +52,7 @@ class SkyMass : public SkyObject
     SkyMass();
     SkyMass(double ix, double iy, double imass, double iradius);
     
-    inline void newton(SkyMass &m, double &delta);
+    inline void newton(SkyMass &m, double delta);
     inline void move(double delta);
 
     friend ostream& operator<< (ostream &o, const SkyMass &g);

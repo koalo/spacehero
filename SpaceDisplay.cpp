@@ -340,7 +340,7 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
       if(arrows)
       {
 	glColor4f(0.4,0.4,0,1);
-#define ARROWFAC 0.5e-6
+        double ARROWFAC = 0.5e-6;
 	getIllustrator()->drawLine(uni.galaxies.at(i).x,uni.galaxies.at(i).y,uni.galaxies.at(i).x+uni.galaxies.at(i).vx*ARROWFAC,uni.galaxies.at(i).y+uni.galaxies.at(i).vy*ARROWFAC,2,true,0.06);
         glColor4f(1,1,1,1);
       }
@@ -356,6 +356,15 @@ void SpaceDisplay::displayUniverse( Universe &uni, int width, int height, bool e
   for(i = 0; i < uni.holes.size(); i++)
   {
     drawSkymass(uni.holes[i]);
+
+    if(true)
+    {
+      glColor4f(0.4,0.4,0,1);
+      double ARROWFAC = 0.5e-6;
+//      double ARROWFAC = sqrt(uni.holes.at(i).vx*uni.holes.at(i).vx+uni.holes.at(i).vy*uni.holes.at(i).vy);
+      getIllustrator()->drawLine(uni.holes.at(i).x,uni.holes.at(i).y,uni.holes.at(i).x+uni.holes.at(i).vx*ARROWFAC,uni.holes.at(i).y+uni.holes.at(i).vy*ARROWFAC,2,true,0.06);
+      glColor4f(1,1,1,1);
+    }
   }
   
   /* Ziel */  

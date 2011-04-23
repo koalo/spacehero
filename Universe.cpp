@@ -250,7 +250,7 @@ inline void SkyMass::move(double delta) {
   //if(hypot(vx,vy)>1) cerr << ".";
 }
 
-inline void SkyMass::newton(SkyMass &m, double &delta) {
+inline void SkyMass::newton(SkyMass &m, double delta) {
   double AX, AY, AZ, a1, a2, r3;
   if( (!getexists()) || (!m.getexists()) ) return;
 
@@ -298,6 +298,7 @@ void Universe::setStargrav(bool grav)
   this->stargrav = grav;
 }
 
+//#define TO2PI(x) ((x)<0?(x)+M_PI*2:(x))
 void Universe::move(double delta)
 {
   delta *= 50; // speedup
@@ -306,8 +307,22 @@ void Universe::move(double delta)
     for(vector<Galaxy>::iterator j = galaxies.begin(); j!= galaxies.end(); j++) {
       i->newton(*j,delta);
     }
+
+#define AFUN(x) (1)
+#define ABS(x) ((x<0)?-(x):(x))
+#define TO2PI(x) ((x)<0?(x)+M_PI*2:(x))
     for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
-      i->newton(*k,delta);
+    //  i->newton(*k,delta);
+      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->y)));
+      if(ang > M_PI)
+      {
+	ang = 2*M_PI-ang;
+      }
+
+      if(ang < 0.25*M_PI)
+      {
+        i->newton(*k,delta*AFUN(ang));
+      }
     }
     if(stargrav)
     {
@@ -324,7 +339,16 @@ void Universe::move(double delta)
       if(i!=j) i->newton(*j,delta);
     }
     for(vector<Blackhole>::iterator k = holes.begin(); k!= holes.end(); k++) {
-      i->newton(*k,delta);
+      double ang = ABS(TO2PI(atan2(k->vy,k->vx))-TO2PI(atan2(i->y-k->y,i->x-k->y)));
+      if(ang > M_PI)
+      {
+	ang = 2*M_PI-ang;
+      }
+
+      if(ang < 0.25*M_PI)
+      {
+        i->newton(*k,delta*AFUN(ang));
+      }
     }
     i->move(delta);
   }

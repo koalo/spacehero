@@ -23,7 +23,7 @@
 #include "Constants.h"
 
 Editor::Editor(Universe &universe) 
-  : uni(universe), maxreserve(MAXSTARTRESERVE), all(false), massreserve(maxreserve), setGalaxy(false),
+  : uni(universe), maxreserve(MAXSTARTRESERVE), all(false), massreserve(maxreserve), setGalaxy(false), setHole(false),
     galaxyX(0), galaxyY(0), canPut(false), removing(false), size(medium), type(hole), zoom(0), scissors(), pointer()
 {
   static const char *image[] = {
@@ -120,7 +120,7 @@ bool Editor::isAllowAll()
 
 bool Editor::settingGalaxy()
 {
-  return setGalaxy;
+  return setGalaxy || setHole;
 }
 
 Editor::Type Editor::getType()
@@ -135,14 +135,23 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
   bool canRemove = false;
   bool wasRemoving = false; 
 
-  if(setGalaxy)
+  if(setGalaxy || setHole)
   {
     if(click)
     {
-      uni.galaxies.back().vx = -(uni.galaxies.back().x-mousex)*2e6;
-      uni.galaxies.back().vy = -(uni.galaxies.back().y-mousey)*2e6;
+      if(setHole)
+      {
+        uni.holes.back().vx = -(uni.holes.back().x-mousex)*2e6;
+        uni.holes.back().vy = -(uni.holes.back().y-mousey)*2e6;
+      }
+      else
+      {
+        uni.galaxies.back().vx = -(uni.galaxies.back().x-mousex)*2e6;
+        uni.galaxies.back().vy = -(uni.galaxies.back().y-mousey)*2e6;
+      }
       uni.calcStars();
       setGalaxy = false;
+      setHole = false;
       canPut = true;
     }
   } 
@@ -246,6 +255,10 @@ void Editor::check(double mousex, double mousey, int pixelx, int pixely, bool cl
 	    switch(type)
 	    {
 	      case hole:
+		setHole = true;
+		canPut = false;
+		galaxyX = pixelx;
+		galaxyY = pixely;
 		uni.holes.push_back(Blackhole(mousex,mousey,getHoleWeight()));
 		break;
 	      case bulge:
@@ -281,7 +294,7 @@ void Editor::drawMouse(SpaceDisplay* display)
   int mousex, mousey;
   SDL_GetMouseState(&mousex, &mousey);
 
-  if(setGalaxy)
+  if(setGalaxy || setHole)
   {
     glColor3f(1,1,0);
     display->getIllustrator()->drawLine(galaxyX,galaxyY,mousex,mousey,2,true);
