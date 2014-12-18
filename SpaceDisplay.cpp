@@ -19,6 +19,7 @@
 #include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <unistd.h>
 
 #include "Constants.h"
 #include "Spacehero.h"

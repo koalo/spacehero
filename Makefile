@@ -7,7 +7,7 @@ CXXFLAGS+=-Wall -Wextra -Weffc++
 
 CXXFLAGS+=-O2
 
-LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem-mt -lboost_regex-mt
+LIBS+=-lm -lGL -lGLU `sdl-config --libs` -lSDL_image -lboost_filesystem -lboost_regex -lpthread -lboost_system
 
 # Profiler stuff
 #CFLAGS+=-pg

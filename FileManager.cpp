@@ -132,7 +132,7 @@ void FileManager::loadLevels()
       {
 	boost::filesystem::ifstream levelstream(level->path().string().c_str());
 	levels.push_back(Level(levelstream));
-	name = level->path().leaf();  
+	name = level->path().leaf().string();  
         name = boost::regex_replace(name, levelname, "\\1", boost::match_default | boost::format_sed);
 	levels.back().setFilename(name);
       }

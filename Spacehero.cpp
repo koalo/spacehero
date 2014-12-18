@@ -18,6 +18,9 @@
 
 #include <fstream>
 #include <errno.h>
+
+
+#include <unistd.h>
 using namespace std;
 
 #include <math.h>
